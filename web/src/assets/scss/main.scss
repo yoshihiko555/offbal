@@ -1,0 +1,4 @@
+.main {
+    margin-top: $header;
+	min-height: calc(100vh - #{($header + $footer)}) !important;
+}

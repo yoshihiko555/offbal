@@ -4,6 +4,7 @@ services:
         build: ./api
         image: drf-image
         container_name: offbal-api
+        command: python3 manage.py runserver 0.0.0.0:8000
         ports:
             - '8000:8000'
         volumes:
@@ -16,6 +17,7 @@ services:
         build: ./web
         image: vue-image
         container_name: offbal-web
+        command: yarn serve
         ports:
             - '8080:8080'
         volumes:

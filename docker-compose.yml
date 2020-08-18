@@ -1,0 +1,39 @@
+version: '3'
+services:
+    api:
+        build: ./api
+        image: drf-image
+        container_name: offbal-api
+        ports:
+            - '8000:8000'
+        volumes:
+            - ./api/:/usr/src/offbal/api/
+        tty: true
+        depends_on:
+            - db
+
+    web:
+        build: ./web
+        image: vue-image
+        container_name: offbal-web
+        ports:
+            - '8080:8080'
+        volumes:
+            - ./web/:/usr/src/offbal/web/
+        tty: true
+        depends_on:
+            - api
+    db:
+        image: mysql:latest
+        container_name: offbal-db
+        restart: always
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_DATABASE: offbal-database
+            MYSQL_USER: user
+            MYSQL_PASSWORD: password
+            MYSQL_ALLOW_EMPTY_PASSWORD: ‘yes’
+        volumes:
+            - ./mysql/:/var/lib/mysql/
+        ports:
+            - '3306:3306'

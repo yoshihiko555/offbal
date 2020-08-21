@@ -16,7 +16,7 @@ SECRET_KEY = 'y*ax+p&t$9(_!0$sq96*voyhz^*e^nb51bst6fs5b%!#a4_dcw'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'localhost',
+    '*'
 ]
 
 # Application definition
@@ -160,7 +160,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# AUTH_USER_MODEL = 'api.mUser'
+AUTH_USER_MODEL = 'api.mUser'
 
 if DEBUG:
     logging.basicConfig(

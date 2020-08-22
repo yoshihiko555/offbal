@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import axios from 'axios'
 import router from '@/router'
+import AuthService from '@/auth/AuthService'
+const auth = new AuthService()
 
 export default {
 	install: function (Vue, options) {
@@ -12,16 +14,15 @@ export default {
 			timeout: 10000,
         })
 		// リクエストのデフォルト定義
-		// http.interceptors.request.use((config) => {
-        //     if (Vue.prototype.$session.has('token')) {
-        //         // ヘッダーに認証済みのToken埋め込み
-		// 		config.headers = {
-		// 			Authorization: `JWT ${Vue.prototype.$session.get('token')}`,
-		// 			'Content-Type': 'application/json'
-		// 		}
-		// 	}
-		// 	return config
-		// })
+		http.interceptors.request.use((config) => {
+			if (auth.isAuthenticated) {
+				config.headers = {
+						Authorization: `Bearer ${AuthService.getAuthToken()}`,
+						'Content-Type': 'application/json'
+				}
+			}
+		 	return config
+		 })
 		//  // レスポンスのデフォルト定義
 		//  http.interceptors.response.use(
 		// 		res => {

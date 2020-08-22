@@ -2,6 +2,10 @@ from pathlib import Path
 import os
 import datetime
 import logging
+import json
+from six.moves.urllib import request
+from cryptography.x509 import load_pem_x509_certificate
+from cryptography.hazmat.backends import default_backend
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -36,7 +40,8 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES' : [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        'rest_framework.permissions.IsAuthenticated',
+#         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES' : [
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
@@ -56,14 +61,14 @@ REST_FRAMEWORK = {
     }
 }
 
-JWT_AUTH = {
-    'JWT_VERIFY': True,
-    'JWT_VERIFY_EXPIRATION': True,
-    'JWT_LEEWAY': 0,
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=86400),
-    'JWT_ALLOW_REFRESH': True,
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
-}
+# JWT_AUTH = {
+#     'JWT_VERIFY': True,
+#     'JWT_VERIFY_EXPIRATION': True,
+#     'JWT_LEEWAY': 0,
+#     'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=86400),
+#     'JWT_ALLOW_REFRESH': True,
+#     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -108,7 +113,7 @@ WSGI_APPLICATION = 'offbal.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'offbal-database',
+        'NAME': 'offbal_db',
         'USER': 'user',
         'PASSWORD': 'password',
         'HOST': 'db',
@@ -161,6 +166,31 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'api.mUser'
+
+AUTH0_DOMAIN = 'dev-orr54nx8.us.auth0.com'
+API_IDENTIFIER = 'https://offbal-api.com.br'
+PUBLIC_KEY = None
+JWT_ISSUER = None
+
+if AUTH0_DOMAIN:
+    jsonurl = request.urlopen('https://' + AUTH0_DOMAIN + '/.well-known/jwks.json')
+    jwks = json.loads(jsonurl.read().decode('utf-8'))
+    cert = '-----BEGIN CERTIFICATE-----\n' + jwks['keys'][0]['x5c'][0] + '\n-----END CERTIFICATE-----'
+    certificate = load_pem_x509_certificate(cert.encode('utf-8'), default_backend())
+    PUBLIC_KEY = certificate.public_key()
+    JWT_ISSUER = 'https://' + AUTH0_DOMAIN + '/'
+
+def jwt_get_username_from_payload_handler(payload):
+    return 'auth0user'
+
+JWT_AUTH = {
+    'JWT_PAYLOAD_GET_USERNAME_HANDLER': jwt_get_username_from_payload_handler,
+    'JWT_PUBLIC_KEY': PUBLIC_KEY,
+    'JWT_ALGORITHM': 'RS256',
+    'JWT_AUDIENCE': API_IDENTIFIER,
+    'JWT_ISSUER': JWT_ISSUER,
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+}
 
 if DEBUG:
     logging.basicConfig(

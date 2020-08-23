@@ -18,7 +18,7 @@ export default class AuthService {
     // 資格情報で作る
     auth0 = new auth0.WebAuth({
         domain: 'dev-orr54nx8.us.auth0.com',
-        clientID: 'OY23K4SFGIBrjxSms0l7P6paOA2EwI7Q',
+        clientID: 'PBarwrwjyH8XR7ItR9dTVKilLZRhhEeh',
         redirectUri: 'http://localhost:8080',
         audience: 'https://offbal-api.com.br',
         responseType: 'token id_token',
@@ -41,9 +41,9 @@ export default class AuthService {
                 console.log(err)
                 alert(`Error: ${err.error}. Check the console for further details.`)
             }
-            if (router.currentRoute.fullPath !== '/') {
-            	router.replace('/')
-            }
+            // if (router.currentRoute.fullPath !== '/') {
+            // 	router.replace('/')
+            // }
         })
     }
 
@@ -68,9 +68,9 @@ export default class AuthService {
         localStorage.removeItem('expires_at')
         this.authNotifier.emit('authChange', false)
         // ホームルートに移動する
-        if (router.currentRoute.fullPath !== '/') {
-        	router.replace('/')
-        }
+        // if (router.currentRoute.fullPath !== '/') {
+        //     router.replace('/')
+        // }
     }
 
     // そのユーザーが認証されているか確認する

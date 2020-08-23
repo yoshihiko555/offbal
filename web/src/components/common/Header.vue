@@ -14,6 +14,7 @@
             >
             	SignIn
             </vs-button>
+
             <vs-button
             	dark
             	v-show='isAuth'
@@ -21,6 +22,7 @@
             >
             	SignOut
             </vs-button>
+
             <vs-button
             	dark
             	@click='publicAPI'
@@ -51,12 +53,14 @@ export default {
     	if (!auth.isAuthenticated()) {
 			auth.handleAuthentication()
 			auth.authNotifier.on('authChange', authState => {
-				console.log(authState)
-				this.isAuth = authState.authenticated
-			})
+                this.isAuth = authState.authenticated
+                if (!this.isAuth) this.$router.push('/')
+                else this.$router.push('/myapp')
+            })
     	} else {
     		// 既に認証済みなら
-    		this.isAuth = auth.isAuthenticated()
+            this.isAuth = auth.isAuthenticated()
+            if (this.$route.name !== 'MyApp') this.$router.push('/myapp')
     	}
 	},
     methods: {

@@ -1,11 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import pages from './pages'
-import register from './register'
 
 Vue.use(VueRouter)
 
-const routes = [...pages, ...register]
+const routes = [...pages]
 
 const router = new VueRouter({
   mode: 'history',

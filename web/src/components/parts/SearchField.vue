@@ -10,7 +10,7 @@
 
 <script>
 export default {
-    name: 'SearchTodo',
+    name: 'SearchField',
     data: () => ({
     	text: '',
     }),

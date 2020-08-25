@@ -7,19 +7,19 @@
             color='white'
         >
         	<v-row align='center'>
-	        	<SearchTodo/>
+	        	<SearchField/>
 	            <v-spacer/>
 	            <v-btn
 	                icon
 	                small
-	                class="mx-2"
+	                class="mr-4"
 	            >
 	                <v-icon>mdi-plus</v-icon>
 	            </v-btn>
 	            <v-btn
 	                icon
 	                small
-	                class="mx-2"
+	                class="mr-3"
 	            >
 	                <v-icon>mdi-cog-outline</v-icon>
 	            </v-btn>
@@ -29,12 +29,12 @@
 </template>
 
 <script>
-import SearchTodo from '@/components/parts/SearchTodo'
+import SearchField from '@/components/parts/SearchField'
 
 export default {
     name: 'MyAppHeader',
     components: {
-    	SearchTodo,
+    	SearchField,
     },
     data: () => ({
     }),

@@ -1,23 +1,45 @@
 <template>
     <div id='my-app'>
-        <MyAppHeader
-            @togleDrawer='drawer = !drawer'
-        />
-        <v-container class="main" :class="{ 'is-drawer': drawer }">
+        <MyAppHeader/>
+        <v-container class="main">
             <v-row>
-                <v-col cols='12'>
+           		<Sidebar
+           			@togleDrawer='drawer = !drawer'
+           		/>
+                <v-col cols='12' class='myapp_main_wrap' :class="{ 'is-drawer': drawer }">
                     <h1>Hello</h1>
+                    <div class='operation_btn_wrap'>
+	                    <vs-button
+							icon
+							relief
+						>
+							<i class='bx bx-filter' ></i>
+						</vs-button>
+						<vs-button
+							icon
+							relief
+						>
+							<i class='bx bx-slider-alt'></i>
+						</vs-button>
+					</div>
+
+					<div class='today_todo_count_wrap'>
+						<vs-button
+							icon
+							relief
+						>
+							<i class='bx bx-list-check'></i>2/5
+						</vs-button>
+					</div>
                 </v-col>
-                <v-btn @click='test'>test</v-btn>
             </v-row>
         </v-container>
-        <Footer/>
     </div>
 </template>
 
 <script>
 import MyAppHeader from '@/components/common/MyAppHeader'
-import Footer from '@/components/common/Footer'
+import Sidebar from '@/components/common/Sidebar'
 
 import AuthService from '@/auth/AuthService'
 const auth = new AuthService()
@@ -26,7 +48,7 @@ export default {
     name: 'MyApp',
     components: {
         MyAppHeader,
-        Footer,
+        Sidebar,
     },
     data: () => ({
         drawer: true,
@@ -37,9 +59,6 @@ export default {
     computed: {
     },
     methods: {
-    	test () {
-    		auth.test()
-    	}
     },
 }
 </script>
@@ -47,5 +66,8 @@ export default {
 <style lang="scss" scoped>
     .is-drawer {
         margin-left: 256px;
+    }
+    .myapp_main_wrap {
+    	position: relative;
     }
 </style>

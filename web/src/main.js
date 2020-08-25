@@ -9,6 +9,7 @@ import VueSession from 'vue-session'
 
 // CSS
 import 'vuesax/dist/vuesax.css'
+import 'boxicons/css/boxicons.min.css'
 require('@/assets/scss/main.scss')
 
 Vue.config.productionTip = false
@@ -16,7 +17,7 @@ Vue.config.productionTip = false
 Vue.use(http)
 Vue.use(Vuesax, {
 	colors: {
-		primary: '#00BCD4',
+		primary: '#03A9F4',
 //		primary: '#40e0d0',
 	}
 })

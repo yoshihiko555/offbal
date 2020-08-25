@@ -6,8 +6,9 @@
         <v-container class="main" :class="{ 'is-drawer': drawer }">
             <v-row>
                 <v-col cols='12'>
-                    <h1>MyApp</h1>
+                    <h1>Hello</h1>
                 </v-col>
+                <v-btn @click='test'>test</v-btn>
             </v-row>
         </v-container>
         <Footer/>
@@ -17,6 +18,9 @@
 <script>
 import MyAppHeader from '@/components/common/MyAppHeader'
 import Footer from '@/components/common/Footer'
+
+import AuthService from '@/auth/AuthService'
+const auth = new AuthService()
 
 export default {
     name: 'MyApp',
@@ -33,6 +37,9 @@ export default {
     computed: {
     },
     methods: {
+    	test () {
+    		auth.test()
+    	}
     },
 }
 </script>

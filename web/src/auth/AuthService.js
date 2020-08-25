@@ -41,9 +41,6 @@ export default class AuthService {
                 console.log(err)
                 alert(`Error: ${err.error}. Check the console for further details.`)
             }
-            // if (router.currentRoute.fullPath !== '/') {
-            // 	router.replace('/')
-            // }
         })
     }
 
@@ -57,6 +54,7 @@ export default class AuthService {
         localStorage.setItem('access_token', authResult.accessToken)
         localStorage.setItem('id_token', authResult.idToken)
         localStorage.setItem('expires_at', expiresAt)
+        localStorage.setItem('user_id', authResult.idTokenPayload.sub)
         this.authNotifier.emit('authChange', { authenticated: true })
     }
 
@@ -66,11 +64,12 @@ export default class AuthService {
         localStorage.removeItem('access_token')
         localStorage.removeItem('id_token')
         localStorage.removeItem('expires_at')
+        localStorage.removeItem('user_id')
         this.authNotifier.emit('authChange', false)
         // ホームルートに移動する
-        // if (router.currentRoute.fullPath !== '/') {
-        //     router.replace('/')
-        // }
+         if (router.currentRoute.fullPath !== '/') {
+             router.replace('/')
+         }
     }
 
     // そのユーザーが認証されているか確認する

@@ -14,6 +14,5 @@ router.register('karma', viewsets.KarmaViewSet)
 app_name = 'api'
 urlpatterns = [
     path('', include(router.urls)),
-    path('public/', views.public),
-    path('private/', views.private),
+    path('signup/', views.SignupView.as_view(), name='signup'),
 ]

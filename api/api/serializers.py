@@ -48,8 +48,9 @@ class UserSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = mUser
         fields = [
-            'username',
-            'email',
+            'auth0_id',
+            'auth0_name',
+#             'email',
             'address',
         ]
 

@@ -14,7 +14,12 @@ require('@/assets/scss/main.scss')
 Vue.config.productionTip = false
 
 Vue.use(http)
-Vue.use(Vuesax)
+Vue.use(Vuesax, {
+	colors: {
+		primary: '#00BCD4',
+//		primary: '#40e0d0',
+	}
+})
 Vue.use(VueSession)
 
 new Vue({

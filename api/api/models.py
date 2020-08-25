@@ -16,14 +16,14 @@ class UserManager(BaseUserManager):
 
     use_in_migrations = True
 
-    def _create_user(self, username, email, password, **extra_fields):
+    def _create_user(self, username, password, **extra_fields):
 
         if not username:
             raise ValueError('ユーザーネームは必須項目です。')
 
-        email = self.normalize_email(email)
+#         email = self.normalize_email(email)
         username = self.model.normalize_username(username)
-        user = self.model(username=username, email=email, **extra_fields)
+        user = self.model(username=username, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
 
@@ -37,14 +37,14 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_user(self, username, email, password=None, **extra_fields):
+    def create_user(self, username, password=None, **extra_fields):
 
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
 
-        return self._create_user(username, email, password, **extra_fields)
+        return self._create_user(username, password, **extra_fields)
 
-    def create_superuser(self, username, email=None, password=None, **extra_fields):
+    def create_superuser(self, username, password=None, **extra_fields):
 
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -54,15 +54,18 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self._create_user(username, email, password, **extra_fields)
+        return self._create_user(username, password, **extra_fields)
+
 
 
 class mUser(AbstractBaseUser,
             PermissionsMixin,
             TimeStampModel):
 
+    auth0_id = models.CharField(_('Auth0Id'), max_length=255, unique=True)
+    auth0_name = models.CharField(_('Auth0Name'), max_length=255, unique=False)
     username = models.CharField(_('Username'), max_length=70, unique=True)
-    email = models.EmailField(_('Email'), max_length=70, unique=True)
+#     email = models.EmailField(_('Email'), max_length=70, unique=True)
     address = models.CharField(_('Address'), max_length=100, blank=True, null=True)
 
     deleted = models.BooleanField(
@@ -93,15 +96,16 @@ class mUser(AbstractBaseUser,
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
-    EMAIL_FIELD = 'email'
-    REQUIRED_FIELDS = ['email']
+#     EMAIL_FIELD = 'email'
+#     REQUIRED_FIELDS = ['email']
 
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
     def __str__(self):
-        return self.username
+        name = self.auth0_name if self.auth0_name != '' else self.username
+        return name
 
     def get_username(self):
         return self.username
@@ -209,7 +213,8 @@ class mSetting(models.Model):
     vacation_mode = models.BooleanField(_('Vacation Mode'), default=False)
 
     def __str__(self):
-        return self.target_user.username + 'のmSetting'
+        name = self.target_user.auth0_name if self.target_user.auth0_name != '' else self.target_user.username
+        return name + 'のmSetting'
 
 
 class Project(TimeStampModel):

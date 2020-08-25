@@ -6,35 +6,26 @@
             dense
             color='white'
         >
-            <h1>offbal</h1>
+        	<v-row align='center'>
+	            <h1 class='header_logo'>offbal</h1>
 
-            <vs-button
-            	v-show='!isAuth'
-            	@click='signin'
-            >
-            	SignIn
-            </vs-button>
+				<div class='header_navi_wrap'>
+		            <vs-button
+		            	v-show='!isAuth'
+		            	@click='signin'
+		            >
+		            	SignIn
+		            </vs-button>
 
-            <vs-button
-            	dark
-            	v-show='isAuth'
-            	@click='signout'
-            >
-            	SignOut
-            </vs-button>
-
-            <vs-button
-            	dark
-            	@click='publicAPI'
-            >
-            	Public API Connect
-            </vs-button>
-            <vs-button
-            	dark
-            	@click='privateAPI'
-            >
-            	Private API Connect
-            </vs-button>
+		            <vs-button
+		            	dark
+		            	v-show='isAuth'
+		            	@click='signout'
+		            >
+		            	SignOut
+		            </vs-button>
+	            </div>
+            </v-row>
         </v-app-bar>
     </div>
 </template>
@@ -56,6 +47,16 @@ export default {
                 this.isAuth = authState.authenticated
                 if (!this.isAuth) this.$router.push('/')
                 else this.$router.push('/myapp')
+                auth.getUserProfile((err, res) => {
+                	if (err) {
+                		console.log(err)
+                	} else {
+                		console.log(res)
+                		const namespace = 'https://auth0/user_metadata'
+                		// サインアップならmSetting等を作成する
+                		if (!res[namespace].signup) this.initUserData(res.sub, res.name)
+                	}
+                })
             })
     	} else {
     		// 既に認証済みなら
@@ -73,10 +74,14 @@ export default {
         handleAuthentication () {
   	    	auth.handleAuthentication()
    	    },
-   	    publicAPI () {
+   	    initUserData (id, name) {
    	    	this.$axios({
-   	    		url: '/api/public/',
-   	    		method: 'GET',
+   	    		url: '/api/signup/',
+   	    		method: 'POST',
+   	    		data: {
+   	    			auth0_id: id,
+   	    			auth0_name: name
+   	    		}
    	    	})
    	    	.then(res => {
    	    		console.log(res)
@@ -84,22 +89,22 @@ export default {
    	    	.catch(e => {
    	    		console.log(e)
    	    	})
-   	    },
-   	    privateAPI () {
-   	    	this.$axios({
-   	    		url: '/api/private/',
-   	    		method: 'GET',
-   	    	})
-   	    	.then(res => {
-   	    		console.log(res)
-   	    	})
-   	    	.catch(e => {
-   	    		console.log(e)
-   	    	})
-   	    },
+   	    }
     }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+    #header::v-deep{
+        .header_logo {
+            margin-left: 2%;
+        }
+        .header_navi_wrap {
+            margin-right: 2%;
+            position: fixed;
+            right: 0;
+            display: inline-flex;
+            align-items: center;
+        }
+    }
 </style>

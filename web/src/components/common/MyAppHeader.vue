@@ -109,7 +109,6 @@ export default {
         },
     	signout () {
             auth.logout()
-            this.$router.push('/')
         },
         test () {
             console.log('test')

@@ -1,0 +1,51 @@
+[
+	{
+		"model": "api.week",
+		"pk": 1,
+		"fields": {
+			"day_of_week": "日曜日"
+		}
+	},
+	{
+		"model": "api.week",
+		"pk": 2,
+		"fields": {
+			"day_of_week": "月曜日"
+		}
+	},
+	{
+		"model": "api.week",
+		"pk": 3,
+		"fields": {
+			"day_of_week": "火曜日"
+		}
+	},
+	{
+		"model": "api.week",
+		"pk": 4,
+		"fields": {
+			"day_of_week": "水曜日"
+		}
+	},
+	{
+		"model": "api.week",
+		"pk": 5,
+		"fields": {
+			"day_of_week": "木曜日"
+		}
+	},
+	{
+		"model": "api.week",
+		"pk": 6,
+		"fields": {
+			"day_of_week": "金曜日"
+		}
+	},
+	{
+		"model": "api.week",
+		"pk": 7,
+		"fields": {
+			"day_of_week": "土曜日"
+		}
+	}
+]

@@ -30,17 +30,15 @@
         },
         data: () => ({
             drawer: true,
-            test: '',
-            test2: '',
         }),
         created () {
-        	this.updateProjectsAction()
+        	this.getProjectsAction()
         },
         computed: {
         },
         methods: {
             ...mapActions([
-                'updateProjectsAction',
+                'getProjectsAction',
             ]),
         },
     }

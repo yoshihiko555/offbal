@@ -38,7 +38,38 @@
                                 :key='project.id'
                                 @click='menu.call(menu.url)'
                             >
-                                <v-list-item-title>{{ project.name }}</v-list-item-title>
+                                <v-icon x-small :color="project.color">mdi-circle</v-icon>
+                                <v-list-item-title class="ml-2">{{ project.name }}</v-list-item-title>
+                                <v-list-item-action class="ml-0">
+                                    <v-menu
+                                        offset-x
+                                        transition="slide-x-transition"
+                                        rounded='lg'
+                                    >
+                                        <template #activator='{ attrs, on }'>
+                                            <v-btn
+                                                icon
+                                                v-bind="attrs"
+                                                v-on='on'
+                                                @click.stop="test"
+                                            >
+                                                <v-icon color="grey">mdi-dots-horizontal</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <v-list>
+                                            <v-list-item
+                                                v-for='(proMenu, i) in projectMenus'
+                                                :key='i'
+                                                @click="proMenu.call(project)"
+                                            >
+                                                <v-list-item-icon class="mr-0">
+                                                    <v-icon small v-text='proMenu.icon'/>
+                                                </v-list-item-icon>
+                                                <v-list-item-title>{{ proMenu.name }}</v-list-item-title>
+                                            </v-list-item>
+                                        </v-list>
+                                    </v-menu>
+                                </v-list-item-action>
                             </v-list-item>
                         </div>
 
@@ -73,16 +104,26 @@
                 </template>
 	 		</v-list>
 		</v-navigation-drawer>
+
+        <!-- モーダル読み込み -->
+        <EditProjectDialog
+            ref='project'
+        />
     </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import EditProjectDialog from '@/components/common/EditProjectDialog'
+
+import { mapGetters, mapActions } from 'vuex'
 import AuthService from '@/auth/AuthService'
 const auth = new AuthService()
 
 export default {
     name: 'Sidebar',
+    components: {
+        EditProjectDialog,
+    },
     data () {
         return {
             drawer: true,
@@ -96,21 +137,21 @@ export default {
                 },
                 {
                     title: 'Today',
-                    call: this.test,
+                    call: this.toPage,
                     icon: 'mdi-calendar-today',
                     isNest: false,
-                    url: '/myapp'
+                    url: '/myapp/today'
                 },
                 {
                     title: 'Coming soon',
-                    call: this.test,
+                    call: this.toPage,
                     icon: 'mdi-calendar-month-outline',
                     isNest: false,
-                    url: '/myapp'
+                    url: '/myapp/future-scheduled'
                 },
                 {
                     title: 'Favorite',
-                    call: this.test,
+                    call: this.toPage,
                     icon: 'mdi-star',
                     isNest: false,
                     url: '/myapp'
@@ -124,10 +165,10 @@ export default {
                 },
                 {
                     title: 'Label',
-                    call: this.test,
+                    call: this.toPage,
                     icon: 'mdi-label-multiple-outline',
                     isNest: true,
-                    url: '/myapp'
+                    url: '/myapp/label'
                 },
                 {
                     title: 'Activity',
@@ -156,6 +197,23 @@ export default {
             		name: 'Label3',
             	},
             ],
+            projectMenus: [
+                {
+                    name: 'プロジェクトの編集',
+                    icon: 'mdi-pencil-outline',
+                    call: this.projectOpen,
+                },
+                {
+                    name: 'プロジェクトを削除',
+                    icon: 'mdi-trash-can-outline',
+                    call: this.projectDelete,
+                },
+                {
+                    name: 'プロジェクトをアーカイブ',
+                    icon: 'mdi-package',
+                    call: this.test,
+                },
+            ]
         }
     },
 	created () {
@@ -166,6 +224,9 @@ export default {
 		])
 	},
     methods: {
+        ...mapActions([
+            'deleteProjectAction',
+        ]),
         togleDrawer () {
             this.drawer = !this.drawer
             this.$emit('togleDrawer')
@@ -178,7 +239,13 @@ export default {
         },
         test () {
             console.log('test')
-        }
+        },
+        projectOpen (project) {
+            this.$refs.project.open(project)
+        },
+        projectDelete (project) {
+            this.deleteProjectAction(project)
+        },
     }
 }
 </script>
@@ -187,4 +254,9 @@ export default {
 	.menu_open_btn_wrap > button {
 		margin-left: 1px;
 	}
+    .v-list-group__items {
+        .v-list-item {
+            height: 40px;
+        }
+    }
 </style>

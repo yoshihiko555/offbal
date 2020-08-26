@@ -31,6 +31,10 @@ from .models import (
     Karma,
 )
 
+from .filters import (
+    ProjectFilter,
+)
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -56,6 +60,17 @@ class ProjectViewSet(BaseModelViewSet):
     permission_classes = (permissions.AllowAny,)
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    filter_class = ProjectFilter
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(self.get_serializer(serializer.instance).data, status=status.HTTP_201_CREATED)
+
+        logger.debug(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SectionViewSet(BaseModelViewSet):

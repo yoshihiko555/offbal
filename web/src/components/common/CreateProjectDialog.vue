@@ -1,5 +1,5 @@
 <template>
-    <vs-dialog v-model="dialog" width="300px">
+    <vs-dialog v-model="dialog" width="300px" prevent-close not-close>
         <v-container
             fluid
             class="pb-0"
@@ -9,32 +9,44 @@
             >
                 新規プロジェクトを追加
             </h5>
-            <v-form @submit.prevent>
+            <ValidationObserver v-slot="{ invalid }">
                 <v-row>
                     <v-col cols='12'>
                         <!-- プロジェクト名 -->
-                        <vs-input
-                            class="my-6"
-                            v-model="project.name"
-                            label='プロジェクト名'
-                        />
+                        <ValidationProvider v-slot='{ errors }' name='プロジェクト名' rules='required'>
+                            <vs-input
+                                class="my-6"
+                                v-model="project.name"
+                                label='プロジェクト名'
+                            >
+                                <template #message-danger>
+                                    {{ errors[0] }}
+                                </template>
+                            </vs-input>
+                        </ValidationProvider>
 
                         <!-- プロジェクトカラー -->
-                        <vs-select
-                            v-model="project.color"
-                            label="カラー"
-                            class="my-3"
-                        >
-                            <vs-option
-                                v-for="(color, i) in colorList"
-                                :key="i"
-                                :label='color.color'
-                                :value='i'
-                                :color='color.code'
+                        <ValidationProvider v-slot='{ errors }' name='プロジェクト名' rules='required'>
+                            <vs-select
+                                v-model="project.color"
+                                label="カラー"
+                                class="my-3"
                             >
-                                {{ color.color }}
-                            </vs-option>
-                        </vs-select>
+                                <template #message-danger>
+                                    {{ errors[0] }}
+                                </template>
+
+                                <vs-option
+                                    v-for="(color, i) in colorList"
+                                    :key="i"
+                                    :label='color.color'
+                                    :value='color.color'
+                                    :color='color.code'
+                                >
+                                    {{ color.color }}
+                                </vs-option>
+                            </vs-select>
+                        </ValidationProvider>
 
                         <!-- お気に入りフラグ -->
                         <div class="favorite_wrap">
@@ -59,6 +71,7 @@
                             </vs-button>
                             <vs-button
                                 relief
+                                :disabled='invalid'
                                 @click.prevent="create"
                             >
                                 <i class="bx bxs-paper-plane"></i> 送信
@@ -67,19 +80,18 @@
 
                     </v-col>
                 </v-row>
-            </v-form>
+            </ValidationObserver>
         </v-container>
     </vs-dialog>
 </template>
+
 <script>
+	import { mapActions } from 'vuex'
     import { Const } from '@/assets/js/const'
     const Con = new Const()
+
     export default {
         name: 'CreateProjectDialog',
-        components: {
-        },
-        props: {
-        },
         data: () => ({
             dialog: false,
             project: {
@@ -89,15 +101,12 @@
             },
             colorList: Con.PROJECT_COLOR,
         }),
-        computed: {
-        },
         methods: {
+            ...mapActions([
+                'addProjectsAction',
+            ]),
             open () {
-                this.project = {
-                    name: '',
-                    color: '',
-                    favorite: false,
-                }
+            	this.init()
                 this.dialog = true
             },
             close () {
@@ -105,10 +114,31 @@
             },
             create () {
                 console.log(this.project)
+                this.$axios({
+                	url: '/api/project/',
+                	method: 'POST',
+                	data: this.project,
+                })
+                .then(res => {
+                	console.log(res)
+                	this.addProjectsAction(res.data)
+                	this.close()
+                })
+                .catch(e => {
+                	console.log(e.response)
+                })
+            },
+            init () {
+            	this.project = {
+            			name: '',
+            			color: '',
+            			favorite: false,
+            	}
             }
         }
     }
 </script>
+
 <style lang='scss' scoped>
     .vs-input-parent::v-deep{
         .vs-input {

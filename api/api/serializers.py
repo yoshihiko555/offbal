@@ -74,9 +74,12 @@ class SettingSerializer(DynamicFieldsModelSerializer):
 
 class ProjectSerializer(DynamicFieldsModelSerializer):
 
+    user_id = serializers.CharField(write_only=True)
+
     class Meta:
         model = Project
         fields = [
+            'id',
             'parent_project',
             'member',
             'name',
@@ -86,7 +89,23 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
             'is_comp_public',
             'deleted',
             'archived',
+            'user_id',
         ]
+
+    def create(self, validated_data):
+        try:
+            user = mUser.objects.get(auth0_id=validated_data['user_id'])
+        except:
+            logger.info('mUserが見つかりませんでした。')
+            return None
+
+        project = Project.objects.create(
+                name = validated_data['name'],
+                color = validated_data['color'],
+                favorite = validated_data['favorite']
+            )
+        project.member.add(user)
+        return project
 
 class ProjectMemberShipSerializer(DynamicFieldsModelSerializer):
 

@@ -85,6 +85,11 @@ export default class AuthService {
         return localStorage.getItem('access_token')
     }
 
+    // UserIdを取得する静的メソッド
+    static getUserId () {
+    	return localStorage.getItem('user_id')
+    }
+
     // ユーザー プロファイルを得るメソッド
     getUserProfile (cb) {
         const accessToken = localStorage.getItem('access_token')

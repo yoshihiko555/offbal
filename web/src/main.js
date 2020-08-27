@@ -6,6 +6,8 @@ import http from '@/plugins/http'
 import vuetify from './plugins/vuetify'
 import Vuesax from 'vuesax'
 import VueSession from 'vue-session'
+import { ValidationProvider, ValidationObserver } from 'vee-validate'
+import myRules from '@/assets/js/rules'
 
 // CSS
 import 'vuesax/dist/vuesax.css'
@@ -22,6 +24,12 @@ Vue.use(Vuesax, {
 	}
 })
 Vue.use(VueSession)
+
+// ルールの呼び出し
+myRules()
+
+Vue.component('ValidationObserver', ValidationObserver)
+Vue.component('ValidationProvider', ValidationProvider)
 
 new Vue({
     router,

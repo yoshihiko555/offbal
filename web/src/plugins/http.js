@@ -18,7 +18,18 @@ export default {
 			if (auth.isAuthenticated) {
 				config.headers = {
 						Authorization: `Bearer ${AuthService.getAuthToken()}`,
-						'Content-Type': 'application/json'
+						'Content-Type': 'application/json',
+				}
+
+				// user_idを格納
+				if (config.method === 'get') {
+					config.params = config.params || {}
+                    config.params.user_id = AuthService.getUserId()
+                } else if (config.method === 'delete') {
+                    // deleteは何もしない
+				} else {
+					// それ以外は全てdataにuser_idを格納
+					config.data.user_id = AuthService.getUserId()
 				}
 			}
 		 	return config

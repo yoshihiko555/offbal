@@ -7,7 +7,7 @@
             <h5
                 align="center"
             >
-                新規プロジェクトを追加
+                プロジェクトを編集する
             </h5>
             <ValidationObserver v-slot="{ invalid }">
                 <v-row>
@@ -72,9 +72,9 @@
                             <vs-button
                                 relief
                                 :disabled='invalid'
-                                @click.prevent="create"
+                                @click.prevent="update"
                             >
-                                <i class="bx bxs-paper-plane"></i> 送信
+                                <i class="bx bxs-paper-plane"></i> 更新
                             </vs-button>
                         </div>
 
@@ -86,54 +86,45 @@
 </template>
 
 <script>
-	import { mapActions } from 'vuex'
+    import { mapActions } from 'vuex'
+    import _ from 'lodash'
     import { Const } from '@/assets/js/const'
     const Con = new Const()
 
     export default {
-        name: 'CreateProjectDialog',
+        name: 'EditProjectDialog',
         data: () => ({
             dialog: false,
-            project: {
-                name: '',
-                color: '',
-                favorite: false,
-            },
+            project: {},
             colorList: Con.PROJECT_COLOR,
         }),
         methods: {
             ...mapActions([
-                'addProjectsAction',
+                'updateProjectAction',
             ]),
-            open () {
-            	this.init()
+            open (project) {
+                this.project = _.cloneDeep(project)
                 this.dialog = true
+                console.log(project)
             },
             close () {
+                this.project = {}
                 this.dialog = false
             },
-            create () {
-                console.log(this.project)
+            update () {
                 this.$axios({
-                	url: '/api/project/',
-                	method: 'POST',
-                	data: this.project,
+                    url: `/api/project/${this.project.id}/`,
+                    method: 'PUT',
+                    data: this.project,
                 })
                 .then(res => {
-                	console.log(res)
-                	this.addProjectsAction(res.data)
-                	this.close()
+                    console.log(res)
+                    this.updateProjectAction(res.data)
+                    this.close()
                 })
                 .catch(e => {
-                	console.log(e.response)
+                    console.log(e)
                 })
-            },
-            init () {
-            	this.project = {
-            			name: '',
-            			color: '',
-            			favorite: false,
-            	}
             }
         }
     }

@@ -15,6 +15,7 @@
     "eventemitter3": "^4.0.4",
     "loadsh": "^0.0.4",
     "moment": "^2.27.0",
+    "vee-validate": "^3.3.9",
     "vue": "^2.6.11",
     "vue-ctk-date-time-picker": "^2.5.0",
     "vue-router": "^3.2.0",

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import pages from './pages'
 import myapp from './myapp'
+import { setTitle, setDescription } from '@/mixins'
 
 Vue.use(VueRouter)
 
@@ -11,6 +12,12 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+})
+
+router.beforeEach((to, from, next) => {
+	setTitle(to.meta.title)
+	setDescription(to.meta.description)
+	next()
 })
 
 export default router

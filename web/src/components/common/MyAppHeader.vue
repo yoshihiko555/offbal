@@ -17,13 +17,7 @@
 	            >
 	                <v-icon>mdi-plus</v-icon>
 	            </v-btn>
-	            <v-btn
-	                icon
-	                small
-	                class="mr-3"
-	            >
-	                <v-icon>mdi-cog-outline</v-icon>
-	            </v-btn>
+                <SettingMenuBtn/>
             </v-row>
         </v-app-bar>
 
@@ -37,12 +31,14 @@
 <script>
 import SearchField from '@/components/parts/SearchField'
 import TaskDialog from '@/components/common/TaskDialog'
+import SettingMenuBtn from '@/components/parts/SettingMenuBtn'
 
 export default {
     name: 'MyAppHeader',
     components: {
     	SearchField,
         TaskDialog,
+        SettingMenuBtn,
     },
     data: () => ({
         taskDialog: false,

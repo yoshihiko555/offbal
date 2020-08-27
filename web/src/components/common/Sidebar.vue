@@ -43,7 +43,7 @@
                             <v-list-item
                                 v-for='project in projects'
                                 :key='project.id'
-                                @click='menu.call(menu.url)'
+                                @click='toPage(menu.route, project)'
                             >
                                 <v-icon x-small :color="project.color">mdi-circle</v-icon>
                                 <v-list-item-title class="ml-2">{{ project.name }}</v-list-item-title>
@@ -58,7 +58,7 @@
                             <v-list-item
                                 v-for='(label, i) in labels'
                                 :key='i'
-                                @click='menu.call(menu.url)'
+                                @click='toPage(menu.route, label)'
                             >
                                 <v-list-item-title>{{ label.name }}</v-list-item-title>
                             </v-list-item>
@@ -70,15 +70,12 @@
                     <v-list-item
                         v-else
                         :key='i'
-                        @click='menu.call(menu.url)'
+                        @click='toPage(menu.route)'
                     >
                         <v-list-item-icon>
                             <v-icon v-text='menu.icon'/>
                         </v-list-item-icon>
-
-                        <v-list-item-title>
-                            {{ menu.title }}
-                        </v-list-item-title>
+                        <v-list-item-title>{{ menu.title }}</v-list-item-title>
                     </v-list-item>
 
                 </template>
@@ -93,123 +90,65 @@
 </template>
 
 <script>
-import CreateProjectDialog from '@/components/common/CreateProjectDialog'
-import SidebarProjectMenuBtn from '@/components/parts/SidebarProjectMenuBtn'
+	import CreateProjectDialog from '@/components/common/CreateProjectDialog'
+    import SidebarProjectMenuBtn from '@/components/parts/SidebarProjectMenuBtn'
 
-import { mapGetters, mapActions } from 'vuex'
-import AuthService from '@/auth/AuthService'
-const auth = new AuthService()
+    import { mapGetters } from 'vuex'
+    import { Const } from '@/assets/js/const'
+    const Con = new Const()
 
-export default {
-    name: 'Sidebar',
-    components: {
-    	CreateProjectDialog,
-        SidebarProjectMenuBtn,
-    },
-    data () {
-        return {
-            drawer: true,
-            menus: [
-                {
-                    title: 'Inbox',
-                    call: this.toPage,
-                    icon: 'mdi-inbox',
-                    isNest: false,
-                    url: '/myapp/inbox'
-                },
-                {
-                    title: 'Today',
-                    call: this.toPage,
-                    icon: 'mdi-calendar-today',
-                    isNest: false,
-                    url: '/myapp/today'
-                },
-                {
-                    title: 'Coming soon',
-                    call: this.toPage,
-                    icon: 'mdi-calendar-month-outline',
-                    isNest: false,
-                    url: '/myapp/future-scheduled'
-                },
-                {
-                    title: 'Favorite',
-                    call: this.toPage,
-                    icon: 'mdi-star',
-                    isNest: false,
-                    url: '/myapp'
-                },
-                {
-                    title: 'Project',
-                    call: this.toPage,
-                    icon: 'mdi-format-list-checkbox',
-                    isNest: true,
-                    url: '/myapp/project'
-                },
-                {
-                    title: 'Label',
-                    call: this.toPage,
-                    icon: 'mdi-label-multiple-outline',
-                    isNest: true,
-                    url: '/myapp/label'
-                },
-                {
-                    title: 'Activity',
-                    call: this.toPage,
-                    icon: 'mdi-bell-ring',
-                    isNest: false,
-                    url: '/myapp/activity'
-                },
-                {
-                    title: 'Signout',
-                    call: this.signout,
-                    icon: 'mdi-account-arrow-right-outline',
-                    isNest: false,
-                    url: '/myapp'
-                },
-            ],
-            // テスト用
-            labels: [
-            	{
-            		name: 'Label1',
-            	},
-            	{
-            		name: 'Label2',
-            	},
-            	{
-            		name: 'Label3',
-            	},
-            ],
-        }
-    },
-	created () {
-	},
-	computed: {
-		...mapGetters([
-			'projects',
-		])
-	},
-    methods: {
-        ...mapActions([
-            'deleteProjectAction',
-        ]),
-        togleDrawer () {
-            this.drawer = !this.drawer
-            this.$emit('togleDrawer')
+    export default {
+        name: 'Sidebar',
+        components: {
+        	CreateProjectDialog,
+            SidebarProjectMenuBtn,
         },
-    	signout () {
-            auth.logout()
+        data () {
+            return {
+                drawer: true,
+                menus: Con.SIDEBAR_MENU,
+                // テスト用
+                labels: [
+                	{
+                		id: 1,
+                		name: 'Label1',
+                	},
+                	{
+                		id: 2,
+                		name: 'Label2',
+                	},
+                	{
+                		id: 3,
+                		name: 'Label3',
+                	},
+                ],
+            }
         },
-        toPage (url) {
-        	this.$router.push(url)
-        },
-        test () {
-            console.log('test')
-        },
-        createProject () {
-        	this.$refs.project.open()
+    	computed: {
+    		...mapGetters([
+    			'projects',
+    		])
+    	},
+        methods: {
+            togleDrawer () {
+                this.drawer = !this.drawer
+                this.$emit('togleDrawer')
+            },
+            toPage (route, param) {
+            	// プロジェクト or ラベルならparamを格納する
+            	const params = param || ''
+            	this.$router.push({
+            		name: route,
+            		params: {
+            			id: params.id,
+            		}
+            	})
+            },
+            createProject () {
+            	this.$refs.project.open()
+            }
         }
     }
-}
 </script>
 
 <style lang="scss" scoped>

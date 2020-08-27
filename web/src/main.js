@@ -8,6 +8,7 @@ import Vuesax from 'vuesax'
 import VueSession from 'vue-session'
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import myRules from '@/assets/js/rules'
+import { globalMixins } from '@/mixins'
 
 // CSS
 import 'vuesax/dist/vuesax.css'
@@ -24,6 +25,8 @@ Vue.use(Vuesax, {
 	}
 })
 Vue.use(VueSession)
+
+Vue.mixin(globalMixins)
 
 // ルールの呼び出し
 myRules()

@@ -10,5 +10,51 @@ class Const {
     ACTIVE_COLOR = 'red accent-4'
 
     NON_ACTIVE_COLOR = 'grey lighten-1'
+
+    SIDEBAR_MENU = [
+        {
+            title: 'Inbox',
+            icon: 'mdi-inbox',
+            isNest: false,
+            route: 'Inbox',
+        },
+        {
+            title: 'Today',
+            icon: 'mdi-calendar-today',
+            isNest: false,
+            route: 'TodayScheduled',
+        },
+        {
+            title: 'Coming soon',
+            icon: 'mdi-calendar-month-outline',
+            isNest: false,
+            route: 'FutureScheduled',
+        },
+        {
+            title: 'Favorite',
+            icon: 'mdi-star',
+            isNest: false,
+            route: 'StartApp',
+        },
+        {
+            title: 'Project',
+            icon: 'mdi-format-list-checkbox',
+            isNest: true,
+            route: 'DetailProject',
+        },
+        {
+            title: 'Label',
+            icon: 'mdi-label-multiple-outline',
+            isNest: true,
+            route: 'Labels',
+        },
+        {
+            title: 'Activity',
+            icon: 'mdi-bell-ring',
+            isNest: false,
+            route: 'Activitys',
+        },
+    ]
 }
+
 export { Const }

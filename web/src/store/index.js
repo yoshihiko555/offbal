@@ -29,7 +29,7 @@ export default new Vuex.Store({
         }
 	},
 	actions: {
-		// プロジェクト一覧更新
+		// プロジェクト一覧取得
 		getProjectsAction (ctx, kwargs) {
 			Vue.prototype.$axios({
 				url: '/api/project/',
@@ -51,8 +51,8 @@ export default new Vuex.Store({
         updateProjectAction (ctx, kwargs) {
             this.commit('updateProject', kwargs)
         },
+        // プロジェクトの削除
         deleteProjectAction (ctx, kwargs) {
-            console.log(ctx, kwargs)
             Vue.prototype.$axios({
                 url: `/api/project/${kwargs.id}/`,
                 method: 'DELETE',
@@ -64,7 +64,7 @@ export default new Vuex.Store({
             .catch(e => {
                 console.log(e)
             })
-        }
+        },
 	},
 	modules: {
 	},

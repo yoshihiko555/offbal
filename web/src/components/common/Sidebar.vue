@@ -33,6 +33,13 @@
 
                         <!-- プロジェクト -->
                         <div v-if="menu.title === 'Project'">
+                            <v-list-item>
+                                <v-list-item-title>新規プロジェクト追加</v-list-item-title>
+                                <v-list-item-action>
+                                    <v-btn icon @click='createProject'><v-icon>mdi-plus</v-icon></v-btn>
+                                </v-list-item-action>
+                            </v-list-item>
+
                             <v-list-item
                                 v-for='project in projects'
                                 :key='project.id'
@@ -41,34 +48,7 @@
                                 <v-icon x-small :color="project.color">mdi-circle</v-icon>
                                 <v-list-item-title class="ml-2">{{ project.name }}</v-list-item-title>
                                 <v-list-item-action class="ml-0">
-                                    <v-menu
-                                        offset-x
-                                        transition="slide-x-transition"
-                                        rounded='lg'
-                                    >
-                                        <template #activator='{ attrs, on }'>
-                                            <v-btn
-                                                icon
-                                                v-bind="attrs"
-                                                v-on='on'
-                                                @click.stop="test"
-                                            >
-                                                <v-icon color="grey">mdi-dots-horizontal</v-icon>
-                                            </v-btn>
-                                        </template>
-                                        <v-list>
-                                            <v-list-item
-                                                v-for='(proMenu, i) in projectMenus'
-                                                :key='i'
-                                                @click="proMenu.call(project)"
-                                            >
-                                                <v-list-item-icon class="mr-0">
-                                                    <v-icon small v-text='proMenu.icon'/>
-                                                </v-list-item-icon>
-                                                <v-list-item-title>{{ proMenu.name }}</v-list-item-title>
-                                            </v-list-item>
-                                        </v-list>
-                                    </v-menu>
+                                    <SidebarProjectMenuBtn :project='project'/>
                                 </v-list-item-action>
                             </v-list-item>
                         </div>
@@ -106,14 +86,15 @@
 		</v-navigation-drawer>
 
         <!-- モーダル読み込み -->
-        <EditProjectDialog
+        <CreateProjectDialog
             ref='project'
         />
     </div>
 </template>
 
 <script>
-import EditProjectDialog from '@/components/common/EditProjectDialog'
+import CreateProjectDialog from '@/components/common/CreateProjectDialog'
+import SidebarProjectMenuBtn from '@/components/parts/SidebarProjectMenuBtn'
 
 import { mapGetters, mapActions } from 'vuex'
 import AuthService from '@/auth/AuthService'
@@ -122,7 +103,8 @@ const auth = new AuthService()
 export default {
     name: 'Sidebar',
     components: {
-        EditProjectDialog,
+    	CreateProjectDialog,
+        SidebarProjectMenuBtn,
     },
     data () {
         return {
@@ -197,23 +179,6 @@ export default {
             		name: 'Label3',
             	},
             ],
-            projectMenus: [
-                {
-                    name: 'プロジェクトの編集',
-                    icon: 'mdi-pencil-outline',
-                    call: this.projectOpen,
-                },
-                {
-                    name: 'プロジェクトを削除',
-                    icon: 'mdi-trash-can-outline',
-                    call: this.projectDelete,
-                },
-                {
-                    name: 'プロジェクトをアーカイブ',
-                    icon: 'mdi-package',
-                    call: this.test,
-                },
-            ]
         }
     },
 	created () {
@@ -240,12 +205,9 @@ export default {
         test () {
             console.log('test')
         },
-        projectOpen (project) {
-            this.$refs.project.open(project)
-        },
-        projectDelete (project) {
-            this.deleteProjectAction(project)
-        },
+        createProject () {
+        	this.$refs.project.open()
+        }
     }
 }
 </script>

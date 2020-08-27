@@ -2,6 +2,7 @@
     <v-menu
         bottom
         offset-y
+        transition="scroll-y-transition"
     >
         <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -9,7 +10,7 @@
                 v-bind="attrs"
                 v-on="on"
             ><v-icon
-                :color="selectPriorityIconColor"
+                :color="selectedPriorityIconColor"
             >mdi-star-box</v-icon>
             </v-btn>
         </template>
@@ -17,7 +18,7 @@
             <v-list-item
                 v-for="(item, i) in items"
                 :key="i"
-                @click="selectPriorityIcon(item)"
+                @click="selectPriority(item)"
             >
                 <v-icon
                     class="mr-1"
@@ -33,6 +34,9 @@
     </v-menu>
 </template>
 <script>
+    import { Const } from '@/assets/js/const'
+    const Con = new Const()
+
     export default {
         name: 'PriorityBtn',
         props: {
@@ -65,15 +69,18 @@
                     color: 'grey lighten-1',
                 },
             ],
-            selectPriorityIconColor: 'grey lighten-1'
+            selectedPriority: '',
+            selectedPriorityIconColor: Con.NON_ACTIVE_COLOR
         }),
         created () {
         },
         mounted: function () {
         },
         methods: {
-            selectPriorityIcon (item) {
-                this.selectPriorityIconColor = item.color
+            selectPriority (item) {
+                this.selectedPriority = item.text
+                this.selectedPriorityIconColor = item.color
+                console.log(item)
             }
         }
     }

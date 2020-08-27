@@ -1,6 +1,9 @@
 <template>
     <v-menu
+        bottom
+        offset-y
         min-width="400px"
+        transition="scroll-y-transition"
     >
         <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -14,23 +17,26 @@
         </template>
         <Datetime
             v-model="reminderDate"
-            inline
             :minute-interval="15"
             :min-date="start"
-        >
-        </Datetime>
+            inline
+            no-keyboard
+        />
     </v-menu>
 </template>
 <script>
+    import { Const } from '@/assets/js/const'
     import moment from 'moment'
     import Datetime from 'vue-ctk-date-time-picker'
     import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
+
+    const Con = new Const()
 
     export default {
         name: 'ReminderBtn',
         data: () => ({
             reminderDate: '',
-            reminderDateColor: 'grey lighten-1'
+            reminderDateColor: Con.NON_ACTIVE_COLOR
         }),
         components: {
             Datetime,
@@ -44,9 +50,9 @@
         watch: {
             reminderDate: function (val) {
                 if (val.length > 0) {
-                    this.reminderDateColor = 'red accent-4'
+                    this.reminderDateColor = Con.ACTIVE_COLOR
                 } else {
-                    this.reminderDateColor = 'grey lighten-1'
+                    this.reminderDateColor = Con.NON_ACTIVE_COLOR
                 }
             }
         },

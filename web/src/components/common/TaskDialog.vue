@@ -25,22 +25,19 @@
                             outlined
                             label="例: 英単語、プログラミング、ブログ、読書"
                             v-model="content"
-                            :counter="200"
+                            rows="5"
+                            no-resize
+                            :counter="100"
                         ></v-textarea>
                     </v-col>
                     <v-col
                         cols="1"
                     >
-                        <DeadLineBtn
-                        ></DeadLineBtn>
-                        <ProjectBtn
-                        ></ProjectBtn>
-                        <LabelBtn
-                        ></LabelBtn>
-                        <PriorityBtn
-                        ></PriorityBtn>
-                        <ReminderBtn
-                        ></ReminderBtn>
+                        <DeadLineBtn/>
+                        <ProjectBtn/>
+                        <LabelBtn/>
+                        <PriorityBtn/>
+                        <ReminderBtn/>
                     </v-col>
                 </v-row>
                 <v-row>
@@ -117,7 +114,7 @@
     }
 
 </script>
-<style lang='scss'>
+<style lang='scss' scoped>
     .task_dialog_wrap {
         height: 300px;
         .task_dialog_task_area_wrap {
@@ -127,7 +124,7 @@
         .task_dialog_task_input_area {
             height: 100%;
         }
-        .vs-input-parent {
+        .vs-input-parent::v-deep {
             width: 100%;
             .vs-input {
                 width: 100%;

@@ -2,7 +2,9 @@
     <v-menu
         bottom
         offset-y
-        min-width="300px"
+        min-width="250px"
+        max-height="400px"
+        transition="scroll-y-transition"
     >
         <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -11,7 +13,7 @@
                 v-on="on"
             >
                 <v-icon
-                    :color="projectBtnColor"
+                    :color="selectedProjectColor"
                 >mdi-inbox</v-icon>
             </v-btn>
         </template>
@@ -49,6 +51,9 @@
     </v-menu>
 </template>
 <script>
+    import { Const } from '@/assets/js/const'
+    const Con = new Const()
+
     export default {
         name: 'ProjectBtn',
         props: {
@@ -118,7 +123,7 @@
                 }
             ],
             selectedProject: '',
-            projectBtnColor: 'grey lighten-1'
+            selectedProjectColor: Con.NON_ACTIVE_COLOR
         }),
         created () {
         },
@@ -137,9 +142,9 @@
         watch: {
             selectedProject: function (val) {
                 if (val.length > 0) {
-                    this.projectBtnColor = 'red accent-4'
+                    this.selectedProjectColor = Con.ACTIVE_COLOR
                 } else {
-                    this.projectBtnColor = 'grey lighten-1'
+                    this.selectedProjectColor = Con.NON_ACTIVE_COLOR
                 }
             }
         }

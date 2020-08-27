@@ -6,5 +6,9 @@ class Const {
         { color: 'green', code: '#009688' },
         { color: 'yellow', code: '#FFD600' },
     ]
+
+    ACTIVE_COLOR = 'red accent-4'
+
+    NON_ACTIVE_COLOR = 'grey lighten-1'
 }
 export { Const }

@@ -1,6 +1,10 @@
 <template>
     <v-menu
+        bottom
+        offset-y
         min-width="400px"
+        transition="scroll-y-transition"
+        :close-on-content-click="false"
     >
         <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -14,23 +18,26 @@
         </template>
         <Datetime
             v-model="deadLineDate"
-            inline
             :minute-interval="30"
             :min-date="start"
-        >
-        </Datetime>
+            inline
+            no-keyboard
+        />
     </v-menu>
 </template>
 <script>
+    import { Const } from '@/assets/js/const'
     import moment from 'moment'
     import Datetime from 'vue-ctk-date-time-picker'
     import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
+
+    const Con = new Const()
 
     export default {
         name: 'DeadLineBtn',
         data: () => ({
             deadLineDate: '',
-            deadLineDateColor: 'grey lighten-1'
+            deadLineDateColor: Con.NON_ACTIVE_COLOR
         }),
         components: {
             Datetime,
@@ -44,9 +51,9 @@
         watch: {
             deadLineDate: function (val) {
                 if (val.length > 0) {
-                    this.deadLineDateColor = 'red accent-4'
+                    this.deadLineDateColor = Con.ACTIVE_COLOR
                 } else {
-                    this.deadLineDateColor = 'grey lighten-1'
+                    this.deadLineDateColor = Con.NON_ACTIVE_COLOR
                 }
             }
         },

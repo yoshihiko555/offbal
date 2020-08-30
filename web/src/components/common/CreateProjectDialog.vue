@@ -104,6 +104,7 @@
         methods: {
             ...mapActions([
                 'addProjectsAction',
+                'addFavoriteProjectsAction',
             ]),
             open () {
             	this.init()
@@ -121,7 +122,8 @@
                 })
                 .then(res => {
                 	console.log(res)
-                	this.addProjectsAction(res.data)
+                    this.addProjectsAction(res.data)
+                    if (res.data.favorite) this.addFavoriteProjectsAction(res.data)
                 	this.close()
                 })
                 .catch(e => {

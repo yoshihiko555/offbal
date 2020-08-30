@@ -67,16 +67,31 @@
                     </v-list-group>
 
                     <!-- ネスト無 -->
-                    <v-list-item
-                        v-else
-                        :key='i'
-                        @click='toPage(menu.route)'
-                    >
-                        <v-list-item-icon>
-                            <v-icon v-text='menu.icon'/>
-                        </v-list-item-icon>
-                        <v-list-item-title>{{ menu.title }}</v-list-item-title>
-                    </v-list-item>
+                    <div v-else :key='i'>
+                        <!-- お気に入り以外 -->
+                        <v-list-item
+                            v-if='menu.title !== "Favorite"'
+                            @click='toPage(menu.route)'
+                        >
+                            <v-list-item-icon>
+                                <v-icon v-text='menu.icon'/>
+                            </v-list-item-icon>
+                            <v-list-item-title>{{ menu.title }}</v-list-item-title>
+                        </v-list-item>
+
+                        <!-- お気に入りプロジェクト -->
+                        <v-list-item
+                            v-else
+                            v-for="favo in favoriteProjects"
+                            :key='favo.id'
+                            @click="toPage(menu.route, favo)"
+                        >
+                            <v-list-item-icon>
+                                <v-icon :color="favo.color" small class="mx-auto">mdi-circle</v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-title>{{ favo.name }}</v-list-item-title>
+                        </v-list-item>
+                    </div>
 
                 </template>
 	 		</v-list>
@@ -126,7 +141,8 @@
         },
     	computed: {
     		...mapGetters([
-    			'projects',
+                'projects',
+                'favoriteProjects',
     		])
     	},
         methods: {

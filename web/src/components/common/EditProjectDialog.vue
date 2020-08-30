@@ -101,6 +101,8 @@
         methods: {
             ...mapActions([
                 'updateProjectAction',
+                'addFavoriteProjectsAction',
+                'deleteFavoriteProjectsAction',
             ]),
             open (project) {
                 this.project = _.cloneDeep(project)
@@ -120,6 +122,8 @@
                 .then(res => {
                     console.log(res)
                     this.updateProjectAction(res.data)
+                    if (res.data.favorite) this.addFavoriteProjectsAction(res.data)
+                    else this.deleteFavoriteProjectsAction(res.data)
                     this.close()
                 })
                 .catch(e => {

@@ -106,6 +106,8 @@
             ...mapActions([
                 'deleteProjectAction',
                 'updateProjectAction',
+                'addFavoriteProjectsAction',
+                'deleteFavoriteProjectsAction',
             ]),
         	editProject () {
         		this.$refs.project.open(this.project)
@@ -124,7 +126,9 @@
         		})
         		.then(res => {
         			console.log(res)
-        			this.updateProjectAction(res.data)
+                    this.updateProjectAction(res.data)
+                    if (res.data.favorite) this.addFavoriteProjectsAction(res.data)
+                    else this.deleteFavoriteProjectsAction(res.data)
         		})
         		.catch(e => {
         			console.log(e)

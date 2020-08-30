@@ -64,7 +64,7 @@ class mUser(AbstractBaseUser,
 
     auth0_id = models.CharField(_('Auth0Id'), max_length=255, unique=True)
     auth0_name = models.CharField(_('Auth0Name'), max_length=255, unique=False)
-    username = models.CharField(_('Username'), max_length=70, unique=True)
+    username = models.CharField(_('Username'), max_length=70, unique=True, blank=True, null=True)
 #     email = models.EmailField(_('Email'), max_length=70, unique=True)
     address = models.CharField(_('Address'), max_length=100, blank=True, null=True)
 

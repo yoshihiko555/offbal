@@ -34,7 +34,7 @@ class Const {
             title: 'Favorite',
             icon: 'mdi-star',
             isNest: false,
-            route: 'StartApp',
+            route: 'DetailProject',
         },
         {
             title: 'Project',

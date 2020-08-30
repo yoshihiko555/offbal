@@ -32,13 +32,15 @@
             drawer: true,
         }),
         created () {
-        	this.getProjectsAction()
+            this.getProjectsAction()
+            this.getFavoriteProjectsAction()
         },
         computed: {
         },
         methods: {
             ...mapActions([
                 'getProjectsAction',
+                'getFavoriteProjectsAction',
             ]),
         },
     }

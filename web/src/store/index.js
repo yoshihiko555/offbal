@@ -7,10 +7,12 @@ Vue.use(Vuex)
 export default new Vuex.Store({
 	strict: true,
 	state: {
-		projects: [],
+        projects: [],
+        favoriteProjects: [],
 	},
 	getters: {
-		projects: state => state.projects,
+        projects: state => state.projects,
+        favoriteProjects: state => state.favoriteProjects,
 	},
 	mutations: {
 		setProjects (state, payload) {
@@ -26,7 +28,17 @@ export default new Vuex.Store({
         deleteProject (state, payload) {
             const index = state.projects.findIndex(project => project.id === payload.id)
             state.projects = state.projects.filter((_, i) => i !== index)
-        }
+        },
+        setFavoriteProjects (state, payload) {
+            state.favoriteProjects = payload
+        },
+        addFavoriteProjects (state, payload) {
+			state.favoriteProjects.push(payload)
+        },
+        deleteFavoriteProjects (state, payload) {
+            const index = state.favoriteProjects.findIndex(project => project.id === payload.id)
+            if (index !== -1) state.favoriteProjects = state.favoriteProjects.filter((_, i) => i !== index)
+        },
 	},
 	actions: {
 		// プロジェクト一覧取得
@@ -64,6 +76,28 @@ export default new Vuex.Store({
             .catch(e => {
                 console.log(e)
             })
+        },
+        // お気に入りプロジェクト一覧取得
+        getFavoriteProjectsAction (ctx, kwargs) {
+            Vue.prototype.$axios({
+				url: '/api/project/favorites/',
+				method: 'GET',
+			})
+			.then(res => {
+				console.log('お気に入りプロジェクト一覧', res)
+				this.commit('setFavoriteProjects', res.data)
+			})
+			.catch(e => {
+				console.log(e)
+			})
+        },
+        // お気に入りプロジェクトを追加
+		addFavoriteProjectsAction (ctx, kwargs) {
+			this.commit('addFavoriteProjects', kwargs)
+        },
+        // お気に入りプロジェクトを削除
+        deleteFavoriteProjectsAction (ctx, kwargs) {
+            this.commit('deleteFavoriteProjects', kwargs)
         },
 	},
 	modules: {

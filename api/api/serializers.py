@@ -54,6 +54,9 @@ class UserSerializer(DynamicFieldsModelSerializer):
             'address',
         ]
 
+    def create(self, validated_data):
+        return mUser.objects.create(auth0_id=validated_data['auth0_id'], auth0_name=validated_data['auth0_name'])
+
 class SettingSerializer(DynamicFieldsModelSerializer):
 
     class Meta:
@@ -128,6 +131,13 @@ class SectionSerializer(DynamicFieldsModelSerializer):
             'deleted',
             'archived',
         ]
+
+    def create(self, validated_data):
+        section = Section.objects.create(
+                target_project = validated_data['target_project'],
+                name = validated_data['name'],
+            )
+        return section
 
 class TaskSerializer(DynamicFieldsModelSerializer):
 

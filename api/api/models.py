@@ -219,13 +219,13 @@ class mSetting(models.Model):
 
 class Project(TimeStampModel):
 
-    parent_project = models.ForeignKey(
-        'self',
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name='project_parent_project'
-    )
+    # parent_project = models.ForeignKey(
+    #     'self',
+    #     on_delete=models.SET_NULL,
+    #     blank=True,
+    #     null=True,
+    #     related_name='project_parent_project'
+    # )
 
     member = models.ManyToManyField(
         mUser,

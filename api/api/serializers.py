@@ -78,12 +78,14 @@ class SettingSerializer(DynamicFieldsModelSerializer):
 class ProjectSerializer(DynamicFieldsModelSerializer):
 
     user_id = serializers.CharField(write_only=True)
+    tasks = serializers.SerializerMethodField()
+    sections = serializers.SerializerMethodField()
 
     class Meta:
         model = Project
         fields = [
             'id',
-            'parent_project',
+            # 'parent_project',
             'member',
             'name',
             'color',
@@ -93,7 +95,15 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
             'deleted',
             'archived',
             'user_id',
+            'tasks',
+            'sections',
         ]
+
+    def get_tasks(self, obj):
+        return TaskSerializer(obj.task_target_project.all(), many=True).data
+
+    def get_sections(self, obj):
+        return SectionSerializer(obj.section_target_project.all(), many=True).data
 
     def create(self, validated_data):
         try:
@@ -123,14 +133,21 @@ class ProjectMemberShipSerializer(DynamicFieldsModelSerializer):
 
 class SectionSerializer(DynamicFieldsModelSerializer):
 
+    tasks = serializers.SerializerMethodField()
+
     class Meta:
         model = Section
         fields = [
+            'id',
             'target_project',
             'name',
             'deleted',
             'archived',
+            'tasks',
         ]
+
+    def get_tasks(self, obj):
+        return TaskSerializer(obj.task_target_section.all(), many=True).data
 
     def create(self, validated_data):
         section = Section.objects.create(
@@ -144,6 +161,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = Task
         fields = [
+            'id',
             'target_user',
             'target_project',
             'target_section',

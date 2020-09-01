@@ -31,7 +31,7 @@
     import { mapMutations } from 'vuex'
 
     export default {
-        name: 'CreateSectionField',
+        name: 'EditSectionField',
         data: () => ({
             section: '',
         }),
@@ -60,7 +60,6 @@
             },
             close () {
                 this.section = ''
-                this.$emit('close-create')
             }
         }
     }

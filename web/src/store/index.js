@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexPersistedstate from 'vuex-persistedstate'
+import { setTitle } from '@/mixins'
 
 Vue.use(Vuex)
 
@@ -10,11 +11,13 @@ export default new Vuex.Store({
         projects: [],
         favoriteProjects: [],
 				labels: [],
+				detailProject: {},
 		},
 		getters: {
         projects: state => state.projects,
         favoriteProjects: state => state.favoriteProjects,
 				labels: state => state.labels,
+				detailProject: state => state.detailProject,
 		},
 		mutations: {
 				setProjects (state, payload) {
@@ -29,24 +32,41 @@ export default new Vuex.Store({
 				addLabel (state, payload) {
 						state.labels.push(payload)
 				},
-      	updateProject (state, payload) {
-          	const index = state.projects.findIndex(project => project.id === payload.id)
-          	Vue.set(state.projects, index, payload)
-      	},
-      	deleteProject (state, payload) {
-          	const index = state.projects.findIndex(project => project.id === payload.id)
-          	state.projects = state.projects.filter((_, i) => i !== index)
-      	},
+				updateProject (state, payload) {
+            // プロジェクト詳細の更新
+            state.detailProject = payload
+
+            // プロジェクト一覧内のプロジェクトの更新
+            const index = state.projects.findIndex(project => project.id === payload.id)
+            Vue.set(state.projects, index, payload)
+        },
+				deleteProject (state, payload) {
+            const index = state.projects.findIndex(project => project.id === payload.id)
+            state.projects = state.projects.filter((_, i) => i !== index)
+        },
       	setFavoriteProjects (state, payload) {
           	state.favoriteProjects = payload
       	},
       	addFavoriteProjects (state, payload) {
 						state.favoriteProjects.push(payload)
       	},
-      	deleteFavoriteProjects (state, payload) {
-          	const index = state.favoriteProjects.findIndex(project => project.id === payload.id)
-          	if (index !== -1) state.favoriteProjects = state.favoriteProjects.filter((_, i) => i !== index)
-      	},
+				deleteFavoriteProjects (state, payload) {
+            const index = state.favoriteProjects.findIndex(project => project.id === payload.id)
+            if (index !== -1) state.favoriteProjects = state.favoriteProjects.filter((_, i) => i !== index)
+        },
+        setDetailProject (state, payload) {
+            state.detailProject = payload
+        },
+        addSection (state, payload) {
+            state.detailProject.sections.push(payload)
+        },
+        updateSection (state, payload) {
+            console.log(payload)
+        },
+        deleteSection (state, payload) {
+            const index = state.detailProject.sections.findIndex(section => section.id === payload)
+            if (index !== -1) state.detailProject.sections = state.detailProject.sections.filter((_, i) => i !== index)
+        },
 		},
 		actions: {
 				// プロジェクト一覧取得
@@ -61,8 +81,7 @@ export default new Vuex.Store({
 						})
 						.catch(e => {
 								console.log(e)
-						})
-        },
+						})        },
 				// ラベル一覧取得
 				getLabelsAction (ctx, kwargs) {
 						Vue.prototype.$axios({
@@ -124,8 +143,39 @@ export default new Vuex.Store({
         deleteFavoriteProjectsAction (ctx, kwargs) {
             this.commit('deleteFavoriteProjects', kwargs)
         },
+        // プロジェクト詳細取得
+        getDetailProjectAction (ctx, id) {
+            Vue.prototype.$axios({
+                url: `/api/project/${id}/`,
+                method: 'GET'
+            })
+            .then(res => {
+                console.log('プロジェクト詳細', res)
+                // Ttile設定
+                setTitle(res.data.name)
+                this.commit('setDetailProject', res.data)
+            })
+            .catch(e => {
+                console.log(e)
+            })
+        },
+        // セクション削除
+        deleteSectionAction (ctx, id) {
+            Vue.prototype.$axios({
+                url: `/api/section/${id}/`,
+                method: 'DELETE',
+            })
+            .then(res => {
+                console.log(res)
+                this.commit('deleteSection', id)
+            })
+            .catch(e => {
+                console.log(e)
+            })
+        }
 		},
-		modules: {},
+		modules: {
+		},
     plugins: [
         VuexPersistedstate({
             storage: window.localStorage

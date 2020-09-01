@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="detail-project-menu-wrap">
         <v-menu
             offset-x
             transition="slide-x-transition"
@@ -27,7 +27,7 @@
                 </v-list-item>
 
                 <v-list-item
-                    v-if='!project.favorite'
+                    v-if='!detailProject.favorite'
                     @click='togleFavorite'
                 >
                     <v-list-item-icon class='mr-0'>
@@ -56,11 +56,11 @@
 
 <script>
 	import EditProjectDialog from '@/components/common/EditProjectDialog'
-	import { mapActions } from 'vuex'
+	import { mapGetters, mapActions } from 'vuex'
 	import _ from 'lodash'
 
     export default {
-        name: 'SidebarProjectMenuBtn',
+        name: 'DetailProjectMenuBtn',
         components: {
         	EditProjectDialog,
         },
@@ -74,6 +74,11 @@
         	return {
         		cloneProject: {},
                 menus: [
+                    {
+                        name: 'セクションの追加',
+                        icon: 'mdi-plus-circle-outline',
+                        call: this.open,
+                    },
                     {
                         name: 'プロジェクトの編集',
                         icon: 'mdi-pencil-outline',
@@ -89,6 +94,11 @@
                         icon: 'mdi-package',
                         call: this.test,
                     },
+                    {
+                        name: '完了したタスクを表示',
+                        icon: 'mdi-check-circle-outline',
+                        call: this.test,
+                    },
                 ],
                 favoMenu: [
                     {
@@ -102,6 +112,11 @@
                 ],
         	}
         },
+        computed: {
+    		...mapGetters([
+                'detailProject',
+    		])
+    	},
         methods: {
             ...mapActions([
                 'deleteProjectAction',
@@ -109,15 +124,18 @@
                 'addFavoriteProjectsAction',
                 'deleteFavoriteProjectsAction',
             ]),
+            open () {
+                this.$emit('open-create')
+            },
         	editProject () {
-        		this.$refs.project.open(this.project)
+        		this.$refs.project.open(this.detailProject)
         	},
         	deleteProject () {
-        		this.deleteProjectAction(this.project)
-        	},
-        	togleFavorite () {
+        		this.deleteProjectAction(this.detailProject)
+            },
+            togleFavorite () {
         		// propsで来たデータの直更新はNGのため一度deepcopy
-        		this.cloneProject = _.cloneDeep(this.project)
+        		this.cloneProject = _.cloneDeep(this.detailProject)
         		this.cloneProject.favorite = !this.cloneProject.favorite
         		this.$axios({
         			url: `/api/project/${this.cloneProject.id}/`,
@@ -142,4 +160,7 @@
 </script>
 
 <style lang="scss" scoped>
+    #detail-project-menu-wrap {
+        display: inline-block;
+    }
 </style>

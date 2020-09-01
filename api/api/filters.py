@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 class ProjectFilter(django_filter.FilterSet):
 
-    user_id = django_filter.CharFilter(method='user_filter')
+    auth0_id = django_filter.CharFilter(method='user_filter')
 
     class Meta:
         model = Project
@@ -32,7 +32,7 @@ class ProjectFilter(django_filter.FilterSet):
 
 class LabelFilter(django_filter.FilterSet):
 
-    user_id = django_filter.CharFilter(method='user_filter')
+    auth0_id = django_filter.CharFilter(method='user_filter')
 
     class Meta:
         model = Label

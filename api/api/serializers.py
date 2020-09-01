@@ -77,7 +77,7 @@ class SettingSerializer(DynamicFieldsModelSerializer):
 
 class ProjectSerializer(DynamicFieldsModelSerializer):
 
-    user_id = serializers.CharField(write_only=True)
+#     auth0_id = serializers.CharField(write_only=True)
     tasks = serializers.SerializerMethodField()
     sections = serializers.SerializerMethodField()
 
@@ -93,7 +93,7 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
             'is_comp_public',
             'deleted',
             'archived',
-            'user_id',
+#             'auth0_id',
             'tasks',
             'sections',
         ]
@@ -105,18 +105,18 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
         return SectionSerializer(obj.section_target_project.all(), many=True).data
 
     def create(self, validated_data):
-        try:
-            user = mUser.objects.get(auth0_id=validated_data['user_id'])
-        except:
-            logger.info('mUserが見つかりませんでした。')
-            return None
+#         try:
+#             user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
+#         except:
+#             logger.info('mUserが見つかりませんでした。')
+#             return None
 
         project = Project.objects.create(
                 name = validated_data['name'],
                 color = validated_data['color'],
                 favorite = validated_data['favorite']
             )
-        project.member.add(user)
+        # project.member.add(user)
         return project
 
 class ProjectMemberShipSerializer(DynamicFieldsModelSerializer):
@@ -157,7 +157,7 @@ class SectionSerializer(DynamicFieldsModelSerializer):
 
 class TaskSerializer(DynamicFieldsModelSerializer):
 
-    user_id = serializers.CharField(write_only=True)
+    auth0_id = serializers.CharField(write_only=True)
     project_name = serializers.CharField(write_only=True)
     deadline_str = serializers.CharField(write_only=True, allow_blank=True)
     remind_str = serializers.CharField(write_only=True, allow_blank=True)
@@ -188,7 +188,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'completed',
             'deleted',
             'is_comp_sub_public',
-            'user_id',
+            'auth0_id',
             'project_name',
             'deadline_str',
             'remind_str',
@@ -202,7 +202,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         logger.debug(validated_data)
 
         try:
-            user = mUser.objects.get(auth0_id=validated_data['user_id'])
+            user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
             project = Project.objects.get(name=validated_data['project_name'])
 
             section_name = validated_data['section_name']
@@ -247,7 +247,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
 
 class LabelSerializer(DynamicFieldsModelSerializer):
 
-    user_id = serializers.CharField(write_only=True)
+    auth0_id = serializers.CharField(write_only=True)
     author = serializers.CharField(read_only=True)
 
     class Meta:
@@ -255,13 +255,13 @@ class LabelSerializer(DynamicFieldsModelSerializer):
         fields = [
             'name',
             'author',
-            'user_id'
+            'auth0_id'
         ]
 
     def create(self, validated_data):
 
         try:
-            user = mUser.objects.get(auth0_id=validated_data['user_id'])
+            user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
         except mUser.DoesNotExist:
             logger.info('mUserが見つかりませんでした')
             return None

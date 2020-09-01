@@ -54,7 +54,7 @@ export default class AuthService {
         localStorage.setItem('access_token', authResult.accessToken)
         localStorage.setItem('id_token', authResult.idToken)
         localStorage.setItem('expires_at', expiresAt)
-        localStorage.setItem('user_id', authResult.idTokenPayload.sub)
+        localStorage.setItem('auth0_id', authResult.idTokenPayload.sub)
         this.authNotifier.emit('authChange', { authenticated: true })
     }
 
@@ -64,7 +64,7 @@ export default class AuthService {
         localStorage.removeItem('access_token')
         localStorage.removeItem('id_token')
         localStorage.removeItem('expires_at')
-        localStorage.removeItem('user_id')
+        localStorage.removeItem('auth0_id')
         this.authNotifier.emit('authChange', false)
         // ホームルートに移動する
          if (router.currentRoute.fullPath !== '/') {
@@ -87,7 +87,7 @@ export default class AuthService {
 
     // UserIdを取得する静的メソッド
     static getUserId () {
-    	return localStorage.getItem('user_id')
+    	return localStorage.getItem('auth0_id')
     }
 
     // ユーザー プロファイルを得るメソッド

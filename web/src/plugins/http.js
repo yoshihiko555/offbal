@@ -21,15 +21,15 @@ export default {
 						'Content-Type': 'application/json',
 				}
 
-				// user_idを格納
+				// auth0_idを格納
 				if (config.method === 'get') {
 					config.params = config.params || {}
-                    config.params.user_id = AuthService.getUserId()
+                    config.params.auth0_id = AuthService.getUserId()
                 } else if (config.method === 'delete') {
                     // deleteは何もしない
 				} else {
-					// それ以外は全てdataにuser_idを格納
-					config.data.user_id = AuthService.getUserId()
+					// それ以外は全てdataにauth0_idを格納
+					config.data.auth0_id = AuthService.getUserId()
 				}
 			}
 		 	return config

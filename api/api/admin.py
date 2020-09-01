@@ -4,6 +4,7 @@ from .models import (
     Week,
     mSetting,
     Project,
+    mUserProjectRelation,
     ProjectMemberShip,
     Section,
     Task,
@@ -16,6 +17,7 @@ admin.site.register(mUser)
 admin.site.register(Week)
 admin.site.register(mSetting)
 admin.site.register(Project)
+admin.site.register(mUserProjectRelation)
 admin.site.register(ProjectMemberShip)
 admin.site.register(Section)
 admin.site.register(Task)

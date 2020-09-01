@@ -221,6 +221,8 @@ class Project(TimeStampModel):
 
     member = models.ManyToManyField(
         mUser,
+        through='mUserProjectRelation',
+        related_name='project_member',
         blank=True
     )
 
@@ -247,6 +249,21 @@ class Project(TimeStampModel):
 
     def __str__(self):
         return self.name
+
+
+class mUserProjectRelation(models.Model):
+    user = models.ForeignKey(
+        mUser,
+        on_delete=models.CASCADE,
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+    )
+    index = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.user.auth0_name + 'の' + self.project.name
 
 
 class ProjectMemberShip(TimeStampModel):

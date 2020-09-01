@@ -7,6 +7,7 @@ from .models import (
     Week,
     mSetting,
     Project,
+    mUserProjectRelation,
     ProjectMemberShip,
     Section,
     Task,

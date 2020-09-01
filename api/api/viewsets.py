@@ -23,6 +23,7 @@ from .models import (
     Week,
     mSetting,
     Project,
+    mUserProjectRelation,
     ProjectMemberShip,
     Section,
     Task,
@@ -67,6 +68,22 @@ class ProjectViewSet(BaseModelViewSet):
 
         if serializer.is_valid():
             self.perform_create(serializer)
+            try:
+                user = mUser.objects.get(auth0_id=request.data['auth0_id'])
+                project = Project.objects.get(id=serializer.data['id'])
+                mUserProjectRelation.objects.create(
+                    user=user,
+                    project=project,
+                    index=self.autoincrement(user),
+                )
+
+            except mUser.DoesNotExist:
+                logger.error('mUserが見つかりませんでした。')
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            except Project.DoesNotExist:
+                logger.error('Projectが見つかりませんでした。')
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
             return Response(self.get_serializer(serializer.instance).data, status=status.HTTP_201_CREATED)
 
         logger.debug(serializer.errors)
@@ -77,6 +94,13 @@ class ProjectViewSet(BaseModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset.filter(favorite=True), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def autoincrement(self, user):
+        '''
+        対象ユーザーが関与するプロジェクト総数 + 1を返却する
+        '''
+        res = user.project_member.all().count() + 1
+        return res
 
 class SectionViewSet(BaseModelViewSet):
 

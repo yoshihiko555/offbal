@@ -1,10 +1,12 @@
 <template>
     <v-menu
         bottom
-        offset-y
+        left
+        offset-x
         min-width="250px"
         max-height="400px"
-        transition="scroll-y-transition"
+        transition="scroll-x-transition"
+        v-model="isShow"
     >
         <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -33,18 +35,6 @@
                         >mdi-circle-medium</v-icon>
                         {{ project.name }}
                     </v-list-item>
-                    <v-list-item
-                        class="pl-8"
-                        v-for="(section, i) in project.sections"
-                        :key="i"
-                        @click="selectSection(section)"
-                    >
-                        <v-icon
-                            class="mr-2"
-                            color="grey lighten-1"
-                        >mdi-menu-down</v-icon>
-                        {{ section.name }}
-                    </v-list-item>
                 </div>
             </v-list-item-group>
         </v-list>
@@ -57,46 +47,37 @@
 
     export default {
         name: 'ProjectBtn',
-        components: {},
-        props: {},
         data: () => ({
             project: {
                 name: '',
                 color: Con.NON_ACTIVE_COLOR,
                 section: ''
             },
+            isShow: false,
         }),
-        created () {},
-        mounted: function () {},
-        watch: {
-            'project.name': function (val) {
-                this.project.color = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
-            }
-        },
         computed: {
             ...mapGetters([
                 'projects',
             ])
         },
         methods: {
-            selectProject (value) {
-                const { name } = value
-                this.project.name = value.name
-                this.$eventHub.$emit('create_task_info', 'project_name', name)
+            selectProject (project) {
+                this.$emit('move-section', project)
             },
-            selectSection (value) {
-                const { name, section } = value
-                this.project.name = name
-                this.project.section = section
-                this.$eventHub.$emit('create_task_info', 'project_name', name)
-                this.$eventHub.$emit('create_task_info', 'section_name', section)
-            },
+            open () {
+                this.isShow = true
+            }
         },
     }
 </script>
-<style lang='scss'>
+<style lang='scss' scoped>
     .project_name {
         padding-top: 15px;
         height: 48px;
+    }
+    .v-btn {
+        width: 0;
+        opacity: 0;
+        pointer-events: none;
     }
 </style>

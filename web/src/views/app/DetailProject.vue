@@ -3,8 +3,13 @@
         <div class="detail_project_header">
             <h1 class="project_title">{{ detailProject.name }}</h1>
             <DetailProjectMenuBtn
-                @open-create='isCreate = true'
+                @open-create='openCreate'
             />
+            <v-spacer/>
+            <div class='operation_btn_wrap pr-2'>
+                <FilterBtn/>
+                <SortBtn/>
+            </div>
         </div>
 
         <TaskList/>
@@ -12,22 +17,18 @@
         <SectionList/>
 
         <CreateSectionBtn
-            v-show="!isCreate"
-            @open-create='isCreate = true'
+            v-show="isCreateBtn"
+            @open-create='openCreate'
         />
         <CreateSectionField
-            v-show="isCreate"
-            @close-create='isCreate = false'
+            v-show="isCreateField"
+            @close-create='closeCreate'
         />
         <EditSectionField
-            v-show="isEdit"
+            v-show="isEditField"
+            ref='edit'
             @close-edit='closeEdit'
         />
-
-        <div class='operation_btn_wrap pr-2'>
-            <FilterBtn/>
-            <SortBtn/>
-        </div>
 
         <div class='today_todo_count_wrap pr-2'>
             <vs-button
@@ -65,11 +66,13 @@
             SectionList,
         },
         data: () => ({
-            isCreate: false,
-            isEdit: false,
+            isCreateBtn: true,      // セクション追加ボタン
+            isCreateField: false,   // セクション追加フィールド
+            isEditField: false,     // セクション更新フィールド
         }),
         created () {
             this.getDetailProjectAction(this.$route.params.id)
+            this.$eventHub.$on('open-edit', this.openEdit)
         },
         beforeRouteUpdate (to, from, next) {
             if (to.params.id !== from.params.id) this.getDetailProjectAction(to.params.id)
@@ -84,9 +87,22 @@
             ...mapActions([
                 'getDetailProjectAction',
             ]),
+            openCreate () {
+                this.isCreateBtn = false
+                this.isCreateField = true
+            },
+            closeCreate () {
+                this.isCreateBtn = true
+                this.isCreateField = false
+            },
+            openEdit (section) {
+                this.isCreateBtn = false
+                this.isEditField = true
+                this.$refs.edit.open(section)
+            },
             closeEdit () {
-                this.isCreate = false
-                this.isEdit = false
+                this.isCreateBtn = true
+                this.isEditField = false
             }
         },
     }
@@ -102,9 +118,6 @@
         }
     }
     .operation_btn_wrap::v-deep {
-        position: absolute;
-        top: 0;
-        right: 0;
         .vs-button {
             display: inline-block;
         }

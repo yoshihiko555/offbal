@@ -1,5 +1,5 @@
 <template>
-    <button class="add_section_btn" @click="open">
+    <button class="add_section_btn mt-2" @click="open">
         <!-- <i class='bx bx-plus-circle'></i> -->
         <span class="add_section">セクション追加</span>
     </button>

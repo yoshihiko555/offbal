@@ -61,7 +61,8 @@ export default new Vuex.Store({
             state.detailProject.sections.push(payload)
         },
         updateSection (state, payload) {
-            console.log(payload)
+            const index = state.detailProject.sections.findIndex(section => section.id === payload.id)
+            Vue.set(state.detailProject.sections, index, payload)
         },
         deleteSection (state, payload) {
             const index = state.detailProject.sections.findIndex(section => section.id === payload)

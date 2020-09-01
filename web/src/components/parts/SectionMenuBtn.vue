@@ -2,6 +2,7 @@
     <div>
         <v-menu
             offset-x
+            left
             transition="slide-x-transition"
             rounded='lg'
         >
@@ -25,17 +26,47 @@
                     </v-list-item-icon>
                     <v-list-item-title>{{ menu.name }}</v-list-item-title>
                 </v-list-item>
+
+                <!-- アーカイブ登録 -->
+                <v-list-item
+                    v-if='!section.archived'
+                    @click='togleArchived'
+                >
+                    <v-list-item-icon class='mr-0'>
+                        <v-icon small v-text='archivedMenu[0].icon'/>
+                    </v-list-item-icon>
+                    <v-list-item-title>{{ archivedMenu[0].name }}</v-list-item-title>
+                </v-list-item>
+
+                <!-- アーカイブ削除 -->
+                <v-list-item
+                    v-else
+                    @click='togleArchived'
+                >
+                    <v-list-item-icon class='mr-0'>
+                        <v-icon small v-text='archivedMenu[1].icon'/>
+                    </v-list-item-icon>
+                    <v-list-item-title>{{ archivedMenu[1].name }}</v-list-item-title>
+                </v-list-item>
             </v-list>
         </v-menu>
+        <SelectProjectBtn
+            @move-section='moveSection'
+            ref='projectBtn'
+        />
     </div>
 </template>
 
 <script>
+    import SelectProjectBtn from '@/components/parts/SelectProjectBtn'
 	import { mapActions, mapMutations } from 'vuex'
 	import _ from 'lodash'
 
     export default {
         name: 'SectionMenuBtn',
+        components: {
+            SelectProjectBtn,
+        },
         props: {
         	section: {
         		type: Object,
@@ -44,49 +75,108 @@
         },
         data () {
         	return {
-        		cloneSection: {},
+                cloneSection: {},
                 menus: [
                     {
                         name: 'セクションの編集',
                         icon: 'mdi-pencil-outline',
-                        call: this.test,
+                        call: this.open,
                     },
                     {
                         name: 'セクションのを削除',
                         icon: 'mdi-trash-can-outline',
-                        call: this.deleteSection,
+                        call: this.deleteLoaclSection,
                     },
                     {
                         name: 'セクションの移動',
                         icon: 'mdi-arrow-right-circle-outline',
-                        call: this.test,
+                        call: this.openSelectProject,
                     },
                     {
                         name: 'セクションの複製',
                         icon: 'mdi-content-copy',
-                        call: this.test,
+                        call: this.copySection,
                     },
+                ],
+                archivedMenu: [
                     {
                         name: 'セクションのアーカイブ',
                         icon: 'mdi-package',
-                        call: this.test,
                     },
-                ],
+                    {
+                        name: 'セクションのアーカイブ削除',
+                        icon: 'mdi-package',
+                    },
+                ]
         	}
         },
         methods: {
             ...mapMutations([
+                'addSection',
                 'updateSection',
+                'deleteSection',
             ]),
             ...mapActions([
                 'deleteSectionAction',
             ]),
-            deleteSection () {
+            open () {
+                this.$eventHub.$emit('open-edit', this.section)
+            },
+            deleteLoaclSection () {
                 this.deleteSectionAction(this.section.id)
             },
-        	test () {
-        		console.log('test')
-        	}
+            openSelectProject () {
+                this.$refs.projectBtn.open()
+            },
+            moveSection (project) {
+                this.cloneSection = _.cloneDeep(this.section)
+                this.cloneSection.target_project = project.id
+                this.$axios({
+                    url: `/api/section/${this.section.id}/`,
+                    method: 'PUT',
+                    data: this.cloneSection,
+                })
+                .then(res => {
+                    console.log(res)
+                    this.deleteSection(this.section.id)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            },
+            copySection () {
+                this.$axios({
+                    url: '/api/section/',
+                    method: 'POST',
+                    data: {
+                        target_project: this.$route.params.id,
+                        name: this.section.name,
+                    }
+                })
+                .then(res => {
+                    console.log(res)
+                    this.addSection(res.data)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            },
+            togleArchived () {
+                this.cloneSection = _.cloneDeep(this.section)
+                this.cloneSection.archived = !this.cloneSection.archived
+                this.$axios({
+                    url: `/api/section/${this.section.id}/`,
+                    method: 'PUT',
+                    data: this.cloneSection
+                })
+                .then(res => {
+                    console.log(res)
+                    this.updateSection(res.data)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            },
         },
     }
 </script>

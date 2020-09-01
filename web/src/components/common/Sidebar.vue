@@ -55,6 +55,13 @@
 
                         <!-- ラベル -->
                         <div v-else>
+                            <v-list-item>
+                                <v-list-item-title>新規ラベル追加</v-list-item-title>
+                                <v-list-item-action>
+                                    <v-btn icon @click='createLabel'><v-icon>mdi-plus</v-icon></v-btn>
+                                </v-list-item-action>
+                            </v-list-item>
+
                             <v-list-item
                                 v-for='(label, i) in labels'
                                 :key='i'
@@ -101,12 +108,17 @@
         <CreateProjectDialog
             ref='project'
         />
+
+        <CreateLabelDialog
+            ref='label'
+        />
     </div>
 </template>
 
 <script>
 	import CreateProjectDialog from '@/components/common/CreateProjectDialog'
     import SidebarProjectMenuBtn from '@/components/parts/SidebarProjectMenuBtn'
+    import CreateLabelDialog from '@/components/common/CreateLabelDialog'
 
     import { mapGetters } from 'vuex'
     import { Const } from '@/assets/js/const'
@@ -117,32 +129,19 @@
         components: {
         	CreateProjectDialog,
             SidebarProjectMenuBtn,
+            CreateLabelDialog,
         },
         data () {
             return {
                 drawer: true,
                 menus: Con.SIDEBAR_MENU,
-                // テスト用
-                labels: [
-                	{
-                		id: 1,
-                		name: 'Label1',
-                	},
-                	{
-                		id: 2,
-                		name: 'Label2',
-                	},
-                	{
-                		id: 3,
-                		name: 'Label3',
-                	},
-                ],
             }
         },
     	computed: {
     		...mapGetters([
                 'projects',
                 'favoriteProjects',
+                'labels',
     		])
     	},
         methods: {
@@ -162,7 +161,10 @@
             },
             createProject () {
             	this.$refs.project.open()
-            }
+            },
+            createLabel () {
+                this.$refs.label.open()
+            },
         }
     }
 </script>

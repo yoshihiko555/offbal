@@ -13,14 +13,14 @@
                 v-on="on"
             >
                 <v-icon
-                    :color="selectedLabelColor"
+                    :color="label.color"
                 >mdi-label-multiple-outline</v-icon>
             </v-btn>
         </template>
         <v-list>
             <v-list-item-group>
                 <v-list-item
-                    v-for="(label, i) in labelList"
+                    v-for="(label, i) in labels"
                     :key="i"
                     @click="selectLabel(label)"
                 >
@@ -31,46 +31,38 @@
     </v-menu>
 </template>
 <script>
+    import { mapGetters } from 'vuex'
     import { Const } from '@/assets/js/const'
     const Con = new Const()
 
     export default {
         name: 'LabelBtn',
-        props: {
-        },
+        components: {},
+        props: {},
         data: () => ({
-            labelList: [
-                {
-                    name: 'programming'
-                },
-                {
-                    name: 'english'
-                },
-                {
-                    name: 'music'
-                }
-            ],
-            selectedLabel: '',
-            selectedLabelColor: Con.NON_ACTIVE_COLOR
+            label: {
+                name: '',
+                color: Con.NON_ACTIVE_COLOR
+            }
         }),
-        created () {
+        created () {},
+        mounted: function () {},
+        watch: {
+            'label.name': function (val) {
+                this.label.color = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
+                this.$eventHub.$emit('create_task_info', 'label_list', [val])
+            }
         },
-        mounted: function () {
+        computed: {
+            ...mapGetters([
+                'labels',
+            ])
         },
         methods: {
-            selectLabel (value) {
-                this.selectedLabel = value.name
+            selectLabel (label) {
+                this.label.name = label.name
             }
         },
-        watch: {
-            selectedLabel: function (val) {
-                if (val.length > 0) {
-                    this.selectedLabelColor = Con.ACTIVE_COLOR
-                } else {
-                    this.selectedLabelColor = Con.NON_ACTIVE_COLOR
-                }
-            }
-        }
     }
 </script>
 <style lang='scss'>

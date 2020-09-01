@@ -83,7 +83,6 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
         model = Project
         fields = [
             'id',
-            'parent_project',
             'member',
             'name',
             'color',
@@ -141,6 +140,21 @@ class SectionSerializer(DynamicFieldsModelSerializer):
 
 class TaskSerializer(DynamicFieldsModelSerializer):
 
+    user_id = serializers.CharField(write_only=True)
+    project_name = serializers.CharField(write_only=True)
+    deadline_str = serializers.CharField(write_only=True, allow_blank=True)
+    remind_str = serializers.CharField(write_only=True, allow_blank=True)
+    label_list = serializers.ListField(
+        child=serializers.CharField(),
+        allow_empty=True,
+        write_only=True,
+    )
+    section_name = serializers.CharField(write_only=True, allow_blank=True)
+
+    target_user = serializers.CharField(read_only=True)
+    target_project = serializers.CharField(read_only=True)
+    label = serializers.CharField(read_only=True)
+
     class Meta:
         model = Task
         fields = [
@@ -155,17 +169,91 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'comment',
             'completed',
             'deleted',
-            'is_comp_sub_public'
+            'is_comp_sub_public',
+            'user_id',
+            'project_name',
+            'deadline_str',
+            'remind_str',
+            'label_list',
+            'section_name',
         ]
 
+    def create(self, validated_data):
+
+        logger.debug('============TASKを作る================')
+        logger.debug(validated_data)
+
+        try:
+            user = mUser.objects.get(auth0_id=validated_data['user_id'])
+            project = Project.objects.get(name=validated_data['project_name'])
+
+            section_name = validated_data['section_name']
+            section = Section.objects.get(name=section_name) if section_name != '' else None
+
+        except mUser.DoesNotExist:
+            logger.error('mUserが見つかりませんでした。')
+            return None
+        except Project.DoesNotExist:
+            logger.error('Projectが見つかりませんでした。')
+            return None
+        except Section.DoesNotExist:
+            logger.error('Sectionが見つかりませんでした。')
+            return None
+
+        dl_str = validated_data['deadline_str']
+        rm_str = validated_data['remind_str']
+
+        deadline = datetime.strptime(dl_str, '%Y-%m-%d %H:%M:%S') if dl_str != '' else None
+        remind = datetime.strptime(rm_str, '%Y-%m-%d %H:%M:%S') if rm_str != '' else None
+
+        task = Task.objects.create(
+            content=validated_data['content'],
+            comment=validated_data['comment'],
+            target_user=user,
+            target_project=project,
+            target_section=section,
+            priority=validated_data['priority'],
+            deadline=deadline,
+            remind=remind,
+        )
+
+        for label_name in validated_data['label_list']:
+            try:
+                label = Label.objects.get(name=label_name)
+                task.label.add(label)
+            except Label.DoesNotExist:
+                logger.error('Labelが見つかりませんでした。')
+                return None
+
+        return task
+
 class LabelSerializer(DynamicFieldsModelSerializer):
+
+    user_id = serializers.CharField(write_only=True)
+    author = serializers.CharField(read_only=True)
 
     class Meta:
         model = Label
         fields = [
-            'target_task',
-            'name'
+            'name',
+            'author',
+            'user_id'
         ]
+
+    def create(self, validated_data):
+
+        try:
+            user = mUser.objects.get(auth0_id=validated_data['user_id'])
+        except mUser.DoesNotExist:
+            logger.info('mUserが見つかりませんでした')
+            return None
+
+        label = Label.objects.create(
+            name=validated_data['name'],
+            author=user
+        )
+
+        return label
 
 class KarmaSerializer(DynamicFieldsModelSerializer):
 

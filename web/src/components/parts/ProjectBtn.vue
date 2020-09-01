@@ -13,14 +13,14 @@
                 v-on="on"
             >
                 <v-icon
-                    :color="selectedProjectColor"
+                    :color="project.color"
                 >mdi-inbox</v-icon>
             </v-btn>
         </template>
         <v-list>
             <v-list-item-group>
                 <div
-                    v-for="(project, i) in projectList"
+                    v-for="(project, i) in projects"
                     :key="i"
                 >
                     <v-list-item
@@ -52,102 +52,46 @@
 </template>
 <script>
     import { Const } from '@/assets/js/const'
+    import { mapGetters } from 'vuex'
     const Con = new Const()
 
     export default {
         name: 'ProjectBtn',
-        props: {
-
-        },
+        components: {},
+        props: {},
         data: () => ({
-            projectList: [
-                {
-                    name: 'インボックス',
-                    color: 'red accent-3',
-                    section: [
-                        {
-                            name: 'study',
-                            project: 'インボックス'
-                        },
-                        {
-                            name: 'hoby',
-                            project: 'インボックス'
-                        },
-                        {
-                            name: 'friend',
-                            project: 'インボックス'
-                        },
-                        {
-                            name: 'family',
-                            project: 'インボックス'
-                        },
-                        {
-                            name: 'helth',
-                            project: 'インボックス'
-                        },
-                    ]
-                },
-                {
-                    name: 'bandue',
-                    color: 'green accent-3',
-                    section: [
-                    ]
-                },
-                {
-                    name: 'coopy',
-                    color: 'grey lighten-1',
-                    section: [
-                        {
-                            name: 'design',
-                            project: 'coopy'
-                        }
-                    ]
-                },
-                {
-                    name: 'offbal',
-                    color: 'yellow accent-3',
-                    section: [
-                        {
-                            name: 'design',
-                            project: 'offbal'
-                        },
-                        {
-                            name: 'coding',
-                            project: 'offbal'
-                        },
-                        {
-                            name: 'deploy',
-                            project: 'offbal'
-                        }
-                    ]
-                }
-            ],
-            selectedProject: '',
-            selectedProjectColor: Con.NON_ACTIVE_COLOR
+            project: {
+                name: '',
+                color: Con.NON_ACTIVE_COLOR,
+                section: ''
+            }
         }),
-        created () {
+        created () {},
+        mounted: function () {},
+        watch: {
+            'project.name': function (val) {
+                this.project.color = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
+            }
         },
-        mounted: function () {
+        computed: {
+            ...mapGetters([
+                'projects',
+            ])
         },
         methods: {
             selectProject (value) {
-                this.selectedProject = value.name
-                console.log(this.selectedProject)
+                const { name } = value
+                this.project.name = value.name
+                this.$eventHub.$emit('create_task_info', 'project_name', name)
             },
             selectSection (value) {
-                this.selectedProject = value.project + '/' + value.name
-                console.log(this.selectedProject)
+                const { name, section } = value
+                this.project.name = name
+                this.project.section = section
+                this.$eventHub.$emit('create_task_info', 'project_name', name)
+                this.$eventHub.$emit('create_task_info', 'section_name', section)
             }
         },
-        watch: {
-            selectedProject: function (val) {
-                if (val.length > 0) {
-                    this.selectedProjectColor = Con.ACTIVE_COLOR
-                } else {
-                    this.selectedProjectColor = Con.NON_ACTIVE_COLOR
-                }
-            }
-        }
     }
 </script>
 <style lang='scss'>

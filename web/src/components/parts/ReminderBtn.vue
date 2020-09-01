@@ -11,16 +11,17 @@
                 v-bind="attrs"
                 v-on="on"
             ><v-icon
-                :color="reminderDateColor"
+                :color="remind.color"
             >mdi-alarm</v-icon>
             </v-btn>
         </template>
         <Datetime
-            v-model="reminderDate"
+            v-model="remind.value"
             :minute-interval="15"
             :min-date="start"
             inline
             no-keyboard
+            format="YYYY-MM-DD HH:mm:ss"
         />
     </v-menu>
 </template>
@@ -34,28 +35,31 @@
 
     export default {
         name: 'ReminderBtn',
-        data: () => ({
-            reminderDate: '',
-            reminderDateColor: Con.NON_ACTIVE_COLOR
-        }),
         components: {
             Datetime,
         },
+        props: {},
+        data: () => ({
+            remind: {
+                value: '',
+                color: Con.NON_ACTIVE_COLOR
+            }
+        }),
+        created () {},
+        mounted: function () {},
+        watch: {
+            'remind.value': function (val) {
+                this.remind.color = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
+                this.$eventHub.$emit('create_task_info', 'remind_str', val)
+            }
+        },
         computed: {
             start () {
-                const start = moment().add(1, 'days').hour(8)
+                const start = moment()
                 return start.format('YYYY-MM-DDTHH:mm:ss')
             },
         },
-        watch: {
-            reminderDate: function (val) {
-                if (val.length > 0) {
-                    this.reminderDateColor = Con.ACTIVE_COLOR
-                } else {
-                    this.reminderDateColor = Con.NON_ACTIVE_COLOR
-                }
-            }
-        },
+        methods: {},
     }
 </script>
 <style lang='scss'>

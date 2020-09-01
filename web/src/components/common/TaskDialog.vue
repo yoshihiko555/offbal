@@ -10,63 +10,72 @@
             >
                 新規タスクを追加
             </h5>
-            <v-form
-                @submit.prevent
-            >
-                <v-row
-                    class="task_dialog_task_area_wrap"
-                >
-                    <v-col
-                        cols="11"
-                        class="task_dialog_task_input_area"
+            <ValidationObserver v-slot="{ invalid }">
+                <!-- <v-form
+                    @submit.prevent
+                > -->
+                    <v-row
+                        class="task_dialog_task_area_wrap"
                     >
-                        <v-textarea
-                            class="mt-3"
-                            outlined
-                            label="例: 英単語、プログラミング、ブログ、読書"
-                            v-model="content"
-                            rows="5"
-                            no-resize
-                            :counter="100"
-                        ></v-textarea>
-                    </v-col>
-                    <v-col
-                        cols="1"
-                    >
-                        <DeadLineBtn/>
-                        <ProjectBtn/>
-                        <LabelBtn/>
-                        <PriorityBtn/>
-                        <ReminderBtn/>
-                    </v-col>
-                </v-row>
-                <v-row>
-                    <v-col
-                        cols="9"
-                    >
-                        <vs-input
-                            class="mt-1"
-                            v-model="comment"
-                            placeholder="コメント"
+                        <v-col
+                            cols="11"
+                            class="task_dialog_task_input_area"
                         >
-                            <template #icon>
-                                <v-icon
-                                    color="teal accent-3"
-                                >mdi-comment-outline</v-icon>
-                            </template>
-                        </vs-input>
-                    </v-col>
-                    <v-col
-                        cols="3"
-                    >
-                        <vs-button
-                            relief
-                            color="#40e0d0"
-                            @click="addTask"
-                        >タスクを追加</vs-button>
-                    </v-col>
-                </v-row>
-            </v-form>
+                            <ValidationProvider v-slot="{ errors }" name='タスク' rules="required">
+                                <v-textarea
+                                    class="mt-3"
+                                    outlined
+                                    label="例: 英単語、プログラミング、ブログ、読書"
+                                    v-model="task.content"
+                                    rows="5"
+                                    no-resize
+                                    :counter="100"
+                                >
+                                    <template #message-danger>
+                                        {{ errors[0] }}
+                                    </template>
+                                </v-textarea>
+                            </ValidationProvider>
+                        </v-col>
+                        <v-col
+                            cols="1"
+                        >
+                            <DeadLineBtn/>
+                            <ProjectBtn/>
+                            <LabelBtn/>
+                            <PriorityBtn/>
+                            <ReminderBtn/>
+                        </v-col>
+                    </v-row>
+                    <v-row>
+                        <v-col
+                            cols="9"
+                        >
+                            <vs-input
+                                class="mt-1"
+                                v-model="task.comment"
+                                placeholder="コメント"
+                            >
+                                <template #icon>
+                                    <v-icon
+                                        color="teal accent-3"
+                                    >mdi-comment-outline</v-icon>
+                                </template>
+                            </vs-input>
+                        </v-col>
+                        <v-col
+                            cols="3"
+                        >
+                            <vs-button
+                                relief
+                                color="#40e0d0"
+                                :disabled="invalid"
+                                @click.prevent="addTask"
+                            >タスクを追加</vs-button>
+                        </v-col>
+                    </v-row>
+                <!-- </v-form> -->
+            </ValidationObserver>
         </v-container>
     </vs-dialog>
 </template>
@@ -79,12 +88,36 @@
 
     export default {
         name: 'TaskDialog',
+        components: {
+            DeadLineBtn,
+            ProjectBtn,
+            LabelBtn,
+            PriorityBtn,
+            ReminderBtn,
+        },
         props: {
             taskDialog: {
                 type: Boolean,
                 required: true
             }
         },
+        data: () => ({
+            task: {
+                project_name: 'インボックス',
+                content: '',
+                comment: '',
+                section_name: '',
+                deadline_str: '',
+                remind_str: '',
+                priority: '1',
+                label_list: [],
+            },
+        }),
+        created () {
+            this.$eventHub.$on('create_task_info', this.create_task_info)
+        },
+        mounted: function () {},
+        watch: {},
         computed: {
             localTaskDialog: {
                 get: function () {
@@ -95,21 +128,27 @@
                 },
             }
         },
-        data: () => ({
-            content: '',
-            comment: '',
-        }),
-        components: {
-            DeadLineBtn,
-            ProjectBtn,
-            LabelBtn,
-            PriorityBtn,
-            ReminderBtn,
-        },
         methods: {
             addTask () {
-                console.log('addTask')
-            }
+                console.log('タスクを追加')
+                console.log(this.task)
+                this.$axios({
+                    url: '/api/task/',
+                    method: 'POST',
+                    data: this.task,
+                })
+                .then(res => {
+                    console.log(res)
+                    this.$eventHub.$emit('add_task', res)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+                this.localTaskDialog = false
+            },
+            create_task_info (key, value) {
+                this.task[key] = value
+            },
         }
     }
 

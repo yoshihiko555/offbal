@@ -12,16 +12,17 @@
                 v-bind="attrs"
                 v-on="on"
             ><v-icon
-                :color='deadLineDateColor'
+                :color='deadline.color'
             >mdi-calendar-clock</v-icon>
             </v-btn>
         </template>
         <Datetime
-            v-model="deadLineDate"
+            v-model="deadline.value"
             :minute-interval="30"
             :min-date="start"
             inline
             no-keyboard
+            format="YYYY-MM-DD HH:mm:ss"
         />
     </v-menu>
 </template>
@@ -35,28 +36,31 @@
 
     export default {
         name: 'DeadLineBtn',
-        data: () => ({
-            deadLineDate: '',
-            deadLineDateColor: Con.NON_ACTIVE_COLOR
-        }),
         components: {
             Datetime,
         },
+        props: {},
+        data: () => ({
+            deadline: {
+                value: '',
+                color: Con.NON_ACTIVE_COLOR
+            }
+        }),
+        created () {},
+        mounted: function () {},
+        watch: {
+            'deadline.value': function (val) {
+                this.deadline.color = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
+                this.$eventHub.$emit('create_task_info', 'deadline_str', val)
+            }
+        },
         computed: {
             start () {
-                const start = moment().add(1, 'days').hour(8)
+                const start = moment()
                 return start.format('YYYY-MM-DDTHH:mm:ss')
             },
         },
-        watch: {
-            deadLineDate: function (val) {
-                if (val.length > 0) {
-                    this.deadLineDateColor = Con.ACTIVE_COLOR
-                } else {
-                    this.deadLineDateColor = Con.NON_ACTIVE_COLOR
-                }
-            }
-        },
+        methods: {},
     }
 </script>
 <style lang='scss'>

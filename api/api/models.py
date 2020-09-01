@@ -219,14 +219,6 @@ class mSetting(models.Model):
 
 class Project(TimeStampModel):
 
-    parent_project = models.ForeignKey(
-        'self',
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name='project_parent_project'
-    )
-
     member = models.ManyToManyField(
         mUser,
         blank=True
@@ -337,13 +329,12 @@ class SubTask(TimeStampModel,
 
 class Label(TimeStampModel):
 
-    target_task = models.ForeignKey(
-        Task,
-        on_delete=models.CASCADE,
-        related_name='label_target_task'
-    )
-
     name = models.CharField(max_length=60)
+
+    author = models.ForeignKey(
+        'api.mUser',
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return self.name

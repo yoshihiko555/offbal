@@ -10,7 +10,7 @@
                 v-bind="attrs"
                 v-on="on"
             ><v-icon
-                :color="selectedPriorityIconColor"
+                :color="priority.color"
             >mdi-star-box</v-icon>
             </v-btn>
         </template>
@@ -39,48 +39,58 @@
 
     export default {
         name: 'PriorityBtn',
-        props: {
-        },
+        components: {},
+        props: {},
         data: () => ({
             items: [
                 {
                     text: '優先度5',
                     icon: 'mdi-star-box',
                     color: 'red accent-4',
+                    value: '5',
                 },
                 {
                     text: '優先度4',
                     icon: 'mdi-star-box',
                     color: 'red accent-3',
+                    value: '4',
                 },
                 {
                     text: '優先度3',
                     icon: 'mdi-star-box',
                     color: 'red accent-2',
+                    value: '3',
                 },
                 {
                     text: '優先度2',
                     icon: 'mdi-star-box',
                     color: 'red accent-1',
+                    value: '2',
                 },
                 {
                     text: '優先度1',
                     icon: 'mdi-star-box',
                     color: 'grey lighten-1',
+                    value: '1',
                 },
             ],
-            selectedPriority: '',
-            selectedPriorityIconColor: Con.NON_ACTIVE_COLOR
+            priority: {
+                value: '',
+                color: Con.NON_ACTIVE_COLOR
+            },
         }),
-        created () {
-        },
-        mounted: function () {
-        },
+        created () {},
+        mounted: function () {},
+        watch: {},
+        computed: {},
         methods: {
-            selectPriority (item) {
-                this.selectedPriority = item.text
-                this.selectedPriorityIconColor = item.color
-                console.log(item)
+            selectPriority (priority) {
+                const { value, color } = priority
+                this.priority = {
+                    value: value,
+                    color: color
+                }
+                this.$eventHub.$emit('create_task_info', 'priority', value)
             }
         }
     }

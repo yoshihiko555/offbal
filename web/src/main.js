@@ -9,6 +9,7 @@ import VueSession from 'vue-session'
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import myRules from '@/assets/js/rules'
 import { globalMixins } from '@/mixins'
+import eventHub from '@/plugins/eventHub'
 
 // CSS
 import 'vuesax/dist/vuesax.css'
@@ -25,6 +26,8 @@ Vue.use(Vuesax, {
 	}
 })
 Vue.use(VueSession)
+
+Vue.use(eventHub)
 
 Vue.mixin(globalMixins)
 

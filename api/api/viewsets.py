@@ -101,12 +101,32 @@ class TaskViewSet(BaseModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(self.get_serializer(serializer.instance).data, status=status.HTTP_201_CREATED)
+
+        logger.debug(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class LabelViewSet(BaseModelViewSet):
 
     permission_classes = (permissions.AllowAny,)
     queryset = Label.objects.all()
     serializer_class = LabelSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(self.get_serializer(serializer.instance).data, status=status.HTTP_201_CREATED)
+
+        logger.debug(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class KarmaViewSet(BaseModelViewSet):

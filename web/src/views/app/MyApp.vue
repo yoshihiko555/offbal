@@ -34,6 +34,7 @@
         created () {
             this.getProjectsAction()
             this.getFavoriteProjectsAction()
+            this.getLabelsAction()
         },
         computed: {
         },
@@ -41,6 +42,7 @@
             ...mapActions([
                 'getProjectsAction',
                 'getFavoriteProjectsAction',
+                'getLabelsAction',
             ]),
         },
     }

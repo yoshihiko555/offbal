@@ -77,7 +77,8 @@ class SettingSerializer(DynamicFieldsModelSerializer):
 
 class ProjectSerializer(DynamicFieldsModelSerializer):
 
-#     auth0_id = serializers.CharField(write_only=True)
+    auth0_id = serializers.CharField(write_only=True)
+    creator = serializers.CharField(read_only=True)
     tasks = serializers.SerializerMethodField()
     sections = serializers.SerializerMethodField()
 
@@ -85,6 +86,7 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
         model = Project
         fields = [
             'id',
+            'creator',
             'member',
             'name',
             'color',
@@ -93,7 +95,7 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
             'is_comp_public',
             'deleted',
             'archived',
-#             'auth0_id',
+            'auth0_id',
             'tasks',
             'sections',
         ]
@@ -105,18 +107,18 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
         return SectionSerializer(obj.section_target_project.all(), many=True).data
 
     def create(self, validated_data):
-#         try:
-#             user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
-#         except:
-#             logger.info('mUserが見つかりませんでした。')
-#             return None
+        try:
+            user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
+        except mUser.DoesNotExist:
+            logger.info('mUserが見つかりませんでした。')
+            return None
 
         project = Project.objects.create(
+                creator=user,
                 name = validated_data['name'],
                 color = validated_data['color'],
                 favorite = validated_data['favorite']
             )
-        # project.member.add(user)
         return project
 
 class ProjectMemberShipSerializer(DynamicFieldsModelSerializer):

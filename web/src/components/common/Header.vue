@@ -45,8 +45,6 @@ export default {
 			auth.handleAuthentication()
 			auth.authNotifier.on('authChange', authState => {
                 this.isAuth = authState.authenticated
-                if (!this.isAuth) this.$router.push('/')
-                else this.$router.push('/myapp')
                 auth.getUserProfile((err, res) => {
                 	if (err) {
                 		console.log(err)
@@ -54,7 +52,12 @@ export default {
                 		console.log(res)
                 		const namespace = 'https://auth0/user_metadata'
                 		// サインアップならmSetting等を作成する
-                		if (!res[namespace].signup) this.initUserData(res.sub, res.name)
+                		if (!res[namespace].signup) {
+                            this.initUserData(res.sub, res.name)
+                        } else {
+                            if (!this.isAuth) this.$router.push('/')
+                            else this.$router.push('/myapp')
+                        }
                 	}
                 })
             })
@@ -84,7 +87,9 @@ export default {
    	    		}
    	    	})
    	    	.then(res => {
-   	    		console.log(res)
+                console.log(res)
+                if (!this.isAuth) this.$router.push('/')
+                else this.$router.push('/myapp')
    	    	})
    	    	.catch(e => {
    	    		console.log(e)

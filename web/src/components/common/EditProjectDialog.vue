@@ -9,15 +9,16 @@
             >
                 プロジェクトを編集する
             </h5>
-            <ValidationObserver v-slot="{ invalid }">
+            <ValidationObserver v-slot="{ invalid }" ref='form'>
                 <v-row>
                     <v-col cols='12'>
                         <!-- プロジェクト名 -->
-                        <ValidationProvider v-slot='{ errors }' name='プロジェクト名' rules='required'>
+                        <ValidationProvider v-slot='{ errors }' name='プロジェクト名' vid='name' rules='required'>
                             <vs-input
                                 class="my-6"
                                 v-model="project.name"
                                 label='プロジェクト名'
+                                :loading='loading'
                             >
                                 <template #message-danger>
                                     {{ errors[0] }}
@@ -86,8 +87,8 @@
 </template>
 
 <script>
-    import { mapActions } from 'vuex'
     import _ from 'lodash'
+    import { mapActions } from 'vuex'
     import { Const } from '@/assets/js/const'
     const Con = new Const()
 
@@ -96,8 +97,19 @@
         data: () => ({
             dialog: false,
             project: {},
+            cloneProject: {},
             colorList: Con.PROJECT_COLOR,
+            loading: false,
+            initFlg: true,
         }),
+        watch: {
+            'project.name': function (val) {
+				if (val && !this.initFlg) {
+					this.loading = true
+					this.checkProjetName(val)
+				}
+            }
+        },
         methods: {
             ...mapActions([
                 'updateProjectAction',
@@ -106,8 +118,10 @@
             ]),
             open (project) {
                 this.project = _.cloneDeep(project)
+                // 重複チェックのために変更前の状態を保持する
+                this.cloneProject = _.cloneDeep(project)
                 this.dialog = true
-                console.log(project)
+                setTimeout(() => { this.initFlg  = false }, 0)
             },
             close () {
                 this.project = {}
@@ -129,7 +143,30 @@
                 .catch(e => {
                     console.log(e)
                 })
-            }
+            },
+            checkProjetName: _.debounce(function checkProjetName (val) {
+				this.$axios({
+					methods: 'GET',
+					url: '/api/project/checkUpdateProjectDuplication/',
+					params: {
+                        current_name: this.cloneProject.name,
+						new_name: val
+					}
+				})
+				.then(res => {
+                    console.log(res.data)
+                    if (!res.data.result) {
+                        this.$refs.form.setErrors({
+                            name: ['既にこのプロジェクト名は作成済みです']
+                        })
+                    }
+					this.loading = false
+				})
+				.catch(e => {
+					console.log(e)
+					this.loading = false
+				})
+			}, 1000),
         }
     }
 </script>

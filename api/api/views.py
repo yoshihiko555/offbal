@@ -45,8 +45,10 @@ class SignupView(generics.CreateAPIView):
                 target_user=user
             )
             project = Project.objects.create(
+                creator=user,
                 name='インボックス'
             )
             project.member.add(user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

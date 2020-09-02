@@ -31,6 +31,7 @@ class UserManager(BaseUserManager):
             target_user=user
         )
         project = Project.objects.create(
+            creator=user,
             name='インボックス'
         )
         project.member.add(user)
@@ -218,6 +219,12 @@ class mSetting(models.Model):
 
 
 class Project(TimeStampModel):
+
+    creator = models.ForeignKey(
+        mUser,
+        on_delete=models.CASCADE,
+        related_name='project_creator_user'
+    )
 
     member = models.ManyToManyField(
         mUser,

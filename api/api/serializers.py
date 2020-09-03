@@ -21,6 +21,10 @@ from datetime import (
 )
 from django.db.models import Q
 
+from .utils import (
+    utc_to_jst,
+)
+
 logging.basicConfig(
     level = logging.DEBUG,
     format = '''%(levelname)s %(asctime)s %(pathname)s:%(funcName)s:%(lineno)s
@@ -170,7 +174,10 @@ class TaskSerializer(DynamicFieldsModelSerializer):
 
     target_user = serializers.CharField(read_only=True)
     target_project = serializers.CharField(read_only=True)
-    label = serializers.CharField(read_only=True)
+    label = serializers.SerializerMethodField(read_only=True)
+    created_at = serializers.SerializerMethodField()
+    updated_at = serializers.SerializerMethodField()
+    sub_tasks = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Task
@@ -194,7 +201,23 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'remind_str',
             'label_list',
             'section_name',
+            'created_at',
+            'updated_at',
+            'sub_tasks',
         ]
+
+    def get_label(self, obj):
+        return LabelSerializer(obj.label.all(), many=True).data
+
+    def get_created_at(self, obj):
+        return utc_to_jst(obj.created_at)
+
+    def get_updated_at(self, obj):
+        return utc_to_jst(obj.updated_at)
+
+    def get_sub_tasks(self, obj):
+        # とりあえず置いておく
+        return None
 
     def create(self, validated_data):
 
@@ -245,18 +268,31 @@ class TaskSerializer(DynamicFieldsModelSerializer):
 
         return task
 
+
 class LabelSerializer(DynamicFieldsModelSerializer):
 
     auth0_id = serializers.CharField(write_only=True)
     author = serializers.CharField(read_only=True)
+    created_at = serializers.SerializerMethodField()
+    updated_at = serializers.SerializerMethodField()
 
     class Meta:
         model = Label
         fields = [
+            'id',
             'name',
             'author',
-            'auth0_id'
+            'auth0_id',
+            'created_at',
+            'updated_at',
         ]
+
+    def get_created_at(self, obj):
+        return utc_to_jst(obj.created_at)
+
+    def get_updated_at(self, obj):
+        return utc_to_jst(obj.updated_at)
+
 
     def create(self, validated_data):
 
@@ -273,12 +309,24 @@ class LabelSerializer(DynamicFieldsModelSerializer):
 
         return label
 
+
 class KarmaSerializer(DynamicFieldsModelSerializer):
+
+    created_at = serializers.SerializerMethodField()
+    updated_at = serializers.SerializerMethodField()
 
     class Meta:
         model = Karma
         fields = [
             'target_user',
             'activity',
-            'point'
+            'point',
+            'created_at',
+            'updated_at',
         ]
+
+    def get_created_at(self, obj):
+        return utc_to_jst(obj.created_at)
+
+    def get_updated_at(self, obj):
+        return utc_to_jst(obj.updated_at)

@@ -1,9 +1,9 @@
 <template>
     <v-menu
         bottom
-        offset-y
-        min-width="250px"
-        max-height="400px"
+        offset-x
+        min-width="200px"
+        max-height="380px"
         transition="scroll-y-transition"
     >
         <template v-slot:activator="{ on, attrs }">
@@ -17,7 +17,9 @@
                 >mdi-inbox</v-icon>
             </v-btn>
         </template>
-        <v-list>
+        <v-list
+            dense
+        >
             <v-list-item-group>
                 <div
                     v-for="(project, i) in projects"
@@ -28,7 +30,7 @@
                         @click="selectProject(project)"
                     >
                         <v-icon
-                            class="pl-1 mr-2"
+                            class="mr-2"
                             :color="project.color"
                         >mdi-circle-medium</v-icon>
                         {{ project.name }}
@@ -37,7 +39,7 @@
                         class="pl-8"
                         v-for="(section, i) in project.sections"
                         :key="i"
-                        @click="selectSection(section)"
+                        @click="selectSection(project.name, section.name)"
                     >
                         <v-icon
                             class="mr-2"
@@ -84,11 +86,12 @@
                 this.project.name = value.name
                 this.$eventHub.$emit('create_task_info', 'project_name', name)
             },
-            selectSection (value) {
-                const { name, section } = value
-                this.project.name = name
+            selectSection (project, section) {
+                console.log(project)
+                console.log(section)
+                this.project.name = project
                 this.project.section = section
-                this.$eventHub.$emit('create_task_info', 'project_name', name)
+                this.$eventHub.$emit('create_task_info', 'project_name', project)
                 this.$eventHub.$emit('create_task_info', 'section_name', section)
             },
         },

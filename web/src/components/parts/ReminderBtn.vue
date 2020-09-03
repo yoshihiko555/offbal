@@ -1,7 +1,7 @@
 <template>
     <v-menu
         bottom
-        offset-y
+        offset-x
         min-width="400px"
         transition="scroll-y-transition"
     >

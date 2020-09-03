@@ -1,10 +1,10 @@
 <template>
     <v-menu
-        bottom
-        offset-y
-        mix-width="250px"
-        max-height="400px"
-        transition="scroll-y-transition"
+        :close-on-content-click="false"
+        offset-x
+        rounded="true"
+        v-model="menu"
+        min-width="250px"
     >
         <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -13,21 +13,37 @@
                 v-on="on"
             >
                 <v-icon
-                    :color="label.color"
+                    :color="labelColor"
                 >mdi-label-multiple-outline</v-icon>
             </v-btn>
         </template>
-        <v-list>
-            <v-list-item-group>
-                <v-list-item
-                    v-for="(label, i) in labels"
-                    :key="i"
-                    @click="selectLabel(label)"
+        <v-card>
+            <v-card-actions
+                class="label_select_area_wrap"
+            >
+                <vs-select
+                    placeholder='Select Label'
+                    v-model='selectLabelList'
+                    multiple
+                    filter
+                    collapse-chips
                 >
-                    {{ label.name }}
-                </v-list-item>
-            </v-list-item-group>
-        </v-list>
+                    <vs-option
+                        v-for='(label, i) in labels'
+                        :key='i'
+                        :label='label.name'
+                        :value='label.name'
+                        filter
+                    >{{ label.name }}
+                    </vs-option>
+                </vs-select>
+            </v-card-actions>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                    <v-btn text @click="menu = false">cancel</v-btn>
+                    <v-btn color="primary" text @click="menu = false">ok</v-btn>
+            </v-card-actions>
+        </v-card>
     </v-menu>
 </template>
 <script>
@@ -40,17 +56,16 @@
         components: {},
         props: {},
         data: () => ({
-            label: {
-                name: '',
-                color: Con.NON_ACTIVE_COLOR
-            }
+            labelColor: Con.NON_ACTIVE_COLOR,
+            selectLabelList: [],
+            menu: false
         }),
         created () {},
         mounted: function () {},
         watch: {
-            'label.name': function (val) {
-                this.label.color = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
-                this.$eventHub.$emit('create_task_info', 'label_list', [val])
+            selectLabelList: function (val) {
+                this.labelColor = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
+                this.$eventHub.$emit('create_task_info', 'label_list', val)
             }
         },
         computed: {
@@ -58,12 +73,11 @@
                 'labels',
             ])
         },
-        methods: {
-            selectLabel (label) {
-                this.label.name = label.name
-            }
-        },
+        methods: {},
     }
 </script>
-<style lang='scss'>
+<style lang='scss' scoped>
+    .label_select_area_wrap {
+        padding: 20px 20px 0px 20px;
+    }
 </style>

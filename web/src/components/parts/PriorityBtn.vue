@@ -1,8 +1,9 @@
 <template>
     <v-menu
         bottom
-        offset-y
+        offset-x
         transition="scroll-y-transition"
+        min-width="180px"
     >
         <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -11,10 +12,12 @@
                 v-on="on"
             ><v-icon
                 :color="priority.color"
-            >mdi-star-box</v-icon>
+            >{{ priority.icon }}</v-icon>
             </v-btn>
         </template>
-        <v-list>
+        <v-list
+            dense
+        >
             <v-list-item
                 v-for="(item, i) in items"
                 :key="i"
@@ -25,7 +28,7 @@
                     :color="item.color"
                 >{{ item.icon }}</v-icon>
                 <v-list-item-title
-                    class="mr-2"
+                    class="ml-4"
                 >
                     {{ item.text }}
                 </v-list-item-title>
@@ -45,38 +48,39 @@
             items: [
                 {
                     text: '優先度5',
-                    icon: 'mdi-star-box',
+                    icon: 'mdi-star',
                     color: 'red accent-4',
                     value: '5',
                 },
                 {
                     text: '優先度4',
-                    icon: 'mdi-star-box',
+                    icon: 'mdi-star',
                     color: 'red accent-3',
                     value: '4',
                 },
                 {
                     text: '優先度3',
-                    icon: 'mdi-star-box',
+                    icon: 'mdi-star',
                     color: 'red accent-2',
                     value: '3',
                 },
                 {
                     text: '優先度2',
-                    icon: 'mdi-star-box',
+                    icon: 'mdi-star',
                     color: 'red accent-1',
                     value: '2',
                 },
                 {
                     text: '優先度1',
-                    icon: 'mdi-star-box',
+                    icon: 'mdi-star-outline',
                     color: 'grey lighten-1',
                     value: '1',
                 },
             ],
             priority: {
                 value: '',
-                color: Con.NON_ACTIVE_COLOR
+                color: Con.NON_ACTIVE_COLOR,
+                icon: 'mdi-star-outline'
             },
         }),
         created () {},
@@ -85,10 +89,11 @@
         computed: {},
         methods: {
             selectPriority (priority) {
-                const { value, color } = priority
+                const { value, color, icon } = priority
                 this.priority = {
                     value: value,
-                    color: color
+                    color: color,
+                    icon: icon
                 }
                 this.$eventHub.$emit('create_task_info', 'priority', value)
             }

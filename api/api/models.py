@@ -340,7 +340,7 @@ class SubTask(TimeStampModel,
     target_task = models.ForeignKey(
         Task,
         on_delete=models.CASCADE,
-        related_name='subtask_target_tast'
+        related_name='subtask_target_task'
     )
 
 

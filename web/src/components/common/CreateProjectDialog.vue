@@ -9,15 +9,16 @@
             >
                 新規プロジェクトを追加
             </h5>
-            <ValidationObserver v-slot="{ invalid }">
+            <ValidationObserver v-slot="{ invalid }" ref='form'>
                 <v-row>
                     <v-col cols='12'>
                         <!-- プロジェクト名 -->
-                        <ValidationProvider v-slot='{ errors }' name='プロジェクト名' rules='required'>
+                        <ValidationProvider v-slot='{ errors }' name='プロジェクト名' vid='name' rules='required'>
                             <vs-input
                                 class="my-6"
                                 v-model="project.name"
                                 label='プロジェクト名'
+                                :loading='loading'
                             >
                                 <template #message-danger>
                                     {{ errors[0] }}
@@ -86,6 +87,7 @@
 </template>
 
 <script>
+    import _ from 'lodash'
 	import { mapActions } from 'vuex'
     import { Const } from '@/assets/js/const'
     const Con = new Const()
@@ -100,7 +102,16 @@
                 favorite: false,
             },
             colorList: Con.PROJECT_COLOR,
+            loading: false,
         }),
+        watch: {
+            'project.name': function (val) {
+				if (val) {
+					this.loading = true
+					this.checkProjetName(val)
+				}
+            }
+        },
         methods: {
             ...mapActions([
                 'addProjectsAction',
@@ -136,7 +147,29 @@
             			color: '',
             			favorite: false,
             	}
-            }
+            },
+            checkProjetName: _.debounce(function checkProjetName (val) {
+				this.$axios({
+					methods: 'GET',
+					url: '/api/project/checkProjectDuplication/',
+					params: {
+						name: val
+					}
+				})
+				.then(res => {
+                    console.log(res.data)
+                    if (!res.data.result) {
+                        this.$refs.form.setErrors({
+                            name: ['既にこのプロジェクト名は作成済みです']
+                        })
+                    }
+					this.loading = false
+				})
+				.catch(e => {
+					console.log(e)
+					this.loading = false
+				})
+			}, 1000),
         }
     }
 </script>

@@ -95,6 +95,40 @@ class ProjectViewSet(BaseModelViewSet):
         serializer = self.get_serializer(queryset.filter(favorite=True), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(methods=['GET'], detail=False)
+    def checkProjectDuplication(self, request):
+        '''
+        プロジェクト作成時のプロジェクト名重複チェック
+        '''
+        auth0_id = request.query_params['auth0_id']
+        name = request.query_params['name']
+        try:
+            user = mUser.objects.get(auth0_id=auth0_id)
+            user_project = user.project_member.all()
+            user_project.get(name=name)
+        except Project.DoesNotExist:
+            return Response({'status': 'success', 'result': True}, status=status.HTTP_200_OK)
+        else:
+            return Response({'status': 'success', 'result': False}, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=False)
+    def checkUpdateProjectDuplication(self, request):
+        '''
+        プロジェクト更新時のプロジェクト名重複チェック
+        '''
+        auth0_id = request.query_params['auth0_id']
+        current_name = request.query_params['current_name']
+        new_name = request.query_params['new_name']
+
+        user = mUser.objects.get(auth0_id=auth0_id)
+        user_project = user.project_member.all()
+        # 現在のプロジェクト名以外のプロジェクトを取得
+        filter_project = user_project.exclude(name=current_name)
+        if filter_project.filter(name=new_name).count() == 0:
+            # 重複するプロジェクト名が存在しない
+            return Response({'status': 'success', 'result': True}, status=status.HTTP_200_OK)
+        return Response({'status': 'success', 'result': False}, status=status.HTTP_200_OK)
+
     def autoincrement(self, user):
         '''
         対象ユーザーが関与するプロジェクト総数 + 1を返却する

@@ -36,13 +36,21 @@ from .filters import (
     ProjectFilter,
 )
 
+from .mixins import (
+    GetLoginUserMixin,
+)
+
 import logging
 logger = logging.getLogger(__name__)
 
 
-class BaseModelViewSet(viewsets.ModelViewSet):
+class BaseModelViewSet(viewsets.ModelViewSet, GetLoginUserMixin):
 
-    pass
+    def list(self, request, *args, **kwargs):
+        self.set_auth0_id(request)
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class UserViewSet(BaseModelViewSet):
@@ -64,6 +72,7 @@ class ProjectViewSet(BaseModelViewSet):
     filter_class = ProjectFilter
 
     def create(self, request, *args, **kwargs):
+        self.auth0_id = request.data['auth0_id']
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
@@ -89,11 +98,21 @@ class ProjectViewSet(BaseModelViewSet):
         logger.debug(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['GET'], detail=False)
-    def favorites(self, request):
-        queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset.filter(favorite=True), many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def update(self, request, pk=None):
+        self.auth0_id = request.data['auth0_id']
+        queryset = self.queryset.get(pk=pk)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        if serializer.is_valid():
+            self.perform_update(serializer)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # @action(methods=['GET'], detail=False)
+    # def favorites(self, request):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     serializer = self.get_serializer(queryset.filter(favorite=True), many=True)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=False)
     def checkProjectDuplication(self, request):

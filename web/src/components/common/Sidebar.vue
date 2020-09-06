@@ -43,6 +43,7 @@
                             <v-list-item
                                 v-for='project in projects'
                                 :key='project.id'
+                                v-show="!project.archived"
                                 @click='toPage(menu.route, project)'
                             >
                                 <v-icon x-small :color="project.color">mdi-circle</v-icon>
@@ -51,6 +52,31 @@
                                     <SidebarProjectMenuBtn :project='project'/>
                                 </v-list-item-action>
                             </v-list-item>
+
+                            <!-- アーカイブプロジェクト -->
+                            <v-expansion-panels
+                                flat
+                                tile
+                                hover
+                                accordion
+                            >
+                                <v-expansion-panel>
+                                    <v-expansion-panel-header hide-actions>
+                                        アーカイブ
+                                    </v-expansion-panel-header>
+                                    <v-expansion-panel-content>
+                                        <v-list-item
+                                            v-for="archived in archivedProjects"
+                                            :key='archived.name'
+                                        >
+                                            <v-list-item-title>{{ archived.name }}</v-list-item-title>
+                                            <v-list-item-action class="ml-0">
+                                                <SidebarArchiveMenuBtn :project='archived'/>
+                                            </v-list-item-action>
+                                        </v-list-item>
+                                    </v-expansion-panel-content>
+                                </v-expansion-panel>
+                            </v-expansion-panels>
                         </div>
 
                         <!-- ラベル -->
@@ -119,6 +145,7 @@
 	import CreateProjectDialog from '@/components/common/CreateProjectDialog'
     import SidebarProjectMenuBtn from '@/components/parts/SidebarProjectMenuBtn'
     import CreateLabelDialog from '@/components/common/CreateLabelDialog'
+    import SidebarArchiveMenuBtn from '@/components/parts/SidebarArchiveMenuBtn'
 
     import { mapGetters } from 'vuex'
     import { Const } from '@/assets/js/const'
@@ -130,6 +157,7 @@
         	CreateProjectDialog,
             SidebarProjectMenuBtn,
             CreateLabelDialog,
+            SidebarArchiveMenuBtn,
         },
         data () {
             return {
@@ -141,6 +169,7 @@
     		...mapGetters([
                 'projects',
                 'favoriteProjects',
+                'archivedProjects',
                 'labels',
     		])
     	},

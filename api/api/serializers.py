@@ -4,6 +4,7 @@ from .models import (
     Week,
     mSetting,
     Project,
+    mUserProjectRelation,
     ProjectMemberShip,
     Section,
     Task,
@@ -38,6 +39,12 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
 
         fields = kwargs.pop('fields', None)
+
+        # auth0_idを設定
+        if 'context' in kwargs:
+            self.auth0_id = kwargs['context']['view'].get_auth0_id()
+        else:
+            self.auth0_id = None
 
         super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)
 
@@ -85,6 +92,10 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
     creator = serializers.CharField(read_only=True)
     tasks = serializers.SerializerMethodField()
     sections = serializers.SerializerMethodField()
+    favorite = serializers.SerializerMethodField()
+    archived = serializers.SerializerMethodField()
+    is_favorite = serializers.BooleanField(write_only=True, required=False)
+    is_archived = serializers.BooleanField(write_only=True, required=False)
 
     class Meta:
         model = Project
@@ -102,7 +113,16 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
             'auth0_id',
             'tasks',
             'sections',
+            'is_favorite',
+            'is_archived',
         ]
+    
+
+    def get_favorite(self, obj):
+        return obj.favorite.filter(auth0_id=self.auth0_id).exists()
+
+    def get_archived(self, obj):
+        return obj.archived.filter(auth0_id=self.auth0_id).exists()
 
     def get_tasks(self, obj):
         return TaskSerializer(obj.task_target_project.all(), many=True).data
@@ -121,9 +141,37 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
                 creator=user,
                 name = validated_data['name'],
                 color = validated_data['color'],
-                favorite = validated_data['favorite']
+                # favorite = validated_data['is_favorite']
             )
+
+        if validated_data['is_favorite']:
+            project.favorite.add(user)
         return project
+
+    def update(self, instance, validated_data):
+        try:
+            user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
+        except mUser.DoesNotExist:
+            logger.info('mUserが見つかりませんでした。')
+            return None
+
+        instance.name = validated_data['name']
+        instance.color = validated_data['color']
+
+        if 'is_favorite' in validated_data:
+            if validated_data['is_favorite']:
+                instance.favorite.add(user)
+            else:
+                instance.favorite.remove(user)
+
+        if 'is_archived' in validated_data:
+            if validated_data['is_archived']:
+                instance.archived.add(user)
+            else:
+                instance.archived.remove(user)
+
+        instance.save()
+        return instance
 
 class ProjectMemberShipSerializer(DynamicFieldsModelSerializer):
 

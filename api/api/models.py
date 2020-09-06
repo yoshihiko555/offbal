@@ -248,11 +248,21 @@ class Project(TimeStampModel):
         default=Color.GREY
     )
 
-    favorite = models.BooleanField(default=False)
+    # favorite = models.BooleanField(default=False)
+    favorite = models.ManyToManyField(
+        mUser,
+        related_name='favorite_user',
+        blank=True,
+    )
     comment = models.TextField(null=True, blank=True)
     is_comp_public = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False)
-    archived = models.BooleanField(default=False)
+    # archived = models.BooleanField(default=False)
+    archived = models.ManyToManyField(
+        mUser,
+        related_name='archived_user',
+        blank=True,
+    )
 
     def __str__(self):
         return self.name
@@ -267,7 +277,7 @@ class mUserProjectRelation(models.Model):
         Project,
         on_delete=models.CASCADE,
     )
-    index = models.IntegerField(default=0)
+    index = models.IntegerField(default=1)
 
     def __str__(self):
         return self.user.auth0_name + 'の' + self.project.name

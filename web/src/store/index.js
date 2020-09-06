@@ -11,13 +11,15 @@ export default new Vuex.Store({
         projects: [],
         favoriteProjects: [],
 		labels: [],
-		detailProject: {},
+        detailProject: {},
+        archivedProjects: [],
 	},
 	getters: {
         projects: state => state.projects,
         favoriteProjects: state => state.favoriteProjects,
 		labels: state => state.labels,
 		detailProject: state => state.detailProject,
+		archivedProjects: state => state.archivedProjects,
 	},
 	mutations: {
 		setProjects (state, payload) {
@@ -45,7 +47,11 @@ export default new Vuex.Store({
             state.projects = state.projects.filter((_, i) => i !== index)
         },
       	setFavoriteProjects (state, payload) {
-          	state.favoriteProjects = payload
+            const favopro = []
+            for (const project of payload) {
+                if (project.favorite) favopro.push(project)
+            }
+          	state.favoriteProjects = favopro
       	},
       	addFavoriteProjects (state, payload) {
 			state.favoriteProjects.push(payload)
@@ -68,6 +74,20 @@ export default new Vuex.Store({
             const index = state.detailProject.sections.findIndex(section => section.id === payload)
             if (index !== -1) state.detailProject.sections = state.detailProject.sections.filter((_, i) => i !== index)
         },
+        setArchivedProjects (state, payload) {
+            const archives = []
+            for (const project of payload) {
+                if (project.archived) archives.push(project)
+            }
+          	state.archivedProjects = archives
+        },
+        addArchivedProjects (state, payload) {
+            state.archivedProjects.push(payload)
+        },
+        deleteArchivedProjects (state, payload) {
+            const index = state.archivedProjects.findIndex(project => project.id === payload.id)
+            if (index !== -1) state.archivedProjects = state.archivedProjects.filter((_, i) => i !== index)
+        },
 	},
 	actions: {
 		// プロジェクト一覧取得
@@ -79,6 +99,8 @@ export default new Vuex.Store({
 			.then(res => {
 					console.log('最新プロジェクト一覧', res)
 					this.commit('setProjects', res.data)
+					this.commit('setFavoriteProjects', res.data)
+					this.commit('setArchivedProjects', res.data)
 			})
 			.catch(e => {
 					console.log(e)
@@ -118,25 +140,26 @@ export default new Vuex.Store({
 	        .then(res => {
 	            console.log(res)
 	            this.commit('deleteProject', kwargs)
+	            this.commit('deleteArchivedProjects', kwargs)
 	        })
 	        .catch(e => {
 	            console.log(e)
 	        })
         },
         // お気に入りプロジェクト一覧取得
-        getFavoriteProjectsAction (ctx, kwargs) {
-            Vue.prototype.$axios({
-				url: '/api/project/favorites/',
-				method: 'GET',
-			})
-			.then(res => {
-				console.log('お気に入りプロジェクト一覧', res)
-				this.commit('setFavoriteProjects', res.data)
-			})
-			.catch(e => {
-				console.log(e)
-			})
-        },
+        // getFavoriteProjectsAction (ctx, kwargs) {
+        //     Vue.prototype.$axios({
+		// 		url: '/api/project/favorites/',
+		// 		method: 'GET',
+		// 	})
+		// 	.then(res => {
+		// 		console.log('お気に入りプロジェクト一覧', res)
+		// 		this.commit('setFavoriteProjects', res.data)
+		// 	})
+		// 	.catch(e => {
+		// 		console.log(e)
+		// 	})
+        // },
         // お気に入りプロジェクトを追加
 		addFavoriteProjectsAction (ctx, kwargs) {
 			this.commit('addFavoriteProjects', kwargs)

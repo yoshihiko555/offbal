@@ -26,17 +26,21 @@ from .serializers import (
     KarmaSerializer
 )
 
+from .mixins import (
+    GetLoginUserMixin,
+)
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class SignupView(generics.CreateAPIView):
+class SignupView(generics.CreateAPIView, GetLoginUserMixin):
     permission_classes = (permissions.AllowAny,)
     queryset = mUser.objects.all()
     serializer_class = UserSerializer
 
     def create(self, request, *args, **kwargs):
+        self.auth0_id = request.data['auth0_id']
         serializer = self.get_serializer(data=request.data)
         if (serializer.is_valid()):
             self.perform_create(serializer)

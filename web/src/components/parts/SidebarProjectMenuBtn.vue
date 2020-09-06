@@ -56,7 +56,7 @@
 
 <script>
 	import EditProjectDialog from '@/components/common/EditProjectDialog'
-	import { mapActions } from 'vuex'
+	import { mapMutations, mapActions } from 'vuex'
 	import _ from 'lodash'
 
     export default {
@@ -87,7 +87,7 @@
                     {
                         name: 'プロジェクトをアーカイブ',
                         icon: 'mdi-package',
-                        call: this.test,
+                        call: this.archive,
                     },
                 ],
                 favoMenu: [
@@ -103,6 +103,9 @@
         	}
         },
         methods: {
+            ...mapMutations([
+                'addArchivedProjects',
+            ]),
             ...mapActions([
                 'deleteProjectAction',
                 'updateProjectAction',
@@ -118,7 +121,7 @@
         	togleFavorite () {
         		// propsで来たデータの直更新はNGのため一度deepcopy
         		this.cloneProject = _.cloneDeep(this.project)
-        		this.cloneProject.favorite = !this.cloneProject.favorite
+        		this.cloneProject.is_favorite = !this.cloneProject.favorite
         		this.$axios({
         			url: `/api/project/${this.cloneProject.id}/`,
         			method: 'PUT',
@@ -133,10 +136,26 @@
         		.catch(e => {
         			console.log(e)
         		})
-        	},
-        	test () {
-        		console.log('test')
-        	}
+            },
+            archive () {
+                this.cloneProject = _.cloneDeep(this.project)
+        		this.cloneProject.is_favorite = false
+        		this.cloneProject.is_archived = true
+        		this.$axios({
+        			url: `/api/project/${this.cloneProject.id}/`,
+        			method: 'PUT',
+        			data: this.cloneProject,
+        		})
+        		.then(res => {
+                    console.log(res)
+                    this.updateProjectAction(res.data)
+                    this.deleteFavoriteProjectsAction(res.data)
+                    this.addArchivedProjects(res.data)
+        		})
+        		.catch(e => {
+        			console.log(e.response)
+        		})
+            },
         },
     }
 </script>

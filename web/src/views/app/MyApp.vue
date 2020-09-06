@@ -33,7 +33,7 @@
         }),
         created () {
             this.getProjectsAction()
-            this.getFavoriteProjectsAction()
+            // this.getFavoriteProjectsAction()
             this.getLabelsAction()
         },
         computed: {

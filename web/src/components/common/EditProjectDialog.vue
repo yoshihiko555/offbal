@@ -52,7 +52,7 @@
                         <!-- お気に入りフラグ -->
                         <div class="favorite_wrap">
                             <p>お気に入り</p>
-                            <vs-switch v-model="project.favorite">
+                            <vs-switch v-model="project.is_favorite">
                                 <template #on>
                                     <i class='bx bxs-star' ></i>
                                 </template>
@@ -118,6 +118,7 @@
             ]),
             open (project) {
                 this.project = _.cloneDeep(project)
+                this.project.is_favorite = project.favorite
                 // 重複チェックのために変更前の状態を保持する
                 this.cloneProject = _.cloneDeep(project)
                 this.dialog = true
@@ -128,6 +129,7 @@
                 this.dialog = false
             },
             update () {
+                console.log(this.project)
                 this.$axios({
                     url: `/api/project/${this.project.id}/`,
                     method: 'PUT',
@@ -141,7 +143,7 @@
                     this.close()
                 })
                 .catch(e => {
-                    console.log(e)
+                    console.log(e.response)
                 })
             },
             checkProjetName: _.debounce(function checkProjetName (val) {

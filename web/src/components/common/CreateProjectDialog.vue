@@ -52,7 +52,7 @@
                         <!-- お気に入りフラグ -->
                         <div class="favorite_wrap">
                             <p>お気に入り</p>
-                            <vs-switch v-model="project.favorite">
+                            <vs-switch v-model="project.is_favorite">
                                 <template #on>
                                     <i class='bx bxs-star' ></i>
                                 </template>
@@ -99,7 +99,7 @@
             project: {
                 name: '',
                 color: '',
-                favorite: false,
+                is_favorite: false,
             },
             colorList: Con.PROJECT_COLOR,
             loading: false,
@@ -145,7 +145,7 @@
             	this.project = {
             			name: '',
             			color: '',
-            			favorite: false,
+            			is_favorite: false,
             	}
             },
             checkProjetName: _.debounce(function checkProjetName (val) {

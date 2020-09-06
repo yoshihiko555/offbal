@@ -124,6 +124,7 @@
                     return this.taskDialog
                 },
                 set: function (value) {
+                    this.init()
                     this.$emit('update', value)
                 },
             }
@@ -145,11 +146,24 @@
                     console.log(e)
                 })
                 this.localTaskDialog = false
+                this.init()
             },
             create_task_info (key, value) {
                 this.task[key] = value
             },
-        }
+            init () {
+                this.task = {
+                    project_name: 'インボックス',
+                    content: '',
+                    comment: '',
+                    section_name: '',
+                    deadline_str: '',
+                    remind_str: '',
+                    priority: '1',
+                    label_list: [],
+                }
+            }
+        },
     }
 
 </script>

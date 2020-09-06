@@ -64,15 +64,32 @@ export default new Vuex.Store({
             state.detailProject = payload
         },
         addSection (state, payload) {
+            // プロジェクト詳細
             state.detailProject.sections.push(payload)
+
+            // 全体の該当プロジェクト
+            const project = state.projects.find(project => project.id === payload.target_project)
+            project.sections.push(payload)
         },
         updateSection (state, payload) {
+            // プロジェクト詳細
             const index = state.detailProject.sections.findIndex(section => section.id === payload.id)
             Vue.set(state.detailProject.sections, index, payload)
+
+            // 全体の該当プロジェクト
+            const project = state.projects.find(project => project.id === payload.target_project)
+            const j = project.sections.findIndex(section => section.id === payload.id)
+            Vue.set(project.sections, j, payload)
         },
         deleteSection (state, payload) {
+            // プロジェクト詳細
             const index = state.detailProject.sections.findIndex(section => section.id === payload)
             if (index !== -1) state.detailProject.sections = state.detailProject.sections.filter((_, i) => i !== index)
+
+            // 全体の該当プロジェクト
+            const project = state.projects.find(project => project.id === state.detailProject.id)
+            const j = project.sections.findIndex(section => section.id === payload)
+            if (j !== -1) project.sections = project.sections.filter((_, i) => i !== j)
         },
         setArchivedProjects (state, payload) {
             const archives = []

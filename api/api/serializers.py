@@ -97,6 +97,8 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
     is_favorite = serializers.BooleanField(write_only=True, required=False)
     is_archived = serializers.BooleanField(write_only=True, required=False)
 
+    isProject = serializers.BooleanField(read_only=True, default=True)
+
     class Meta:
         model = Project
         fields = [
@@ -115,6 +117,7 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
             'sections',
             'is_favorite',
             'is_archived',
+            'isProject',
         ]
     
 
@@ -187,6 +190,9 @@ class ProjectMemberShipSerializer(DynamicFieldsModelSerializer):
 class SectionSerializer(DynamicFieldsModelSerializer):
 
     tasks = serializers.SerializerMethodField()
+    target_project_name = serializers.CharField(read_only=True, source='target_project.name')
+
+    isProject = serializers.BooleanField(read_only=True, default=False)
 
     class Meta:
         model = Section
@@ -197,6 +203,8 @@ class SectionSerializer(DynamicFieldsModelSerializer):
             'deleted',
             'archived',
             'tasks',
+            'isProject',
+            'target_project_name',
         ]
 
     def get_tasks(self, obj):
@@ -276,7 +284,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
 
         try:
             user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
-            project = Project.objects.get(name=validated_data['project_name'])
+            project = Project.objects.get(name=validated_data['project_name'], creator=user)
 
             section_name = validated_data['section_name']
             section = Section.objects.get(name=section_name) if section_name != '' else None

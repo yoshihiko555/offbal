@@ -1,50 +1,62 @@
 <template>
-    <v-menu
-        :close-on-content-click="false"
-        offset-x
-        rounded="true"
-        v-model="menu"
-        min-width="250px"
-    >
-        <template v-slot:activator="{ on, attrs }">
-            <v-btn
-                icon
-                v-bind="attrs"
-                v-on="on"
-            >
-                <v-icon
-                    :color="labelColor"
-                >mdi-label-multiple-outline</v-icon>
-            </v-btn>
-        </template>
-        <v-card>
-            <v-card-actions
-                class="label_select_area_wrap"
-            >
-                <vs-select
-                    placeholder='Select Label'
-                    v-model='selectLabelList'
-                    multiple
-                    filter
-                    collapse-chips
+    <div>
+        <v-tooltip
+            top
+            activator="#label_btn"
+            z-index=99000
+            open-delay=250
+        >
+            <span>ラベルを設定</span>
+        </v-tooltip>
+        <v-menu
+            :close-on-content-click="false"
+            offset-y
+            rounded="true"
+            v-model="menu"
+            min-width="250px"
+        >
+            <template v-slot:activator="{ on, attrs }">
+                <div id="label_btn">
+                    <v-btn
+                        icon
+                        v-bind="attrs"
+                        v-on="on"
+                    >
+                        <v-icon
+                            :color="labelColor"
+                        >mdi-label-multiple-outline</v-icon>
+                    </v-btn>
+                </div>
+            </template>
+            <v-card>
+                <v-card-actions
+                    class="label_select_area_wrap"
                 >
-                    <vs-option
-                        v-for='(label, i) in labels'
-                        :key='i'
-                        :label='label.name'
-                        :value='label.name'
+                    <vs-select
+                        placeholder='Select Label'
+                        v-model='selectLabelList'
+                        multiple
                         filter
-                    >{{ label.name }}
-                    </vs-option>
-                </vs-select>
-            </v-card-actions>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                    <v-btn text @click="menu = false">cancel</v-btn>
-                    <v-btn color="primary" text @click="menu = false">ok</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-menu>
+                        collapse-chips
+                    >
+                        <vs-option
+                            v-for='(label, i) in labels'
+                            :key='i'
+                            :label='label.name'
+                            :value='label.name'
+                            filter
+                        >{{ label.name }}
+                        </vs-option>
+                    </vs-select>
+                </v-card-actions>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                        <v-btn text @click="menu = false">cancel</v-btn>
+                        <v-btn color="primary" text @click="menu = false">ok</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-menu>
+    </div>
 </template>
 <script>
     import { mapGetters } from 'vuex'

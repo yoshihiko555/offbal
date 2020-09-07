@@ -1,29 +1,40 @@
 <template>
-    <v-menu
-        bottom
-        offset-x
-        min-width="400px"
-        transition="scroll-y-transition"
-    >
-        <template v-slot:activator="{ on, attrs }">
-            <v-btn
-                icon
-                v-bind="attrs"
-                v-on="on"
-            ><v-icon
-                :color="remind.color"
-            >mdi-alarm</v-icon>
-            </v-btn>
-        </template>
-        <Datetime
-            v-model="remind.value"
-            :minute-interval="15"
-            :min-date="start"
-            inline
-            no-keyboard
-            format="YYYY-MM-DD HH:mm:ss"
-        />
-    </v-menu>
+    <div>
+        <v-tooltip
+            top
+            activator="#reminder_btn"
+            z-index=99000
+            open-delay=250
+        >
+            <span>リマインダー</span>
+        </v-tooltip>
+        <v-menu
+            offset-y
+            min-width="400px"
+            transition="scroll-y-transition"
+        >
+            <template v-slot:activator="{ on, attrs }">
+                <div id="reminder_btn">
+                    <v-btn
+                        icon
+                        v-bind="attrs"
+                        v-on="on"
+                    ><v-icon
+                        :color="remind.color"
+                    >mdi-alarm</v-icon>
+                    </v-btn>
+                </div>
+            </template>
+            <Datetime
+                v-model="remind.value"
+                :minute-interval="15"
+                :min-date="start"
+                inline
+                no-keyboard
+                format="YYYY-MM-DD HH:mm:ss"
+            />
+        </v-menu>
+    </div>
 </template>
 <script>
     import { Const } from '@/assets/js/const'

@@ -1,30 +1,41 @@
 <template>
-    <v-menu
-        bottom
-        offset-x
-        min-width="400px"
-        transition="scroll-y-transition"
-        :close-on-content-click="false"
-    >
-        <template v-slot:activator="{ on, attrs }">
-            <v-btn
-                icon
-                v-bind="attrs"
-                v-on="on"
-            ><v-icon
-                :color='deadline.color'
-            >mdi-calendar-clock</v-icon>
-            </v-btn>
-        </template>
-        <Datetime
-            v-model="deadline.value"
-            :minute-interval="30"
-            :min-date="start"
-            inline
-            no-keyboard
-            format="YYYY-MM-DD HH:mm:ss"
-        />
-    </v-menu>
+    <div>
+        <v-tooltip
+            top
+            activator="#deadline_btn"
+            z-index=99000
+            open-delay=250
+        >
+            <span>期限を設定</span>
+        </v-tooltip>
+        <v-menu
+            offset-y
+            min-width="400px"
+            transition="scroll-y-transition"
+            :close-on-content-click="false"
+        >
+            <template v-slot:activator="{ on, attrs }">
+                <div id="deadline_btn">
+                    <v-btn
+                        icon
+                        v-bind="attrs"
+                        v-on="on"
+                    ><v-icon
+                        :color='deadline.color'
+                    >mdi-calendar-clock</v-icon>
+                    </v-btn>
+                </div>
+            </template>
+            <Datetime
+                v-model="deadline.value"
+                :minute-interval="30"
+                :min-date="start"
+                inline
+                no-keyboard
+                format="YYYY-MM-DD HH:mm:ss"
+            />
+        </v-menu>
+    </div>
 </template>
 <script>
     import { Const } from '@/assets/js/const'

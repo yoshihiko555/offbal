@@ -1,40 +1,51 @@
 <template>
-    <v-menu
-        bottom
-        offset-x
-        transition="scroll-y-transition"
-        min-width="180px"
-    >
-        <template v-slot:activator="{ on, attrs }">
-            <v-btn
-                icon
-                v-bind="attrs"
-                v-on="on"
-            ><v-icon
-                :color="priority.color"
-            >{{ priority.icon }}</v-icon>
-            </v-btn>
-        </template>
-        <v-list
-            dense
+    <div>
+        <v-tooltip
+            top
+            activator="#priority_btn"
+            z-index=99000
+            open-delay=250
         >
-            <v-list-item
-                v-for="(item, i) in items"
-                :key="i"
-                @click="selectPriority(item)"
+            <span>優先度を設定</span>
+        </v-tooltip>
+        <v-menu
+            offset-y
+            transition="scroll-y-transition"
+            min-width="180px"
+        >
+            <template v-slot:activator="{ on, attrs }">
+                <div id="priority_btn">
+                    <v-btn
+                        icon
+                        v-bind="attrs"
+                        v-on="on"
+                    ><v-icon
+                        :color="priority.color"
+                    >{{ priority.icon }}</v-icon>
+                    </v-btn>
+                </div>
+            </template>
+            <v-list
+                dense
             >
-                <v-icon
-                    class="mr-1"
-                    :color="item.color"
-                >{{ item.icon }}</v-icon>
-                <v-list-item-title
-                    class="ml-4"
+                <v-list-item
+                    v-for="(item, i) in items"
+                    :key="i"
+                    @click="selectPriority(item)"
                 >
-                    {{ item.text }}
-                </v-list-item-title>
-            </v-list-item>
-        </v-list>
-    </v-menu>
+                    <v-icon
+                        class="mr-1"
+                        :color="item.color"
+                    >{{ item.icon }}</v-icon>
+                    <v-list-item-title
+                        class="ml-4"
+                    >
+                        {{ item.text }}
+                    </v-list-item-title>
+                </v-list-item>
+            </v-list>
+        </v-menu>
+    </div>
 </template>
 <script>
     import { Const } from '@/assets/js/const'

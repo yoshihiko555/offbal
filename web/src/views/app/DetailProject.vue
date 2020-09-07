@@ -12,6 +12,10 @@
             </div>
         </div>
 
+        <CreateTaskField
+            :project=detailProject
+        />
+
         <TaskList
             :tasks=detailProject.tasks
         />
@@ -54,6 +58,7 @@
     import TaskList from '@/components/common/TaskList'
     import SectionList from '@/components/common/SectionList'
     import { mapGetters, mapActions } from 'vuex'
+    import CreateTaskField from '@/components/parts/CreateTaskField'
 
     export default {
         name: 'DetailProject',
@@ -66,11 +71,12 @@
             DetailProjectMenuBtn,
             TaskList,
             SectionList,
+            CreateTaskField,
         },
         data: () => ({
-            isCreateBtn: true,      // セクション追加ボタン
-            isCreateField: false,   // セクション追加フィールド
-            isEditField: false,     // セクション更新フィールド
+            isCreateBtn: true,        // セクション追加ボタン
+            isCreateField: false,     // セクション追加フィールド
+            isEditField: false,       // セクション更新フィールド
         }),
         created () {
             this.getDetailProjectAction(this.$route.params.id)
@@ -105,7 +111,7 @@
             closeEdit () {
                 this.isCreateBtn = true
                 this.isEditField = false
-            }
+            },
         },
     }
 </script>

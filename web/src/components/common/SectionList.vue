@@ -19,17 +19,16 @@
                 />
             </v-expansion-panel-header>
             <v-expansion-panel-content>
-                <v-list>
-                    <v-list-item v-for="task in tasks" :key="task.id">
-                        <v-list-item-title>{{ task.name }}</v-list-item-title>
-                    </v-list-item>
-                </v-list>
+                <TaskList
+                    :tasks=section.tasks
+                />
             </v-expansion-panel-content>
         </v-expansion-panel>
     </v-expansion-panels>
 </template>
 
 <script>
+    import TaskList from '@/components/common/TaskList'
     import SectionMenuBtn from '@/components/parts/SectionMenuBtn'
     import { mapGetters } from 'vuex'
 
@@ -37,23 +36,9 @@
         name: 'SectionList',
         components: {
             SectionMenuBtn,
+            TaskList,
         },
         data: () => ({
-            // テスト用
-            tasks: [
-                {
-                    id: 1,
-                    name: 'task1'
-                },
-                {
-                    id: 2,
-                    name: 'task2'
-                },
-                {
-                    id: 3,
-                    name: 'task3'
-                },
-            ]
         }),
     	computed: {
     		...mapGetters([

@@ -188,6 +188,12 @@ class TaskViewSet(BaseModelViewSet):
         logger.debug(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = self.get_serializer(instance).data
+        self.perform_destroy(instance)
+        return Response(data, status=status.HTTP_200_OK)
+
 
 class LabelViewSet(BaseModelViewSet):
 

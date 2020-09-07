@@ -97,6 +97,7 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
     is_favorite = serializers.BooleanField(write_only=True, required=False)
     is_archived = serializers.BooleanField(write_only=True, required=False)
 
+    # 画面側でのアイコン描画判定用 (プロジェクトかセクションか)
     isProject = serializers.BooleanField(read_only=True, default=True)
 
     class Meta:
@@ -119,7 +120,7 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
             'is_archived',
             'isProject',
         ]
-    
+
 
     def get_favorite(self, obj):
         return obj.favorite.filter(auth0_id=self.auth0_id).exists()
@@ -128,7 +129,7 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
         return obj.archived.filter(auth0_id=self.auth0_id).exists()
 
     def get_tasks(self, obj):
-        return TaskSerializer(obj.task_target_project.all(), many=True).data
+        return TaskSerializer(obj.task_target_project.all().filter(target_section=None), many=True).data
 
     def get_sections(self, obj):
         return SectionSerializer(obj.section_target_project.all(), many=True).data
@@ -220,7 +221,8 @@ class SectionSerializer(DynamicFieldsModelSerializer):
 class TaskSerializer(DynamicFieldsModelSerializer):
 
     auth0_id = serializers.CharField(write_only=True)
-    project_name = serializers.CharField(write_only=True)
+    project_id = serializers.IntegerField(write_only=True)
+    section_id = serializers.IntegerField(write_only=True)
     deadline_str = serializers.CharField(write_only=True, allow_blank=True)
     remind_str = serializers.CharField(write_only=True, allow_blank=True)
     label_list = serializers.ListField(
@@ -228,14 +230,15 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         allow_empty=True,
         write_only=True,
     )
-    section_name = serializers.CharField(write_only=True, allow_blank=True)
 
     target_user = serializers.CharField(read_only=True)
-    target_project = serializers.CharField(read_only=True)
-    label = serializers.SerializerMethodField(read_only=True)
+    target_project = serializers.ReadOnlyField(source='target_project.id')
+    target_project_name = serializers.CharField(read_only=True, source='target_project.name')
+    target_section_name = serializers.CharField(read_only=True, source='target_section.name')
+    label = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
-    sub_tasks = serializers.SerializerMethodField(read_only=True)
+    sub_tasks = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
@@ -243,7 +246,9 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'id',
             'target_user',
             'target_project',
+            'target_project_name',
             'target_section',
+            'target_section_name',
             'content',
             'label',
             'priority',
@@ -254,11 +259,11 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'deleted',
             'is_comp_sub_public',
             'auth0_id',
-            'project_name',
+            'project_id',
+            'section_id',
             'deadline_str',
             'remind_str',
             'label_list',
-            'section_name',
             'created_at',
             'updated_at',
             'sub_tasks',
@@ -282,12 +287,15 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         logger.debug('============TASKを作る================')
         logger.debug(validated_data)
 
+        project_id = validated_data['project_id']
+        section_id = validated_data['section_id']
+
         try:
             user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
-            project = Project.objects.get(name=validated_data['project_name'], creator=user)
-
-            section_name = validated_data['section_name']
-            section = Section.objects.get(name=section_name) if section_name != '' else None
+            section = Section.objects.get(id=section_id) if section_id != 0 else None
+            if section != None:
+                project = section.target_project
+            project = Project.objects.get(id=project_id) if project_id != 0 else Project.objects.get(name='インボックス', creator=user)
 
         except mUser.DoesNotExist:
             logger.error('mUserが見つかりませんでした。')

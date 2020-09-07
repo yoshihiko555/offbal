@@ -12,7 +12,9 @@
             </div>
         </div>
 
-        <TaskList/>
+        <TaskList
+            :tasks=detailProject.tasks
+        />
 
         <SectionList/>
 

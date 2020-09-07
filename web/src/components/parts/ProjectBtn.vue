@@ -138,10 +138,9 @@
         methods: {
             selectProject (value) {
                 if (value.isProject) {
-                    this.$eventHub.$emit('create_task_info', 'project_name', value.name)
+                    this.$eventHub.$emit('create_task_info', 'project_id', value.id)
                 } else {
-                    this.$eventHub.$emit('create_task_info', 'project_name', value.target_project_name)
-                    this.$eventHub.$emit('create_task_info', 'section_name', value.name)
+                    this.$eventHub.$emit('create_task_info', 'section_id', value.id)
                 }
                 this.menu = false
                 this.projectBtnColor = Con.ACTIVE_COLOR

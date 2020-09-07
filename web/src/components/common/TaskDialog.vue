@@ -70,7 +70,7 @@
                                 relief
                                 color="#40e0d0"
                                 :disabled="invalid"
-                                @click.prevent="addTask"
+                                @click.prevent="addLocalTask"
                             >タスクを追加</vs-button>
                         </v-col>
                     </v-row>
@@ -80,6 +80,7 @@
     </vs-dialog>
 </template>
 <script>
+    import { mapMutations } from 'vuex'
     import DeadLineBtn from '@/components/parts/DeadLineBtn'
     import ProjectBtn from '@/components/parts/ProjectBtn'
     import LabelBtn from '@/components/parts/LabelBtn'
@@ -103,10 +104,10 @@
         },
         data: () => ({
             task: {
-                project_name: 'インボックス',
+                project_id: 0,
+                section_id: 0,
                 content: '',
                 comment: '',
-                section_name: '',
                 deadline_str: '',
                 remind_str: '',
                 priority: '1',
@@ -130,7 +131,10 @@
             }
         },
         methods: {
-            addTask () {
+            ...mapMutations([
+                'addTask',
+            ]),
+            addLocalTask () {
                 console.log('タスクを追加')
                 console.log(this.task)
                 this.$axios({
@@ -140,7 +144,7 @@
                 })
                 .then(res => {
                     console.log(res)
-                    this.$eventHub.$emit('add_task', res)
+                    this.addTask(res.data)
                 })
                 .catch(e => {
                     console.log(e)
@@ -153,10 +157,10 @@
             },
             init () {
                 this.task = {
-                    project_name: 'インボックス',
+                    project_id: 0,
+                    section_id: 0,
                     content: '',
                     comment: '',
-                    section_name: '',
                     deadline_str: '',
                     remind_str: '',
                     priority: '1',

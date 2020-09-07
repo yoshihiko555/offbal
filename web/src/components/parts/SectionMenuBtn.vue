@@ -83,9 +83,9 @@
                         call: this.open,
                     },
                     {
-                        name: 'セクションのを削除',
+                        name: 'セクションを削除',
                         icon: 'mdi-trash-can-outline',
-                        call: this.deleteLoaclSection,
+                        call: this.deleteLocalSection,
                     },
                     {
                         name: 'セクションの移動',
@@ -122,7 +122,7 @@
             open () {
                 this.$eventHub.$emit('open-edit', this.section)
             },
-            deleteLoaclSection () {
+            deleteLocalSection () {
                 this.deleteSectionAction(this.section.id)
             },
             openSelectProject () {

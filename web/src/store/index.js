@@ -106,16 +106,18 @@ export default new Vuex.Store({
 	        if (index !== -1) state.archivedProjects = state.archivedProjects.filter((_, i) => i !== index)
 	    },
 		addTask (state, payload) {
-			// 違う詳細だったら追加しない
+			// 違うプロジェクトだったら追加しない
 			if (state.detailProject.id !== payload.target_project) return
 			if (payload.target_section == null) {
 				// プロジェクトのタスクに追加
 				state.detailProject.tasks.push(payload)
+
 				// 全体の該当プロジェクト
 				// const project = state.projects.find(project => project.id === payload.target_project)
 				// project.sections.push(payload)
 			} else {
 				// セクションのタスクに追加
+				console.log('セクションのタスクに追加')
 				const section = state.detailProject.sections.find(section => section.id === payload.target_section)
 				section.tasks.push(payload)
 			}

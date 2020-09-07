@@ -140,6 +140,9 @@
                 if (value.isProject) {
                     this.$eventHub.$emit('create_task_info', 'project_id', value.id)
                 } else {
+                    if (value.target_project_name !== 'インボックス') {
+                        this.$eventHub.$emit('create_task_info', 'project_id', value.target_project)
+                    }
                     this.$eventHub.$emit('create_task_info', 'section_id', value.id)
                 }
                 this.menu = false

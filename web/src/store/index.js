@@ -23,16 +23,16 @@ export default new Vuex.Store({
 	},
 	mutations: {
 		setProjects (state, payload) {
-				state.projects = payload
+            state.projects = payload
 		},
 		setLabels (state, payload) {
-				state.labels = payload
+            state.labels = payload
 		},
 		addProject (state, payload) {
-				state.projects.push(payload)
+            state.projects.push(payload)
 		},
 		addLabel (state, payload) {
-				state.labels.push(payload)
+            state.labels.push(payload)
 		},
 		updateProject (state, payload) {
 	        // プロジェクト詳細の更新
@@ -45,7 +45,10 @@ export default new Vuex.Store({
 		deleteProject (state, payload) {
 	        const index = state.projects.findIndex(project => project.id === payload.id)
 	        state.projects = state.projects.filter((_, i) => i !== index)
-    	},
+        },
+        updateProjectIndex (state, payload) {
+            state.projects = payload
+        },
   		setFavoriteProjects (state, payload) {
 	        const favopro = []
 	        for (const project of payload) {
@@ -182,19 +185,19 @@ export default new Vuex.Store({
 	        this.commit('updateProject', kwargs)
 	    },
 	    // プロジェクトの削除
-		    deleteProjectAction (ctx, kwargs) {
-	        	Vue.prototype.$axios({
-		            url: `/api/project/${kwargs.id}/`,
-		            method: 'DELETE',
-	        	})
-	        	.then(res => {
-		            console.log(res)
-		            this.commit('deleteProject', kwargs)
-		            this.commit('deleteArchivedProjects', kwargs)
-	        	})
-	        	.catch(e => {
-	            	console.log(e)
-	        	})
+        deleteProjectAction (ctx, kwargs) {
+            Vue.prototype.$axios({
+                url: `/api/project/${kwargs.id}/`,
+                method: 'DELETE',
+            })
+            .then(res => {
+                console.log(res)
+                this.commit('deleteProject', kwargs)
+                this.commit('deleteArchivedProjects', kwargs)
+            })
+            .catch(e => {
+                console.log(e)
+            })
 	    },
 	    // お気に入りプロジェクト一覧取得
 	    // getFavoriteProjectsAction (ctx, kwargs) {

@@ -26,7 +26,7 @@ class ProjectFilter(django_filter.FilterSet):
 
     def user_filter(self, queryset, name, value):
         user = mUser.objects.get(auth0_id=value)
-        res = queryset.filter(member=user)
+        res = queryset.filter(member=user).order_by('muserprojectrelation__index')
         return res
 
 

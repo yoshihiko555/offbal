@@ -79,10 +79,9 @@ class ProjectViewSet(BaseModelViewSet):
             self.perform_create(serializer)
             try:
                 user = mUser.objects.get(auth0_id=request.data['auth0_id'])
-                project = Project.objects.get(id=serializer.data['id'])
                 mUserProjectRelation.objects.create(
                     user=user,
-                    project=project,
+                    project=serializer.instance,
                     index=self.autoincrement(user),
                 )
 
@@ -147,6 +146,21 @@ class ProjectViewSet(BaseModelViewSet):
             # 重複するプロジェクト名が存在しない
             return Response({'status': 'success', 'result': True}, status=status.HTTP_200_OK)
         return Response({'status': 'success', 'result': False}, status=status.HTTP_200_OK)
+
+    @action(methods=['PUT'], detail=False)
+    def updateProjectIndex(self, request, pk=None):
+        self.auth0_id = request.data['auth0_id']
+        user = mUser.objects.get(auth0_id=request.data['auth0_id'])
+        projects = []
+        for i, project in enumerate(request.data['projects'], 1):
+            pro = mUserProjectRelation.objects.get(user=user, project__id=project['id'])
+            pro.index = i
+            projects.append(pro)
+
+        mUserProjectRelation.objects.bulk_update(projects, fields=['index'])
+        user_project = user.project_member.all().order_by('muserprojectrelation__index')
+        serializer = self.get_serializer(user_project, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def autoincrement(self, user):
         '''

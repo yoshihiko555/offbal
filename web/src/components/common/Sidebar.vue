@@ -39,19 +39,26 @@
                                     <v-btn icon @click='createProject'><v-icon>mdi-plus</v-icon></v-btn>
                                 </v-list-item-action>
                             </v-list-item>
-
-                            <v-list-item
-                                v-for='project in projects'
-                                :key='project.id'
-                                v-show="!project.archived"
-                                @click='toPage(menu.route, project)'
+                            <draggable
+                                :list='localProjects'
+                                animation='200'
+                                chosen-class="chosen"
+                                drag-class="drag"
+                                @end='end'
                             >
-                                <v-icon x-small :color="project.color">mdi-circle</v-icon>
-                                <v-list-item-title class="ml-2">{{ project.name }}</v-list-item-title>
-                                <v-list-item-action class="ml-0">
-                                    <SidebarProjectMenuBtn :project='project'/>
-                                </v-list-item-action>
-                            </v-list-item>
+                                <v-list-item
+                                    v-for='project in projects'
+                                    :key='project.id'
+                                    v-show="!project.archived"
+                                    @click='toPage(menu.route, project)'
+                                >
+                                    <v-icon x-small :color="project.color">mdi-circle</v-icon>
+                                    <v-list-item-title class="ml-2">{{ project.name }}</v-list-item-title>
+                                    <v-list-item-action class="ml-0">
+                                        <SidebarProjectMenuBtn :project='project'/>
+                                    </v-list-item-action>
+                                </v-list-item>
+                            </draggable>
 
                             <!-- アーカイブプロジェクト -->
                             <v-expansion-panels
@@ -146,8 +153,10 @@
     import SidebarProjectMenuBtn from '@/components/parts/SidebarProjectMenuBtn'
     import CreateLabelDialog from '@/components/common/CreateLabelDialog'
     import SidebarArchiveMenuBtn from '@/components/parts/SidebarArchiveMenuBtn'
+    import draggable from 'vuedraggable'
 
-    import { mapGetters } from 'vuex'
+    import { mapGetters, mapMutations } from 'vuex'
+    import _ from 'lodash'
     import { Const } from '@/assets/js/const'
     const Con = new Const()
 
@@ -158,12 +167,17 @@
             SidebarProjectMenuBtn,
             CreateLabelDialog,
             SidebarArchiveMenuBtn,
+            draggable,
         },
         data () {
             return {
                 drawer: true,
                 menus: Con.SIDEBAR_MENU,
+                local: [],
             }
+        },
+        created () {
+            this.local = _.cloneDeep(this.projects)
         },
     	computed: {
     		...mapGetters([
@@ -171,9 +185,20 @@
                 'favoriteProjects',
                 'archivedProjects',
                 'labels',
-    		])
+            ]),
+            localProjects: {
+                get () {
+                    return this.local
+                },
+                set (val) {
+                    this.local = val
+                }
+            }
     	},
         methods: {
+            ...mapMutations([
+               'updateProjectIndex',
+            ]),
             togleDrawer () {
                 this.drawer = !this.drawer
                 this.$emit('togleDrawer')
@@ -194,6 +219,23 @@
             createLabel () {
                 this.$refs.label.open()
             },
+            end (e) {
+                this.$axios({
+                    url: '/api/project/updateProjectIndex/',
+                    method: 'PUT',
+                    data: {
+                        projects: this.localProjects,
+                    }
+                })
+                .then(res => {
+                    console.log(res)
+                    // this.localProjects = res.data
+                    this.updateProjectIndex(res.data)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            },
         }
     }
 </script>
@@ -206,5 +248,13 @@
         .v-list-item {
             height: 40px;
         }
+    }
+    .chosen {
+        opacity: 0.7;
+        background: #03A9F4;
+    }
+    .drag {
+        opacity: 0.5;
+        background: #dedede;
     }
 </style>

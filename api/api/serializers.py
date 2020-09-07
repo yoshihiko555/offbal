@@ -96,6 +96,7 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
     archived = serializers.SerializerMethodField()
     is_favorite = serializers.BooleanField(write_only=True, required=False)
     is_archived = serializers.BooleanField(write_only=True, required=False)
+    index = serializers.SerializerMethodField()
 
     # 画面側でのアイコン描画判定用 (プロジェクトかセクションか)
     isProject = serializers.BooleanField(read_only=True, default=True)
@@ -119,6 +120,7 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
             'is_favorite',
             'is_archived',
             'isProject',
+            'index',
         ]
 
 
@@ -133,6 +135,14 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
 
     def get_sections(self, obj):
         return SectionSerializer(obj.section_target_project.all(), many=True).data
+
+    def get_index(self, obj):
+        try:
+            user = mUser.objects.get(auth0_id=self.auth0_id)
+            relation = mUserProjectRelation.objects.get(user=user, project=obj)
+            return relation.index
+        except:
+            return None
 
     def create(self, validated_data):
         try:

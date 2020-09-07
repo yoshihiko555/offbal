@@ -20,6 +20,7 @@
     "vue-ctk-date-time-picker": "^2.5.0",
     "vue-router": "^3.2.0",
     "vue-session": "^1.0.0",
+    "vuedraggable": "^2.24.1",
     "vuesax": "^4.0.1-alpha.23",
     "vuetify": "^2.2.11",
     "vuex": "^3.4.0",

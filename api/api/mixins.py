@@ -11,3 +11,12 @@ class GetLoginUserMixin:
 
     def get_auth0_id(self):
         return getattr(self, 'auth0_id', None)
+
+
+    def set_ordering_type(self, request):
+        if 'ordering_type' in request.query_params:
+            self.ordering_type = request.query_params['ordering_type']
+
+
+    def get_ordering_type(self):
+        return getattr(self, 'ordering_type', None)

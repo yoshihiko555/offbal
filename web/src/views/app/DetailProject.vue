@@ -57,8 +57,9 @@
     import DetailProjectMenuBtn from '@/components/parts/DetailProjectMenuBtn'
     import TaskList from '@/components/common/TaskList'
     import SectionList from '@/components/common/SectionList'
-    import { mapGetters, mapActions } from 'vuex'
     import CreateTaskField from '@/components/parts/CreateTaskField'
+
+    import { mapGetters, mapActions } from 'vuex'
 
     export default {
         name: 'DetailProject',

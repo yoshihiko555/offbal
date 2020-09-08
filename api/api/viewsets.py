@@ -162,6 +162,14 @@ class ProjectViewSet(BaseModelViewSet):
         serializer = self.get_serializer(user_project, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(methods=['GET'], detail=True)
+    def order_tasks(self, request, pk=None):
+        self.set_ordering_type(request)
+        project = Project.objects.get(pk=pk)
+        serializer = self.get_serializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
     def autoincrement(self, user):
         '''
         対象ユーザーが関与するプロジェクト総数 + 1を返却する

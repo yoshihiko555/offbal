@@ -139,7 +139,6 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
             return TaskSerializer(obj.task_target_project.all().filter(target_section=None), many=True).data
 
     def get_sections(self, obj):
-        logger.info(self.context)
         return SectionSerializer(obj.section_target_project.all(), many=True, context=self.context).data
 
     def get_index(self, obj):

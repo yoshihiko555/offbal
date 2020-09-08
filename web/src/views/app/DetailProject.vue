@@ -41,6 +41,7 @@
                 icon
                 relief
                 size="large"
+                to='/myapp/karma/'
             >
                 <i class='bx bx-list-check'></i>2/5
             </vs-button>

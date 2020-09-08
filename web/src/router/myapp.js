@@ -6,6 +6,7 @@ import DetailProject from '@/views/app/DetailProject'
 import Labels from '@/views/app/Labels'
 import TodayScheduled from '@/views/app/TodayScheduled'
 import FutureScheduled from '@/views/app/FutureScheduled'
+import Karma from '@/views/app/Karma'
 
 const routes = {
 	path: '/myapp',
@@ -59,6 +60,14 @@ const routes = {
 			component: FutureScheduled,
 		    meta: {
 		    	title: 'Future',
+		    },
+		},
+		{
+			path: 'karma',
+			name: 'Karma',
+			component: Karma,
+		    meta: {
+		    	title: 'Karma',
 		    },
 		},
 	]

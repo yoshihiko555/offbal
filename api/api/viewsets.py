@@ -244,12 +244,14 @@ class KarmaViewSet(BaseModelViewSet):
     @action(methods=['GET'], detail=False)
     def info(self, request, pk=None):
         user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
-        total = Karma.objects.filter(target_user=user).aggregate(sum_of_point=Sum('point'))
-        info = self.get_karma_info(total['sum_of_point'])
+        total_result = Karma.objects.filter(target_user=user).aggregate(sum_of_point=Sum('point'))
+        # カルマポイントがない場合は0を入れる
+        total = total_result['sum_of_point'] if total_result['sum_of_point'] != None else 0
+        info = self.get_karma_info(total)
         data = {
             'rank': info['rank'],
             'msg': info['msg'],
-            'totalPoint': total['sum_of_point'],
+            'totalPoint': total,
         }
         return Response(data=data, status=status.HTTP_200_OK)
 

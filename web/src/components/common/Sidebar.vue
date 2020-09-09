@@ -39,6 +39,7 @@
                                     <v-btn icon @click='createProject'><v-icon>mdi-plus</v-icon></v-btn>
                                 </v-list-item-action>
                             </v-list-item>
+
                             <draggable
                                 :list='localProjects'
                                 animation='200'
@@ -47,7 +48,7 @@
                                 @end='end'
                             >
                                 <v-list-item
-                                    v-for='project in projects'
+                                    v-for='project in localProjects'
                                     :key='project.id'
                                     v-show="!project.archived"
                                     @click='toPage(menu.route, project)'
@@ -66,15 +67,17 @@
                                 tile
                                 hover
                                 accordion
+                                v-show='archivedProjects.length > 0'
                             >
                                 <v-expansion-panel>
                                     <v-expansion-panel-header hide-actions>
-                                        アーカイブ
+                                        <span class='archived_title'>アーカイブ</span>
                                     </v-expansion-panel-header>
                                     <v-expansion-panel-content>
                                         <v-list-item
                                             v-for="archived in archivedProjects"
                                             :key='archived.name'
+                                            @click='toPage(menu.route, archived)'
                                         >
                                             <v-list-item-title>{{ archived.name }}</v-list-item-title>
                                             <v-list-item-action class="ml-0">
@@ -132,7 +135,6 @@
                             <v-list-item-title>{{ favo.name }}</v-list-item-title>
                         </v-list-item>
                     </div>
-
                 </template>
 	 		</v-list>
 		</v-navigation-drawer>
@@ -177,7 +179,15 @@
             }
         },
         created () {
-            this.local = _.cloneDeep(this.projects)
+        	this.localProjects = _.cloneDeep(this.projects)
+        },
+        watch: {
+        	projects: {
+        	    deep: true,
+        	    handler (val, old) {
+        	    	this.localProjects = _.cloneDeep(val)
+        	    },
+        	},
         },
     	computed: {
     		...mapGetters([
@@ -193,7 +203,7 @@
                 set (val) {
                     this.local = val
                 }
-            }
+            },
     	},
         methods: {
             ...mapMutations([
@@ -219,7 +229,7 @@
             createLabel () {
                 this.$refs.label.open()
             },
-            end (e) {
+            end: _.debounce(function end (e) {
                 this.$axios({
                     url: '/api/project/updateProjectIndex/',
                     method: 'PUT',
@@ -229,13 +239,19 @@
                 })
                 .then(res => {
                     console.log(res)
-                    // this.localProjects = res.data
                     this.updateProjectIndex(res.data)
+                    this.$vs.notification({
+                    	position: 'bottom-center',
+                    	color: 'primary',
+                    	buttonClose: false,
+                    	classNotification: 'project_sort',
+                    	text: 'プロジェクトの並び順を移動しました。'
+                    })
                 })
                 .catch(e => {
                     console.log(e)
                 })
-            },
+            }, 1000),
         }
     }
 </script>
@@ -254,7 +270,55 @@
         background: #03A9F4;
     }
     .drag {
-        opacity: 0.5;
-        background: #dedede;
+        opacity: 0;
+    }
+    .v-expansion-panel--active > .v-expansion-panel-header {
+        min-height: 40px;
+    }
+
+    .v-expansion-panel-header > *:not(.v-expansion-panel-header__icon) {
+        flex: initial;
+    }
+
+    .v-expansion-panel-header::v-deep {
+        min-height: 40px;
+        justify-content: center;
+        color: #777;
+        transition: 0.3s all ease-in-out;
+
+        &:hover {
+            color: #333;
+
+            &::before {
+                opacity: 1 !important;
+                background-color: #333;
+            }
+        }
+
+        &::before {
+            height: 1px;
+            width: 100%;
+            top: 50%;
+            opacity: 1;
+            background-color: #777;
+        }
+
+        .archived_title {
+            position: relative;
+            padding: 0 1em;
+            display: inline-block;
+            background-color: #fff;
+            text-align: center;
+            font-size: 14px;
+        }
+    }
+</style>
+
+<style lang='scss'>
+    /* Vuesax通知パーツ用デザイン */
+    .project_sort {
+        .vs-notification__content__text p {
+            color: #fff !important;
+        }
     }
 </style>

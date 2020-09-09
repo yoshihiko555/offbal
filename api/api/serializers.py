@@ -43,8 +43,10 @@ class DynamicFieldsModelSerializer(serializers.ModelSerializer):
         # auth0_idを設定
         if 'context' in kwargs:
             self.auth0_id = kwargs['context']['view'].get_auth0_id()
+            self.ordering_type = kwargs['context']['view'].get_ordering_type()
         else:
             self.auth0_id = None
+            self.ordering_type = None
 
         super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)
 
@@ -131,10 +133,13 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
         return obj.archived.filter(auth0_id=self.auth0_id).exists()
 
     def get_tasks(self, obj):
-        return TaskSerializer(obj.task_target_project.all().filter(target_section=None), many=True).data
+        if hasattr(self, 'ordering_type') and self.ordering_type != None:
+            return TaskSerializer(obj.task_target_project.all().filter(target_section=None).order_by('-' + self.ordering_type), many=True).data
+        else:
+            return TaskSerializer(obj.task_target_project.all().filter(target_section=None), many=True).data
 
     def get_sections(self, obj):
-        return SectionSerializer(obj.section_target_project.all(), many=True).data
+        return SectionSerializer(obj.section_target_project.all(), many=True, context=self.context).data
 
     def get_index(self, obj):
         try:
@@ -206,6 +211,9 @@ class SectionSerializer(DynamicFieldsModelSerializer):
     # 画面側でのアイコン描画判定用 (プロジェクトかセクションか)
     isProject = serializers.BooleanField(read_only=True, default=False)
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     class Meta:
         model = Section
         fields = [
@@ -220,7 +228,10 @@ class SectionSerializer(DynamicFieldsModelSerializer):
         ]
 
     def get_tasks(self, obj):
-        return TaskSerializer(obj.task_target_section.all(), many=True).data
+        if hasattr(self, 'ordering_type') and self.ordering_type != None:
+            return TaskSerializer(obj.task_target_section.all().order_by('-' + self.ordering_type), many=True).data
+        else:
+            return TaskSerializer(obj.task_target_section.all(), many=True).data
 
     def create(self, validated_data):
         section = Section.objects.create(

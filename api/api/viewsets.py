@@ -8,6 +8,8 @@ from rest_framework import (
 )
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.db.models import Sum
+
 from .serializers import (
     UserSerializer,
     SettingSerializer,
@@ -36,17 +38,19 @@ from django.utils import timezone
 
 from .filters import (
     ProjectFilter,
+    KarmaFilter,
 )
 
 from .mixins import (
     GetLoginUserMixin,
+    CreateKarmaMixin,
 )
 
 import logging
 logger = logging.getLogger(__name__)
 
 
-class BaseModelViewSet(viewsets.ModelViewSet, GetLoginUserMixin):
+class BaseModelViewSet(viewsets.ModelViewSet, GetLoginUserMixin, CreateKarmaMixin):
 
     def list(self, request, *args, **kwargs):
         self.set_auth0_id(request)
@@ -109,12 +113,6 @@ class ProjectViewSet(BaseModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # @action(methods=['GET'], detail=False)
-    # def favorites(self, request):
-    #     queryset = self.filter_queryset(self.get_queryset())
-    #     serializer = self.get_serializer(queryset.filter(favorite=True), many=True)
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
-
     @action(methods=['GET'], detail=False)
     def checkProjectDuplication(self, request):
         '''
@@ -164,6 +162,14 @@ class ProjectViewSet(BaseModelViewSet):
         serializer = self.get_serializer(user_project, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(methods=['GET'], detail=True)
+    def order_tasks(self, request, pk=None):
+        self.set_ordering_type(request)
+        project = Project.objects.get(pk=pk)
+        serializer = self.get_serializer(project)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
     def autoincrement(self, user):
         '''
         対象ユーザーが関与するプロジェクト総数 + 1を返却する
@@ -199,6 +205,8 @@ class TaskViewSet(BaseModelViewSet):
 
         if serializer.is_valid():
             self.perform_create(serializer)
+            user = mUser.objects.get(auth0_id=request.data['auth0_id'])
+            self.create_karma(user, self.ADD_TASK)
             return Response(self.get_serializer(serializer.instance).data, status=status.HTTP_201_CREATED)
 
         logger.debug(serializer.errors)
@@ -250,3 +258,28 @@ class KarmaViewSet(BaseModelViewSet):
     permission_classes = (permissions.AllowAny,)
     queryset = Karma.objects.all()
     serializer_class = KarmaSerializer
+    filter_class = KarmaFilter
+
+    @action(methods=['GET'], detail=False)
+    def info(self, request, pk=None):
+        user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+        total_result = Karma.objects.filter(target_user=user).aggregate(sum_of_point=Sum('point'))
+        # カルマポイントがない場合は0を入れる
+        total = total_result['sum_of_point'] if total_result['sum_of_point'] != None else 0
+        info = self.get_karma_info(total)
+        data = {
+            'rank': info['rank'],
+            'msg': info['msg'],
+            'totalPoint': total,
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    def get_karma_info(self, point):
+        if point < 100:
+            return { 'rank': '初心者', 'msg': 'あなたは初心者だ'}
+        elif point < 200:
+            return { 'rank': '中級者', 'msg': 'あなたは中級者なのです'}
+        elif point < 300:
+            return { 'rank': '上級者', 'msg': 'あなたは上級者だ。頑張れ'}
+        else:
+            return { 'rank': 'マスター', 'msg': 'あなたはマスターしてる。さらに頑張れ'}

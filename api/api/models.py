@@ -203,7 +203,7 @@ class mSetting(models.Model):
         default=Theme.DEFAULT
     )
 
-    daily_task_number = models.PositiveSmallIntegerField(default=0)
+    daily_task_number = models.PositiveSmallIntegerField(default=5)
 
     holiday = models.ManyToManyField(
         Week,
@@ -382,5 +382,9 @@ class Karma(TimeStampModel):
         related_name='karma_target_user'
     )
 
+    activity_type = models.PositiveSmallIntegerField()
     activity = models.CharField(max_length=100)
-    point = models.PositiveSmallIntegerField()
+    point = models.IntegerField()
+
+    def __str__(self):
+        return self.target_user.auth0_name + 'の' + self.activity

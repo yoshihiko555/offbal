@@ -41,6 +41,7 @@
                 icon
                 relief
                 size="large"
+                to='/myapp/karma/'
             >
                 <i class='bx bx-list-check'></i>2/5
             </vs-button>
@@ -57,8 +58,9 @@
     import DetailProjectMenuBtn from '@/components/parts/DetailProjectMenuBtn'
     import TaskList from '@/components/common/TaskList'
     import SectionList from '@/components/common/SectionList'
-    import { mapGetters, mapActions } from 'vuex'
     import CreateTaskField from '@/components/parts/CreateTaskField'
+
+    import { mapGetters, mapActions } from 'vuex'
 
     export default {
         name: 'DetailProject',

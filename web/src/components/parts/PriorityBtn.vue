@@ -1,6 +1,16 @@
 <template>
     <div>
         <v-tooltip
+            v-if="isSelected"
+            top
+            activator="#priority_btn"
+            z-index=99000
+            open-delay=250
+        >
+            <span>{{ priorityValue }}</span>
+        </v-tooltip>
+        <v-tooltip
+            v-else
             top
             activator="#priority_btn"
             z-index=99000
@@ -9,7 +19,7 @@
             <span>優先度を設定</span>
         </v-tooltip>
         <v-menu
-            offset-y
+            offset-x
             transition="scroll-y-transition"
             min-width="180px"
         >
@@ -31,7 +41,7 @@
                 <v-list-item
                     v-for="(item, i) in items"
                     :key="i"
-                    @click="selectPriority(item)"
+                    @click="selectPriority(item.value)"
                 >
                     <v-icon
                         class="mr-1"
@@ -54,7 +64,13 @@
     export default {
         name: 'PriorityBtn',
         components: {},
-        props: {},
+        props: {
+            defaultPriority: {
+                type: String,
+                required: false,
+                default: '1'
+            }
+        },
         data: () => ({
             items: [
                 {
@@ -89,24 +105,36 @@
                 },
             ],
             priority: {
-                value: '',
+                value: '1',
                 color: Con.NON_ACTIVE_COLOR,
-                icon: 'mdi-star-outline'
+                icon: 'mdi-star-outline',
+                text: '優先度1'
             },
+            isSelected: false,
         }),
-        created () {},
+        created () {
+            this.priority.value = this.defaultPriority
+        },
         mounted: function () {},
-        watch: {},
-        computed: {},
+        watch: {
+            'priority.value': function (val) {
+                const item = this.items.filter(item => item.value === val)[0]
+                this.priority.color = item.color
+                this.priority.icon = item.icon
+                this.priority.text = item.text
+                this.isSelected = true
+            }
+        },
+        computed: {
+            priorityValue () {
+                return this.priority.text
+            }
+        },
         methods: {
-            selectPriority (priority) {
-                const { value, color, icon } = priority
-                this.priority = {
-                    value: value,
-                    color: color,
-                    icon: icon
-                }
+            selectPriority (value) {
+                this.priority.value = value
                 this.$eventHub.$emit('create_task_info', 'priority', value)
+                this.isSelected = true
             }
         }
     }

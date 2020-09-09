@@ -41,7 +41,9 @@
                             cols="1"
                         >
                             <DeadLineBtn/>
-                            <ProjectBtn/>
+                            <ProjectBtn
+                                :defaultProjectId=detailProject.id
+                            />
                             <LabelBtn/>
                             <PriorityBtn/>
                             <ReminderBtn/>
@@ -80,7 +82,7 @@
     </vs-dialog>
 </template>
 <script>
-    import { mapMutations } from 'vuex'
+    import { mapGetters, mapMutations } from 'vuex'
     import DeadLineBtn from '@/components/parts/DeadLineBtn'
     import ProjectBtn from '@/components/parts/ProjectBtn'
     import LabelBtn from '@/components/parts/LabelBtn'
@@ -117,18 +119,23 @@
         created () {
             this.$eventHub.$on('create_task_info', this.create_task_info)
         },
-        mounted: function () {},
+        mounted: function () {
+        },
         watch: {},
         computed: {
             localTaskDialog: {
                 get: function () {
+                    this.init()
                     return this.taskDialog
                 },
                 set: function (value) {
                     this.init()
                     this.$emit('update', value)
                 },
-            }
+            },
+            ...mapGetters([
+                'detailProject',
+            ])
         },
         methods: {
             ...mapMutations([
@@ -186,9 +193,6 @@
             .vs-input {
                 width: 100%;
             }
-        }
-        .task_dialog_add_task_btn {
-            width: 100%;
         }
     }
 </style>

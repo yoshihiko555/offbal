@@ -1,6 +1,16 @@
 <template>
     <div>
         <v-tooltip
+            v-if="isSelected"
+            top
+            activator="#project_btn"
+            z-index=99000
+            open-delay=250
+        >
+            <span>{{ projectName }}</span>
+        </v-tooltip>
+        <v-tooltip
+            v-else
             top
             activator="#project_btn"
             z-index=99000
@@ -10,7 +20,7 @@
         </v-tooltip>
         <v-menu
             :close-on-content-click="false"
-            offset-y
+            offset-x
             min-width="200px"
             max-height="380px"
             transition="scroll-y-transition"
@@ -64,7 +74,7 @@
                                 <v-icon
                                     class="mr-2"
                                     color="grey lighten-1"
-                                >mdi-menu-down</v-icon>
+                                >mdi-rhombus-medium-outline</v-icon>
                                 {{ section.name }}
                             </v-list-item>
                         </div>
@@ -95,7 +105,7 @@
                                 <v-icon
                                     class="mr-3"
                                     color="grey lighten-1"
-                                >mdi-menu-down</v-icon>
+                                >mdi-square-medium-outline</v-icon>
                                 {{ item.name }}
                             </v-list-item>
                         </div>
@@ -114,15 +124,43 @@
     export default {
         name: 'ProjectBtn',
         components: {},
-        props: {},
+        props: {
+            defaultProjectId: {
+                type: Number,
+                required: false,
+                default: 0
+            },
+            defaultProject: {
+                type: String,
+                required: false,
+                default: ''
+            },
+            defaultSection: {
+                type: String,
+                required: false,
+                default: ''
+            },
+        },
         data: () => ({
             projectBtnColor: Con.NON_ACTIVE_COLOR,
             filterValue: '',
             filteredItems: [],
-            menu: false
+            menu: false,
+            project: {
+                name: '',
+                section: '',
+            },
+            isSelected: false,
         }),
-        created () {},
-        mounted: function () {},
+        created () {
+            this.project = {
+                name: this.defaultProject,
+                section: this.defaultSection
+            }
+            this.$eventHub.$emit('create_task_info', 'project_id', this.defaultProjectId)
+        },
+        mounted: function () {
+        },
         watch: {
             filterValue: function (val) {
                 this.filteredItems = []
@@ -139,28 +177,67 @@
                         }
                     }
                 }
+            },
+            project: {
+                handler: function (val) {
+                    if (val.name !== '' || val.section !== '') {
+                        this.projectBtnColor = Con.ACTIVE_COLOR
+                        this.isSelected = true
+                    } else {
+                        this.projectBtnColor = Con.NON_ACTIVE_COLOR
+                        this.isSelected = false
+                    }
+                },
+                deep: true
             }
         },
         computed: {
             ...mapGetters([
                 'projects',
             ]),
+            projectName () {
+                let project = this.project.name
+                if (this.project.section !== '') project += '/' + this.project.section
+                return project
+            }
         },
         methods: {
             selectProject (value) {
+                // プロジェクトを選択
                 if (value.isProject) {
+                    this.setProjectInfo(value)
                     this.$eventHub.$emit('create_task_info', 'project_id', value.id)
+                    this.$eventHub.$emit('create_task_info', 'section_id', 0)
                 } else {
-                    if (value.target_project_name !== 'インボックス') {
-                        this.$eventHub.$emit('create_task_info', 'project_id', value.target_project)
-                    }
-                    this.$eventHub.$emit('create_task_info', 'section_id', value.id)
+                    this.setSectionInfo(value)
+                    this.selectSection(value)
                 }
                 this.menu = false
-                this.projectBtnColor = Con.ACTIVE_COLOR
+            },
+            selectSection (value) {
+                // セクションを選択
+                if (value.target_project_name !== 'インボックス') {
+                    this.$eventHub.$emit('create_task_info', 'project_id', value.target_project)
+                }
+                this.$eventHub.$emit('create_task_info', 'section_id', value.id)
             },
             filterProjectSectionName (value) {
+                // プロジェクト名・セクション名を検索する
                 return value.name.indexOf(this.filterValue) === 0
+            },
+            setProjectInfo (value) {
+                // プロジェクト選択時情報をセット
+                this.project = {
+                    name: value.name,
+                    section: ''
+                }
+            },
+            setSectionInfo (value) {
+                // セクション選択時情報をセット
+                this.project = {
+                    name: value.target_project_name,
+                    section: value.name
+                }
             }
         },
     }

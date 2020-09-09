@@ -1,6 +1,16 @@
 <template>
     <div>
         <v-tooltip
+            v-if="isSelected"
+            top
+            activator="#label_btn"
+            z-index=99000
+            open-delay=250
+        >
+            <span>{{ labelValue }}</span>
+        </v-tooltip>
+        <v-tooltip
+            v-else
             top
             activator="#label_btn"
             z-index=99000
@@ -10,7 +20,7 @@
         </v-tooltip>
         <v-menu
             :close-on-content-click="false"
-            offset-y
+            offset-x
             rounded="true"
             v-model="menu"
             min-width="250px"
@@ -43,7 +53,7 @@
                             v-for='(label, i) in labels'
                             :key='i'
                             :label='label.name'
-                            :value='label.name'
+                            :value='label.id'
                             filter
                         >{{ label.name }}
                         </vs-option>
@@ -66,14 +76,25 @@
     export default {
         name: 'LabelBtn',
         components: {},
-        props: {},
+        props: {
+            defaultLabelList: {
+                type: Array,
+                required: false,
+                default: () => ([])
+            },
+        },
         data: () => ({
             labelColor: Con.NON_ACTIVE_COLOR,
             selectLabelList: [],
-            menu: false
+            menu: false,
         }),
-        created () {},
-        mounted: function () {},
+        created () {
+            for (const i in this.defaultLabelList) {
+                this.selectLabelList.push(this.defaultLabelList[i].id)
+            }
+        },
+        mounted: function () {
+        },
         watch: {
             selectLabelList: function (val) {
                 this.labelColor = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
@@ -83,7 +104,22 @@
         computed: {
             ...mapGetters([
                 'labels',
-            ])
+            ]),
+            isSelected () {
+                return this.selectLabelList.length > 0
+            },
+            labelValue () {
+                // 選択済みのラベルをカンマ区切りで出力
+                let res = ''
+                let multi = false
+                for (const i in this.selectLabelList) {
+                    const label = this.labels.filter(label => label.id === this.selectLabelList[i])[0]
+                    if (multi) res += ', '
+                    res += label.name
+                    multi = true
+                }
+                return res
+            }
         },
         methods: {},
     }

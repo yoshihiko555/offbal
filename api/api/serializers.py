@@ -203,6 +203,7 @@ class SectionSerializer(DynamicFieldsModelSerializer):
     tasks = serializers.SerializerMethodField()
     target_project_name = serializers.CharField(read_only=True, source='target_project.name')
 
+    # 画面側でのアイコン描画判定用 (プロジェクトかセクションか)
     isProject = serializers.BooleanField(read_only=True, default=False)
 
     class Meta:
@@ -229,14 +230,32 @@ class SectionSerializer(DynamicFieldsModelSerializer):
         return section
 
 class TaskSerializer(DynamicFieldsModelSerializer):
+    """
+    - タスクデータ作成用パラメータ
+        auth0_id : ユーザーID (必須)
+        content : タスク内容 (必須)
+        comment : コメント (必須,空でもok)
+        project_id ： プロジェクトのid (必須)
+        section_id : セクションのid (必須) ※指定無しの場合0
+        deadline_str : 有効期限の文字列 (必須,空でもok) [%Y-%m-%d %H:%M:%S]
+        remind_str : リマインダーの文字列 (必須,空でもok) [%Y-%m-%d %H:%M:%S]
+        label_list : ラベルidのリスト (必須,空でもok)
+        priority : 優先度の文字列 (必須) [1~5]
+
+            ※プロジェクト, セクション指定の際
+                1. プロジェクトidとセクションidが0の場合インボックスに作成
+                2. 「プロジェクト」 にタスク追加時はプロジェクトidのみ指定すればok
+                3. 「セクション」 にタスク追加時はセクションidのみ指定すればok
+    """
 
     auth0_id = serializers.CharField(write_only=True)
+
     project_id = serializers.IntegerField(write_only=True)
     section_id = serializers.IntegerField(write_only=True)
     deadline_str = serializers.CharField(write_only=True, allow_blank=True)
     remind_str = serializers.CharField(write_only=True, allow_blank=True)
     label_list = serializers.ListField(
-        child=serializers.CharField(),
+        child=serializers.IntegerField(),
         allow_empty=True,
         write_only=True,
     )
@@ -244,11 +263,15 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     target_user = serializers.CharField(read_only=True)
     target_project = serializers.ReadOnlyField(source='target_project.id')
     target_project_name = serializers.CharField(read_only=True, source='target_project.name')
-    target_section_name = serializers.CharField(read_only=True, source='target_section.name')
+    target_section = serializers.ReadOnlyField(source='target_section.id', default=0)
+    target_section_name = serializers.CharField(read_only=True, source='target_section.name', default='')
     label = serializers.SerializerMethodField()
+    deadline = serializers.SerializerMethodField()
+    remind = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
     sub_tasks = serializers.SerializerMethodField()
+    completed_at = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
@@ -277,16 +300,32 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'created_at',
             'updated_at',
             'sub_tasks',
+            'completed_at',
         ]
 
     def get_label(self, obj):
         return LabelSerializer(obj.label.all(), many=True).data
+
+    def get_deadline(self, obj):
+        if obj.deadline == None:
+            return ''
+        return utc_to_jst(obj.deadline)
+
+    def get_remind(self, obj):
+        if obj.remind == None:
+            return ''
+        return utc_to_jst(obj.remind)
 
     def get_created_at(self, obj):
         return utc_to_jst(obj.created_at)
 
     def get_updated_at(self, obj):
         return utc_to_jst(obj.updated_at)
+
+    def get_completed_at(self, obj):
+        if obj.completed_at == None:
+            return ''
+        return utc_to_jst(obj.completed_at)
 
     def get_sub_tasks(self, obj):
         # とりあえず置いておく
@@ -334,15 +373,64 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             remind=remind,
         )
 
-        for label_name in validated_data['label_list']:
+        for pk in validated_data['label_list']:
             try:
-                label = Label.objects.get(name=label_name)
+                label = Label.objects.get(pk=pk)
                 task.label.add(label)
             except Label.DoesNotExist:
                 logger.error('Labelが見つかりませんでした。')
-                return None
+                return
 
         return task
+
+    def update(self, instance, validated_data):
+
+        project_id = validated_data['project_id']
+        section_id = validated_data['section_id']
+
+        try:
+            user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
+            section = Section.objects.get(id=section_id) if section_id != 0 else None
+            if section != None:
+                project = section.target_project
+            project = Project.objects.get(id=project_id) if project_id != 0 else Project.objects.get(name='インボックス', creator=user)
+
+            instance.target_project = project
+            instance.target_section = section
+
+        except mUser.DoesNotExist:
+            logger.error('mUserが見つかりませんでした。')
+            return None
+        except Project.DoesNotExist:
+            logger.error('Projectが見つかりませんでした。')
+            return None
+        except Section.DoesNotExist:
+            logger.error('Sectionが見つかりませんでした。')
+            return None
+
+        dl_str = validated_data['deadline_str']
+        rm_str = validated_data['remind_str']
+
+        deadline = datetime.strptime(dl_str, '%Y-%m-%d %H:%M:%S') if dl_str != '' else None
+        remind = datetime.strptime(rm_str, '%Y-%m-%d %H:%M:%S') if rm_str != '' else None
+
+        instance.content = validated_data['content']
+        instance.comment = validated_data['comment']
+        instance.priority = validated_data['priority']
+        instance.deadline = deadline
+        instance.remind = remind
+
+        instance.label.clear()
+        for pk in validated_data['label_list']:
+            try:
+                label = Label.objects.get(pk=pk)
+                instance.label.add(label)
+            except Label.DoesNotExist:
+                logger.error('Labelが見つかりませんでした。')
+                return
+
+        instance.save()
+        return instance
 
 
 class LabelSerializer(DynamicFieldsModelSerializer):

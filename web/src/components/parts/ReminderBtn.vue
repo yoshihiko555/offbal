@@ -1,6 +1,16 @@
 <template>
     <div>
         <v-tooltip
+            v-if="isSelected"
+            top
+            activator="#reminder_btn"
+            z-index=99000
+            open-delay=250
+        >
+            <span>{{ remindDate }}</span>
+        </v-tooltip>
+        <v-tooltip
+            v-else
             top
             activator="#reminder_btn"
             z-index=99000
@@ -9,7 +19,7 @@
             <span>リマインダー</span>
         </v-tooltip>
         <v-menu
-            offset-y
+            offset-x
             min-width="400px"
             transition="scroll-y-transition"
         >
@@ -49,18 +59,34 @@
         components: {
             Datetime,
         },
-        props: {},
+        props: {
+            defaultRemind: {
+                type: String,
+                required: false,
+                default: ''
+            }
+        },
         data: () => ({
             remind: {
                 value: '',
                 color: Con.NON_ACTIVE_COLOR
-            }
+            },
+            isSelected: false,
         }),
-        created () {},
-        mounted: function () {},
+        created () {
+        },
+        mounted: function () {
+            if (this.defaultRemind !== null) this.remind.value = this.defaultRemind
+        },
         watch: {
             'remind.value': function (val) {
-                this.remind.color = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
+                if (val.length > 0) {
+                    this.remind.color = Con.ACTIVE_COLOR
+                    this.isSelected = true
+                } else {
+                    this.remind.color = Con.NON_ACTIVE_COLOR
+                    this.isSelected = false
+                }
                 this.$eventHub.$emit('create_task_info', 'remind_str', val)
             }
         },
@@ -69,6 +95,9 @@
                 const start = moment()
                 return start.format('YYYY-MM-DDTHH:mm:ss')
             },
+            remindDate () {
+                return this.remind.value
+            }
         },
         methods: {},
     }

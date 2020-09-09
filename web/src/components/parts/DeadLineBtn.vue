@@ -1,6 +1,16 @@
 <template>
     <div>
         <v-tooltip
+            v-if="isSelected"
+            top
+            activator="#deadline_btn"
+            z-index=99000
+            open-delay=250
+        >
+            <span>{{ deadlineDate }}</span>
+        </v-tooltip>
+        <v-tooltip
+            v-else
             top
             activator="#deadline_btn"
             z-index=99000
@@ -9,7 +19,7 @@
             <span>期限を設定</span>
         </v-tooltip>
         <v-menu
-            offset-y
+            offset-x
             min-width="400px"
             transition="scroll-y-transition"
             :close-on-content-click="false"
@@ -21,7 +31,7 @@
                         v-bind="attrs"
                         v-on="on"
                     ><v-icon
-                        :color='deadline.color'
+                        :color="deadline.color"
                     >mdi-calendar-clock</v-icon>
                     </v-btn>
                 </div>
@@ -50,14 +60,22 @@
         components: {
             Datetime,
         },
-        props: {},
+        props: {
+            defaultDeadline: {
+                type: String,
+                required: false,
+                default: ''
+            }
+        },
         data: () => ({
             deadline: {
                 value: '',
                 color: Con.NON_ACTIVE_COLOR
-            }
+            },
         }),
-        created () {},
+        created () {
+            if (this.defaultDeadline !== null) this.deadline.value = this.defaultDeadline
+        },
         mounted: function () {},
         watch: {
             'deadline.value': function (val) {
@@ -69,6 +87,12 @@
             start () {
                 const start = moment()
                 return start.format('YYYY-MM-DDTHH:mm:ss')
+            },
+            isSelected () {
+                return this.deadline.value !== ''
+            },
+            deadlineDate () {
+                return this.deadline.value
             },
         },
         methods: {},

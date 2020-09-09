@@ -111,7 +111,7 @@ export default new Vuex.Store({
 		addTask (state, payload) {
 			// 違うプロジェクトだったら追加しない
 			if (state.detailProject.id !== payload.target_project) return
-			if (payload.target_section == null) {
+			if (payload.target_section === 0) {
 				// プロジェクトのタスクに追加
 				state.detailProject.tasks.push(payload)
 
@@ -127,7 +127,7 @@ export default new Vuex.Store({
 		},
 		deleteTask (state, payload) {
 			// プロジェクト詳細
-			if (payload.target_section == null) {
+			if (payload.target_section === 0) {
 				const index = state.detailProject.tasks.findIndex(task => task.id === payload.id)
 				if (index !== -1) state.detailProject.tasks = state.detailProject.tasks.filter((_, i) => i !== index)
 			} else {
@@ -141,6 +141,18 @@ export default new Vuex.Store({
 	        // const j = project.tasks.findIndex(task => task.id === payload)
 	        // if (j !== -1) project.tasks = project.tasks.filter((_, i) => i !== j)
 	    },
+		updateTask (state, payload) {
+			console.log('updateTask')
+			console.log(payload)
+			if (payload.target_section === 0) {
+				const index = state.detailProject.tasks.findIndex(task => task.id === payload.id)
+				Vue.set(state.detailProject.tasks, index, payload)
+			} else {
+				const section = state.detailProject.sections.find(section => section.id === payload.target_section)
+				const index = section.tasks.findIndex(task => task.id === payload.id)
+				Vue.set(section.tasks, index, payload)
+			}
+		},
 	},
 	actions: {
 		// プロジェクト一覧取得
@@ -264,7 +276,11 @@ export default new Vuex.Store({
 	        .catch(e => {
 	            console.log(e)
 	        })
-	    }
+	    },
+		// タスク更新
+		updateTaskAction (ctx, kwargs) {
+			this.commit('updateTask', kwargs)
+		},
 	},
 	modules: {
 	},

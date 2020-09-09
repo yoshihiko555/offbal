@@ -9,6 +9,7 @@
             >
                 <vs-checkbox
                     color="primary"
+                    @change="checkTask(task)"
                 ></vs-checkbox>
             </v-list-item-action>
             <v-list-item-content>
@@ -24,20 +25,18 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex'
+    import { mapGetters, mapMutations } from 'vuex'
     import TaskMenuBtn from '@/components/parts/TaskMenuBtn'
+    import _ from 'lodash'
 
     export default {
         name: 'TaskList',
         components: {
             TaskMenuBtn
         },
-        props: {
-            tasks: {
-                type: Array,
-                required: true,
-            },
-        },
+        props: [
+            'tasks',
+        ],
         data: () => ({
         }),
         mounted: function () {
@@ -48,6 +47,25 @@
     		])
     	},
         methods: {
+            ...mapMutations([
+                'deleteTask',
+            ]),
+            checkTask: _.debounce(function checkTask (task) {
+                this.$axios({
+                    url: '/api/task/complete/',
+                    method: 'POST',
+                    data: {
+                        task_id: task.id,
+                    }
+                })
+                .then(res => {
+                    console.log(res)
+                    this.deleteTask(res.data)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            }, 800),
         },
     }
 </script>

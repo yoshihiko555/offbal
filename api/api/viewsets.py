@@ -32,6 +32,8 @@ from .models import (
     Karma,
 )
 
+from django.utils import timezone
+
 from .filters import (
     ProjectFilter,
 )
@@ -207,6 +209,23 @@ class TaskViewSet(BaseModelViewSet):
         data = self.get_serializer(instance).data
         self.perform_destroy(instance)
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False)
+    def complete(self, request):
+        """
+        該当タスクの完了フラグを立てるアクション
+        """
+        try:
+            instance = Task.objects.get(pk=request.data['task_id'])
+            instance.completed = True
+            instance.completed_at = timezone.datetime.now()
+            instance.save()
+        except Task.DoesNotExist:
+            logger.error('タスクが見つかりませんでした。')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(self.get_serializer(instance).data,status=status.HTTP_200_OK)
+
 
 
 class LabelViewSet(BaseModelViewSet):

@@ -38,6 +38,7 @@ class TaskModel(models.Model):
     remind = models.DateTimeField(null=True, blank=True)
     comment = models.TextField(null=True, blank=True)
     completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
     deleted = models.BooleanField(default=False)
 
     def __str__(self):

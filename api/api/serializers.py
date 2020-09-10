@@ -37,8 +37,6 @@ logger = logging.getLogger(__name__)
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
-        logger.info(kwargs)
-
         fields = kwargs.pop('fields', None)
 
         # auth0_idを設定
@@ -94,6 +92,7 @@ class CategorySerializer(DynamicFieldsModelSerializer):
     auth0_id = serializers.CharField(write_only=True)
     creator = serializers.CharField(read_only=True)
     tasks = serializers.SerializerMethodField()
+    complete_tasks = serializers.SerializerMethodField()
     sections = serializers.SerializerMethodField()
     favorite = serializers.SerializerMethodField()
     archived = serializers.SerializerMethodField()
@@ -119,6 +118,7 @@ class CategorySerializer(DynamicFieldsModelSerializer):
             'archived',
             'auth0_id',
             'tasks',
+            'complete_tasks',
             'sections',
             'is_favorite',
             'is_archived',
@@ -135,9 +135,15 @@ class CategorySerializer(DynamicFieldsModelSerializer):
 
     def get_tasks(self, obj):
         if hasattr(self, 'ordering_type') and self.ordering_type != None:
-            return TaskSerializer(obj.task_target_category.all().filter(target_section=None).order_by('-' + self.ordering_type), many=True).data
+            return TaskSerializer(obj.task_target_category.all().filter(Q(target_section=None) & Q(completed=False)).order_by('-' + self.ordering_type), many=True).data
         else:
-            return TaskSerializer(obj.task_target_category.all().filter(target_section=None), many=True).data
+            return TaskSerializer(obj.task_target_category.all().filter(Q(target_section=None) & Q(completed=False)), many=True).data
+
+    def get_complete_tasks(self, obj):
+        if hasattr(self, 'ordering_type') and self.ordering_type != None:
+            return TaskSerializer(obj.task_target_category.all().filter(Q(target_section=None) & Q(completed=True)).order_by('-' + self.ordering_type), many=True).data
+        else:
+            return TaskSerializer(obj.task_target_category.all().filter(Q(target_section=None) & Q(completed=True)), many=True).data
 
     def get_sections(self, obj):
         return SectionSerializer(obj.section_target_category.all(), many=True, context=self.context).data
@@ -207,6 +213,7 @@ class CategoryMemberShipSerializer(DynamicFieldsModelSerializer):
 class SectionSerializer(DynamicFieldsModelSerializer):
 
     tasks = serializers.SerializerMethodField()
+    complete_tasks = serializers.SerializerMethodField()
     target_category_name = serializers.CharField(read_only=True, source='target_category.name')
 
     # 画面側でのアイコン描画判定用 (カテゴリーかセクションか)
@@ -224,15 +231,22 @@ class SectionSerializer(DynamicFieldsModelSerializer):
             'deleted',
             'archived',
             'tasks',
+            'complete_tasks',
             'isCategory',
             'target_category_name',
         ]
 
     def get_tasks(self, obj):
         if hasattr(self, 'ordering_type') and self.ordering_type != None:
-            return TaskSerializer(obj.task_target_section.all().order_by('-' + self.ordering_type), many=True).data
+            return TaskSerializer(obj.task_target_section.all().filter(Q(completed=False)).order_by('-' + self.ordering_type), many=True).data
         else:
-            return TaskSerializer(obj.task_target_section.all(), many=True).data
+            return TaskSerializer(obj.task_target_section.all().filter(Q(completed=False)), many=True).data
+
+    def get_complete_tasks(self, obj):
+        if hasattr(self, 'ordering_type') and self.ordering_type != None:
+            return TaskSerializer(obj.task_target_section.all().filter(Q(completed=True)).order_by('-' + self.ordering_type), many=True).data
+        else:
+            return TaskSerializer(obj.task_target_section.all().filter(Q(completed=True)), many=True).data
 
     def create(self, validated_data):
         section = Section.objects.create(

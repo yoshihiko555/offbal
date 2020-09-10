@@ -50,7 +50,7 @@
             ...mapMutations([
                 'deleteTask',
             ]),
-            checkTask: _.debounce(function checkTask (task) {
+            checkTask (task) {
                 this.$axios({
                     url: '/api/task/complete/',
                     method: 'POST',
@@ -60,12 +60,12 @@
                 })
                 .then(res => {
                     console.log(res)
-                    this.deleteTask(res.data)
+                    setTimeout(this.deleteTask, 600, res.data)
                 })
                 .catch(e => {
                     console.log(e)
                 })
-            }, 800),
+            },
         },
     }
 </script>

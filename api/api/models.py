@@ -218,6 +218,44 @@ class mSetting(models.Model):
         return name + 'のmSetting'
 
 
+class DefaultCategory(models.Model):
+
+    class Name(models.TextChoices):
+        WORK = 'work', _('Work')
+        SLEEP = 'sleep', _('Sleep')
+        FAMILY = 'family', _('Family')
+        MOTION = 'motion', _('Motion')
+        FRIEND = 'friend',_('Friend')
+        LOVE = 'love', _('Love')
+        HEALTH = 'health', _('Health')
+        HOBBY = 'hobby', _('Hobby')
+
+    name = models.CharField(
+        max_length=60,
+        choices=Name.choices,
+        default=Name.WORK
+    )
+
+    class Color(models.TextChoices):
+        GREY = 'grey', _('Grey')
+        RED = 'red', _('Red')
+        BLUE = 'blue', _('Blue')
+        GREEN = 'green', _('Green')
+        YELLOW = 'yellow', _('Yellow')
+        ORANGE = 'orange', _('Orange')
+        PINK = 'pink', _('Pink')
+        TEAL = 'teal', _('Teal')
+        CYAN = 'cyan', _('Cyan')
+
+    color = models.CharField(
+        max_length=20,
+        choices=Color.choices,
+        default=Color.GREY
+    )
+
+    def __str__(self):
+        return self.name
+
 class Category(TimeStampModel):
 
     creator = models.ForeignKey(
@@ -241,6 +279,10 @@ class Category(TimeStampModel):
         BLUE = 'blue', _('Blue')
         GREEN = 'green', _('Green')
         YELLOW = 'yellow', _('Yellow')
+        ORANGE = 'orange', _('Orange')
+        PINK = 'pink', _('Pink')
+        TEAL = 'teal', _('Teal')
+        CYAN = 'cyan', _('Cyan')
 
     color = models.CharField(
         max_length=20,

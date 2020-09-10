@@ -1,0 +1,66 @@
+[
+    {
+        "model": "api.defaultcategory",
+        "pk": 1,
+        "fields": {
+            "name": "work",
+            "color": "cyan"
+        }
+    },
+    {
+        "model": "api.defaultcategory",
+        "pk": 2,
+        "fields": {
+            "name": "sleep",
+            "color": "teal"
+        }
+    },
+    {
+        "model": "api.defaultcategory",
+        "pk": 3,
+        "fields": {
+            "name": "family",
+            "color": "yellow"
+        }
+    },
+    {
+        "model": "api.defaultcategory",
+        "pk": 4,
+        "fields": {
+            "name": "motion",
+            "color": "blue"
+        }
+    },
+    {
+        "model": "api.defaultcategory",
+        "pk": 5,
+        "fields": {
+            "name": "friend",
+            "color": "orange"
+        }
+    },
+    {
+        "model": "api.defaultcategory",
+        "pk": 6,
+        "fields": {
+            "name": "love",
+            "color": "red"
+        }
+    },
+    {
+        "model": "api.defaultcategory",
+        "pk": 7,
+        "fields": {
+            "name": "health",
+            "color": "pink"
+        }
+    },
+        {
+        "model": "api.defaultcategory",
+        "pk": 8,
+        "fields": {
+            "name": "hobby",
+            "color": "gray"
+        }
+    }
+]

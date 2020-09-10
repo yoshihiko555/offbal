@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="detail-category-menu-wrap">
         <v-menu
             offset-x
             transition="slide-x-transition"
@@ -27,7 +27,7 @@
                 </v-list-item>
 
                 <v-list-item
-                    v-if='!project.favorite'
+                    v-if='!detailCategory.favorite'
                     @click='togleFavorite'
                 >
                     <v-list-item-icon class='mr-0'>
@@ -48,46 +48,56 @@
         </v-menu>
 
         <!-- モーダル読み込み -->
-        <EditProjectDialog
-            ref='project'
+        <EditCategoryDialog
+            ref='category'
         />
     </div>
 </template>
 
 <script>
-	import EditProjectDialog from '@/components/common/EditProjectDialog'
-	import { mapMutations, mapActions } from 'vuex'
+	import EditCategoryDialog from '@/components/common/EditCategoryDialog'
+	import { mapGetters, mapActions } from 'vuex'
 	import _ from 'lodash'
 
     export default {
-        name: 'SidebarProjectMenuBtn',
+        name: 'DetailCategoryMenuBtn',
         components: {
-        	EditProjectDialog,
+        	EditCategoryDialog,
         },
         props: {
-        	project: {
+        	category: {
         		type: Object,
         		requied: true,
         	},
         },
         data () {
         	return {
-        		cloneProject: {},
+        		cloneCategory: {},
                 menus: [
                     {
-                        name: 'プロジェクトの編集',
+                        name: 'セクションの追加',
+                        icon: 'mdi-plus-circle-outline',
+                        call: this.open,
+                    },
+                    {
+                        name: 'カテゴリーの編集',
                         icon: 'mdi-pencil-outline',
-                        call: this.editProject,
+                        call: this.editCategory,
                     },
                     {
-                        name: 'プロジェクトを削除',
+                        name: 'カテゴリーを削除',
                         icon: 'mdi-trash-can-outline',
-                        call: this.deleteProject,
+                        call: this.deleteCategory,
                     },
                     {
-                        name: 'プロジェクトをアーカイブ',
+                        name: 'カテゴリーをアーカイブ',
                         icon: 'mdi-package',
-                        call: this.archive,
+                        call: this.test,
+                    },
+                    {
+                        name: '完了したタスクを表示',
+                        icon: 'mdi-check-circle-outline',
+                        call: this.test,
                     },
                 ],
                 favoMenu: [
@@ -102,63 +112,55 @@
                 ],
         	}
         },
+        computed: {
+    		...mapGetters([
+                'detailCategory',
+    		])
+    	},
         methods: {
-            ...mapMutations([
-                'addArchivedProjects',
-            ]),
             ...mapActions([
-                'deleteProjectAction',
-                'updateProjectAction',
-                'addFavoriteProjectsAction',
-                'deleteFavoriteProjectsAction',
+                'deleteCategoryAction',
+                'updateCategoryAction',
+                'addFavoriteCategorysAction',
+                'deleteFavoriteCategorysAction',
             ]),
-        	editProject () {
-        		this.$refs.project.open(this.project)
+            open () {
+                this.$emit('open-create')
+            },
+        	editCategory () {
+        		this.$refs.category.open(this.detailCategory)
         	},
-        	deleteProject () {
-        		this.deleteProjectAction(this.project)
-        	},
-        	togleFavorite () {
+        	deleteCategory () {
+        		this.deleteCategoryAction(this.detailCategory)
+            },
+            togleFavorite () {
         		// propsで来たデータの直更新はNGのため一度deepcopy
-        		this.cloneProject = _.cloneDeep(this.project)
-        		this.cloneProject.is_favorite = !this.cloneProject.favorite
+        		this.cloneCategory = _.cloneDeep(this.detailCategory)
+        		this.cloneCategory.favorite = !this.cloneCategory.favorite
         		this.$axios({
-        			url: `/api/project/${this.cloneProject.id}/`,
+        			url: `/api/category/${this.cloneCategory.id}/`,
         			method: 'PUT',
-        			data: this.cloneProject,
+        			data: this.cloneCategory,
         		})
         		.then(res => {
         			console.log(res)
-                    this.updateProjectAction(res.data)
-                    if (res.data.favorite) this.addFavoriteProjectsAction(res.data)
-                    else this.deleteFavoriteProjectsAction(res.data)
+                    this.updateCategoryAction(res.data)
+                    if (res.data.favorite) this.addFavoriteCategorysAction(res.data)
+                    else this.deleteFavoriteCategorysAction(res.data)
         		})
         		.catch(e => {
         			console.log(e)
         		})
-            },
-            archive () {
-                this.cloneProject = _.cloneDeep(this.project)
-        		this.cloneProject.is_favorite = false
-        		this.cloneProject.is_archived = true
-        		this.$axios({
-        			url: `/api/project/${this.cloneProject.id}/`,
-        			method: 'PUT',
-        			data: this.cloneProject,
-        		})
-        		.then(res => {
-                    console.log(res)
-                    this.updateProjectAction(res.data)
-                    this.deleteFavoriteProjectsAction(res.data)
-                    this.addArchivedProjects(res.data)
-        		})
-        		.catch(e => {
-        			console.log(e.response)
-        		})
-            },
+        	},
+        	test () {
+        		console.log('test')
+        	}
         },
     }
 </script>
 
 <style lang="scss" scoped>
+    #detail-category-menu-wrap {
+        display: inline-block;
+    }
 </style>

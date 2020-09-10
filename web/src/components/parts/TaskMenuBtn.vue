@@ -29,9 +29,9 @@
             </v-list>
         </v-menu>
 
-        <SelectProjectSectionBtn
-            @move-project-section='moveProjectSection'
-            ref='selectProjectSection'
+        <SelectCategorySectionBtn
+            @move-category-section='moveCategorySection'
+            ref='selectCategorySection'
         />
 
         <EditTaskDialog
@@ -43,13 +43,13 @@
 <script>
     import { mapActions, mapMutations } from 'vuex'
     import EditTaskDialog from '@/components/common/EditTaskDialog'
-    import SelectProjectSectionBtn from '@/components/parts/SelectProjectSectionBtn'
+    import SelectCategorySectionBtn from '@/components/parts/SelectCategorySectionBtn'
 
     export default {
         name: 'TaskMenuBtn',
         components: {
             EditTaskDialog,
-            SelectProjectSectionBtn,
+            SelectCategorySectionBtn,
         },
         props: {
             task: {
@@ -66,9 +66,9 @@
                         call: this.showEditTaskDialog,
                     },
                     {
-                        name: 'プロジェクトの移動',
+                        name: 'カテゴリーの移動',
                         icon: 'mdi-arrow-right-circle-outline',
-                        call: this.showMoveProjectDialog,
+                        call: this.showMoveCategoryDialog,
                     },
                     {
                         name: 'タスクの複製',
@@ -98,13 +98,13 @@
             showEditTaskDialog () {
                 this.$refs.taskEdit.open(this.task)
             },
-            showMoveProjectDialog () {
-                this.$refs.selectProjectSection.open()
+            showMoveCategoryDialog () {
+                this.$refs.selectCategorySection.open()
             },
             cloneTaskData () {
                 const task = this.task
                 this.cloneTask = {
-                    project_id: task.target_project,
+                    category_id: task.target_category,
                     section_id: task.target_section,
                     content: task.content,
                     comment: task.comment,
@@ -138,7 +138,7 @@
             },
             init () {
                 this.cloneTask = {
-                    project_id: 0,
+                    category_id: 0,
                     section_id: 0,
                     content: '',
                     comment: '',
@@ -148,9 +148,9 @@
                     label_list: [],
                 }
             },
-            createMoveProjectSectionTaskData (projectId, sectionId) {
+            createMoveCategorySectionTaskData (categoryId, sectionId) {
                 this.cloneTask = {
-                    project_id: projectId,
+                    category_id: categoryId,
                     section_id: sectionId,
                     content: this.task.content,
                     comment: this.task.comment,
@@ -163,11 +163,11 @@
                     this.cloneTask.label_list.push(this.task.label[i].id)
                 }
             },
-            moveProjectSection (value) {
-                const { target_project: targetProject, target_section: targetSection } = this.task
-                const { project_id: projectId, section_id: sectionId } = value
-                if (targetProject === projectId && targetSection === sectionId) return
-                this.createMoveProjectSectionTaskData(projectId, sectionId)
+            moveCategorySection (value) {
+                const { target_category: targetCategory, target_section: targetSection } = this.task
+                const { category_id: categoryId, section_id: sectionId } = value
+                if (targetCategory === categoryId && targetSection === sectionId) return
+                this.createMoveCategorySectionTaskData(categoryId, sectionId)
                 this.$axios({
                     url: `/api/task/${this.task.id}/`,
                     method: 'PUT',

@@ -6,7 +6,7 @@
         accordion
     >
         <v-expansion-panel
-            v-for="section in detailProject.sections"
+            v-for="section in detailCategory.sections"
             v-show="!section.archived"
             :key="section.id"
         >
@@ -42,7 +42,7 @@
         }),
     	computed: {
     		...mapGetters([
-                'detailProject',
+                'detailCategory',
     		])
     	},
         methods: {

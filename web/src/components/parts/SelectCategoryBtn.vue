@@ -15,25 +15,25 @@
                 v-on="on"
             >
                 <v-icon
-                    :color="project.color"
+                    :color="category.color"
                 >mdi-inbox</v-icon>
             </v-btn>
         </template>
         <v-list>
             <v-list-item-group>
                 <div
-                    v-for="(project, i) in projects"
+                    v-for="(category, i) in categorys"
                     :key="i"
                 >
                     <v-list-item
-                        class="project_name"
-                        @click="selectProject(project)"
+                        class="category_name"
+                        @click="selectCategory(category)"
                     >
                         <v-icon
                             class="pl-1 mr-2"
-                            :color="project.color"
+                            :color="category.color"
                         >mdi-circle-medium</v-icon>
-                        {{ project.name }}
+                        {{ category.name }}
                     </v-list-item>
                 </div>
             </v-list-item-group>
@@ -46,9 +46,9 @@
     const Con = new Const()
 
     export default {
-        name: 'ProjectBtn',
+        name: 'CategoryBtn',
         data: () => ({
-            project: {
+            category: {
                 name: '',
                 color: Con.NON_ACTIVE_COLOR,
                 section: ''
@@ -57,12 +57,12 @@
         }),
         computed: {
             ...mapGetters([
-                'projects',
+                'categorys',
             ])
         },
         methods: {
-            selectProject (project) {
-                this.$emit('move-section', project)
+            selectCategory (category) {
+                this.$emit('move-section', category)
             },
             open () {
                 this.isShow = true
@@ -71,7 +71,7 @@
     }
 </script>
 <style lang='scss' scoped>
-    .project_name {
+    .category_name {
         padding-top: 15px;
         height: 48px;
     }

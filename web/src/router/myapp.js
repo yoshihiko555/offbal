@@ -2,7 +2,7 @@ import MyApp from '@/views/app/MyApp'
 import StartApp from '@/views/app/StartApp'
 import ToDoList from '@/views/app/ToDoList'
 import Activitys from '@/views/app/Activitys'
-import DetailProject from '@/views/app/DetailProject'
+import DetailCategory from '@/views/app/DetailCategory'
 import Labels from '@/views/app/Labels'
 import TodayScheduled from '@/views/app/TodayScheduled'
 import FutureScheduled from '@/views/app/FutureScheduled'
@@ -37,9 +37,9 @@ const routes = {
 		    },
 		},
 		{
-			path: 'project/:id',
-			name: 'DetailProject',
-			component: DetailProject,
+			path: 'category/:id',
+			name: 'DetailCategory',
+			component: DetailCategory,
 		},
 		{
 			path: 'label/:id',

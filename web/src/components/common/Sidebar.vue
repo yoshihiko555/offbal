@@ -31,43 +31,43 @@
                             </v-list-item-title>
                         </template>
 
-                        <!-- プロジェクト -->
-                        <div v-if="menu.title === 'Project'">
+                        <!-- カテゴリー -->
+                        <div v-if="menu.title === 'Category'">
                             <v-list-item>
-                                <v-list-item-title>新規プロジェクト追加</v-list-item-title>
+                                <v-list-item-title>新規カテゴリー追加</v-list-item-title>
                                 <v-list-item-action>
-                                    <v-btn icon @click='createProject'><v-icon>mdi-plus</v-icon></v-btn>
+                                    <v-btn icon @click='createCategory'><v-icon>mdi-plus</v-icon></v-btn>
                                 </v-list-item-action>
                             </v-list-item>
 
                             <draggable
-                                :list='localProjects'
+                                :list='localCategorys'
                                 animation='200'
                                 chosen-class="chosen"
                                 drag-class="drag"
                                 @end='end'
                             >
                                 <v-list-item
-                                    v-for='project in localProjects'
-                                    :key='project.id'
-                                    v-show="!project.archived"
-                                    @click='toPage(menu.route, project)'
+                                    v-for='category in localCategorys'
+                                    :key='category.id'
+                                    v-show="!category.archived"
+                                    @click='toPage(menu.route, category)'
                                 >
-                                    <v-icon x-small :color="project.color">mdi-circle</v-icon>
-                                    <v-list-item-title class="ml-2">{{ project.name }}</v-list-item-title>
+                                    <v-icon x-small :color="category.color">mdi-circle</v-icon>
+                                    <v-list-item-title class="ml-2">{{ category.name }}</v-list-item-title>
                                     <v-list-item-action class="ml-0">
-                                        <SidebarProjectMenuBtn :project='project'/>
+                                        <SidebarCategoryMenuBtn :category='category'/>
                                     </v-list-item-action>
                                 </v-list-item>
                             </draggable>
 
-                            <!-- アーカイブプロジェクト -->
+                            <!-- アーカイブカテゴリー -->
                             <v-expansion-panels
                                 flat
                                 tile
                                 hover
                                 accordion
-                                v-show='archivedProjects.length > 0'
+                                v-show='archivedCategorys.length > 0'
                             >
                                 <v-expansion-panel>
                                     <v-expansion-panel-header hide-actions>
@@ -75,13 +75,13 @@
                                     </v-expansion-panel-header>
                                     <v-expansion-panel-content>
                                         <v-list-item
-                                            v-for="archived in archivedProjects"
+                                            v-for="archived in archivedCategorys"
                                             :key='archived.name'
                                             @click='toPage(menu.route, archived)'
                                         >
                                             <v-list-item-title>{{ archived.name }}</v-list-item-title>
                                             <v-list-item-action class="ml-0">
-                                                <SidebarArchiveMenuBtn :project='archived'/>
+                                                <SidebarArchiveMenuBtn :category='archived'/>
                                             </v-list-item-action>
                                         </v-list-item>
                                     </v-expansion-panel-content>
@@ -122,10 +122,10 @@
                             <v-list-item-title>{{ menu.title }}</v-list-item-title>
                         </v-list-item>
 
-                        <!-- お気に入りプロジェクト -->
+                        <!-- お気に入りカテゴリー -->
                         <v-list-item
                             v-else
-                            v-for="favo in favoriteProjects"
+                            v-for="favo in favoriteCategorys"
                             :key='favo.id'
                             @click="toPage(menu.route, favo)"
                         >
@@ -140,8 +140,8 @@
 		</v-navigation-drawer>
 
         <!-- モーダル読み込み -->
-        <CreateProjectDialog
-            ref='project'
+        <CreateCategoryDialog
+            ref='category'
         />
 
         <CreateLabelDialog
@@ -151,8 +151,8 @@
 </template>
 
 <script>
-	import CreateProjectDialog from '@/components/common/CreateProjectDialog'
-    import SidebarProjectMenuBtn from '@/components/parts/SidebarProjectMenuBtn'
+	import CreateCategoryDialog from '@/components/common/CreateCategoryDialog'
+    import SidebarCategoryMenuBtn from '@/components/parts/SidebarCategoryMenuBtn'
     import CreateLabelDialog from '@/components/common/CreateLabelDialog'
     import SidebarArchiveMenuBtn from '@/components/parts/SidebarArchiveMenuBtn'
     import draggable from 'vuedraggable'
@@ -165,8 +165,8 @@
     export default {
         name: 'Sidebar',
         components: {
-        	CreateProjectDialog,
-            SidebarProjectMenuBtn,
+        	CreateCategoryDialog,
+            SidebarCategoryMenuBtn,
             CreateLabelDialog,
             SidebarArchiveMenuBtn,
             draggable,
@@ -179,24 +179,24 @@
             }
         },
         created () {
-        	this.localProjects = _.cloneDeep(this.projects)
+        	this.localCategorys = _.cloneDeep(this.categorys)
         },
         watch: {
-        	projects: {
+        	categorys: {
         	    deep: true,
         	    handler (val, old) {
-        	    	this.localProjects = _.cloneDeep(val)
+        	    	this.localCategorys = _.cloneDeep(val)
         	    },
         	},
         },
     	computed: {
     		...mapGetters([
-                'projects',
-                'favoriteProjects',
-                'archivedProjects',
+                'categorys',
+                'favoriteCategorys',
+                'archivedCategorys',
                 'labels',
             ]),
-            localProjects: {
+            localCategorys: {
                 get () {
                     return this.local
                 },
@@ -207,14 +207,14 @@
     	},
         methods: {
             ...mapMutations([
-               'updateProjectIndex',
+               'updateCategoryIndex',
             ]),
             togleDrawer () {
                 this.drawer = !this.drawer
                 this.$emit('togleDrawer')
             },
             toPage (route, param) {
-            	// プロジェクト or ラベルならparamを格納する
+            	// カテゴリー or ラベルならparamを格納する
             	const params = param || ''
             	this.$router.push({
             		name: route,
@@ -223,29 +223,29 @@
             		}
             	})
             },
-            createProject () {
-            	this.$refs.project.open()
+            createCategory () {
+            	this.$refs.category.open()
             },
             createLabel () {
                 this.$refs.label.open()
             },
             end: _.debounce(function end (e) {
                 this.$axios({
-                    url: '/api/project/updateProjectIndex/',
+                    url: '/api/category/updateCategoryIndex/',
                     method: 'PUT',
                     data: {
-                        projects: this.localProjects,
+                        categorys: this.localCategorys,
                     }
                 })
                 .then(res => {
                     console.log(res)
-                    this.updateProjectIndex(res.data)
+                    this.updateCategoryIndex(res.data)
                     this.$vs.notification({
                     	position: 'bottom-center',
                     	color: 'primary',
                     	buttonClose: false,
-                    	classNotification: 'project_sort',
-                    	text: 'プロジェクトの並び順を移動しました。'
+                    	classNotification: 'category_sort',
+                    	text: 'カテゴリーの並び順を移動しました。'
                     })
                 })
                 .catch(e => {
@@ -316,7 +316,7 @@
 
 <style lang='scss'>
     /* Vuesax通知パーツ用デザイン */
-    .project_sort {
+    .category_sort {
         .vs-notification__content__text p {
             color: #fff !important;
         }

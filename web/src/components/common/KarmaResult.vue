@@ -10,7 +10,7 @@
             <v-col cols='6'>
                 <v-card>
                     <v-card-title class='pb-0'>今週のタスク</v-card-title>
-                    <ReactiveBar class='graph pa-4 mx-auto' :chart-data='weekKarmaPoint'/>
+                    <ReactiveBar class='pa-4 mx-auto' :chart-data='weekKarmaPoint' :height='height'/>
                 </v-card>
             </v-col>
         </v-row>
@@ -76,6 +76,7 @@
                     },
                 ]
             },
+            height: 264,
             weekKarmaPoint: {
             	labels: ['月', '火', '水', '木', '金', '土', '日'],
                 datasets: [
@@ -92,7 +93,7 @@
                             '#90aac1',
                         ],
                     },
-                ]
+                ],
             }
         }),
         created () {

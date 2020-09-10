@@ -50,22 +50,22 @@
                 </v-list-item>
             </v-list>
         </v-menu>
-        <SelectProjectBtn
+        <SelectCategoryBtn
             @move-section='moveSection'
-            ref='projectBtn'
+            ref='categoryBtn'
         />
     </div>
 </template>
 
 <script>
-    import SelectProjectBtn from '@/components/parts/SelectProjectBtn'
+    import SelectCategoryBtn from '@/components/parts/SelectCategoryBtn'
 	import { mapActions, mapMutations } from 'vuex'
 	import _ from 'lodash'
 
     export default {
         name: 'SectionMenuBtn',
         components: {
-            SelectProjectBtn,
+            SelectCategoryBtn,
         },
         props: {
         	section: {
@@ -90,7 +90,7 @@
                     {
                         name: 'セクションの移動',
                         icon: 'mdi-arrow-right-circle-outline',
-                        call: this.openSelectProject,
+                        call: this.openSelectCategory,
                     },
                     {
                         name: 'セクションの複製',
@@ -125,12 +125,12 @@
             deleteLocalSection () {
                 this.deleteSectionAction(this.section.id)
             },
-            openSelectProject () {
-                this.$refs.projectBtn.open()
+            openSelectCategory () {
+                this.$refs.categoryBtn.open()
             },
-            moveSection (project) {
+            moveSection (category) {
                 this.cloneSection = _.cloneDeep(this.section)
-                this.cloneSection.target_project = project.id
+                this.cloneSection.target_category = category.id
                 this.$axios({
                     url: `/api/section/${this.section.id}/`,
                     method: 'PUT',
@@ -149,7 +149,7 @@
                     url: '/api/section/',
                     method: 'POST',
                     data: {
-                        target_project: this.$route.params.id,
+                        target_category: this.$route.params.id,
                         name: this.section.name,
                     }
                 })

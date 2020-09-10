@@ -1,8 +1,8 @@
 <template>
-    <div id='project-list'>
-        <div class="detail_project_header">
-            <h1 class="project_title">{{ detailProject.name }}</h1>
-            <DetailProjectMenuBtn
+    <div id='category-list'>
+        <div class="detail_category_header">
+            <h1 class="category_title">{{ detailCategory.name }}</h1>
+            <DetailCategoryMenuBtn
                 @open-create='openCreate'
             />
             <v-spacer/>
@@ -13,11 +13,11 @@
         </div>
 
         <CreateTaskField
-            :project=detailProject
+            :category=detailCategory
         />
 
         <TaskList
-            :tasks=detailProject.tasks
+            :tasks=detailCategory.tasks
         />
 
         <SectionList/>
@@ -55,7 +55,7 @@
     import CreateSectionBtn from '@/components/parts/CreateSectionBtn'
     import CreateSectionField from '@/components/parts/CreateSectionField'
     import EditSectionField from '@/components/parts/EditSectionField'
-    import DetailProjectMenuBtn from '@/components/parts/DetailProjectMenuBtn'
+    import DetailCategoryMenuBtn from '@/components/parts/DetailCategoryMenuBtn'
     import TaskList from '@/components/common/TaskList'
     import SectionList from '@/components/common/SectionList'
     import CreateTaskField from '@/components/parts/CreateTaskField'
@@ -63,14 +63,14 @@
     import { mapGetters, mapActions } from 'vuex'
 
     export default {
-        name: 'DetailProject',
+        name: 'DetailCategory',
         components: {
             FilterBtn,
             SortBtn,
             CreateSectionBtn,
             CreateSectionField,
             EditSectionField,
-            DetailProjectMenuBtn,
+            DetailCategoryMenuBtn,
             TaskList,
             SectionList,
             CreateTaskField,
@@ -81,21 +81,21 @@
             isEditField: false,       // セクション更新フィールド
         }),
         created () {
-            this.getDetailProjectAction(this.$route.params.id)
+            this.getDetailCategoryAction(this.$route.params.id)
             this.$eventHub.$on('open-edit', this.openEdit)
         },
         beforeRouteUpdate (to, from, next) {
-            if (to.params.id !== from.params.id) this.getDetailProjectAction(to.params.id)
+            if (to.params.id !== from.params.id) this.getDetailCategoryAction(to.params.id)
             next()
         },
     	computed: {
     		...mapGetters([
-                'detailProject',
+                'detailCategory',
     		])
     	},
         methods: {
             ...mapActions([
-                'getDetailProjectAction',
+                'getDetailCategoryAction',
             ]),
             openCreate () {
                 this.isCreateBtn = false
@@ -119,11 +119,11 @@
 </script>
 
 <style lang="scss" scoped>
-    .detail_project_header {
+    .detail_category_header {
         display: flex;
         align-items: center;
 
-        .project_title {
+        .category_title {
             display: inline-block;
         }
     }

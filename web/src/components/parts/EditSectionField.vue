@@ -45,7 +45,7 @@
                     url: `/api/section/${this.section.id}/`,
                     method: 'PUT',
                     data: {
-                        target_project: this.$route.params.id,
+                        target_category: this.$route.params.id,
                         name: this.section.name,
                     }
                 })

@@ -3,16 +3,16 @@
         <v-tooltip
             v-if="isSelected"
             top
-            activator="#project_btn"
+            activator="#category_btn"
             z-index=99000
             open-delay=250
         >
-            <span>{{ projectName }}</span>
+            <span>{{ categoryName }}</span>
         </v-tooltip>
         <v-tooltip
             v-else
             top
-            activator="#project_btn"
+            activator="#category_btn"
             z-index=99000
             open-delay=250
         >
@@ -27,14 +27,14 @@
             v-model="menu"
         >
             <template v-slot:activator="{ on, attrs }">
-                <div id="project_btn">
+                <div id="category_btn">
                     <v-btn
                         icon
                         v-bind="attrs"
                         v-on="on"
                     >
                         <v-icon
-                            :color="projectBtnColor"
+                            :color="categoryBtnColor"
                         >mdi-inbox</v-icon>
                     </v-btn>
                 </div>
@@ -52,24 +52,24 @@
                     <!-- フィルター絞る前 -->
                     <div v-if="filterValue.length === 0">
                         <div
-                            v-for="(project, i) in projects"
+                            v-for="(category, i) in categorys"
                             :key="i"
                         >
                             <v-list-item
-                                class="project_name"
-                                @click="selectProject(project)"
+                                class="category_name"
+                                @click="selectCategory(category)"
                             >
                                 <v-icon
                                     class="mr-2"
-                                    :color="project.color"
+                                    :color="category.color"
                                 >mdi-circle-medium</v-icon>
-                                {{ project.name }}
+                                {{ category.name }}
                             </v-list-item>
                             <v-list-item
                                 class="pl-8"
-                                v-for="(section, i) in project.sections"
+                                v-for="(section, i) in category.sections"
                                 :key="i"
-                                @click="selectProject(section)"
+                                @click="selectCategory(section)"
                             >
                                 <v-icon
                                     class="mr-2"
@@ -87,9 +87,9 @@
                             :key="i"
                         >
                             <v-list-item
-                                v-if="item.isProject"
-                                class="project_name"
-                                @click="selectProject(item)"
+                                v-if="item.isCategory"
+                                class="category_name"
+                                @click="selectCategory(item)"
                             >
                                 <v-icon
                                     class="mr-2"
@@ -99,8 +99,8 @@
                             </v-list-item>
                             <v-list-item
                                 v-else
-                                class="project_name"
-                                @click="selectProject(item)"
+                                class="category_name"
+                                @click="selectCategory(item)"
                             >
                                 <v-icon
                                     class="mr-3"
@@ -122,15 +122,15 @@
     const Con = new Const()
 
     export default {
-        name: 'ProjectBtn',
+        name: 'CategoryBtn',
         components: {},
         props: {
-            defaultProjectId: {
+            defaultCategoryId: {
                 type: Number,
                 required: false,
                 default: 0
             },
-            defaultProject: {
+            defaultCategory: {
                 type: String,
                 required: false,
                 default: ''
@@ -142,22 +142,22 @@
             },
         },
         data: () => ({
-            projectBtnColor: Con.NON_ACTIVE_COLOR,
+            categoryBtnColor: Con.NON_ACTIVE_COLOR,
             filterValue: '',
             filteredItems: [],
             menu: false,
-            project: {
+            category: {
                 name: '',
                 section: '',
             },
             isSelected: false,
         }),
         created () {
-            this.project = {
-                name: this.defaultProject,
+            this.category = {
+                name: this.defaultCategory,
                 section: this.defaultSection
             }
-            this.$eventHub.$emit('create_task_info', 'project_id', this.defaultProjectId)
+            this.$eventHub.$emit('create_task_info', 'category_id', this.defaultCategoryId)
         },
         mounted: function () {
         },
@@ -165,26 +165,26 @@
             filterValue: function (val) {
                 this.filteredItems = []
                 if (val.length > 0) {
-                    const projectList = this.projects
-                    for (const [k, project] of Object.entries(projectList)) {
-                        if (this.filterProjectSectionName(project)) {
-                            this.filteredItems.push(project)
+                    const categoryList = this.categorys
+                    for (const [k, category] of Object.entries(categoryList)) {
+                        if (this.filterCategorySectionName(category)) {
+                            this.filteredItems.push(category)
                         }
-                        for (const [j, section] of Object.entries(project.sections)) {
-                            if (this.filterProjectSectionName(section)) {
+                        for (const [j, section] of Object.entries(category.sections)) {
+                            if (this.filterCategorySectionName(section)) {
                                 this.filteredItems.push(section)
                             }
                         }
                     }
                 }
             },
-            project: {
+            category: {
                 handler: function (val) {
                     if (val.name !== '' || val.section !== '') {
-                        this.projectBtnColor = Con.ACTIVE_COLOR
+                        this.categoryBtnColor = Con.ACTIVE_COLOR
                         this.isSelected = true
                     } else {
-                        this.projectBtnColor = Con.NON_ACTIVE_COLOR
+                        this.categoryBtnColor = Con.NON_ACTIVE_COLOR
                         this.isSelected = false
                     }
                 },
@@ -193,20 +193,20 @@
         },
         computed: {
             ...mapGetters([
-                'projects',
+                'categorys',
             ]),
-            projectName () {
-                let project = this.project.name
-                if (this.project.section !== '') project += '/' + this.project.section
-                return project
+            categoryName () {
+                let category = this.category.name
+                if (this.category.section !== '') category += '/' + this.category.section
+                return category
             }
         },
         methods: {
-            selectProject (value) {
+            selectCategory (value) {
                 // プロジェクトを選択
-                if (value.isProject) {
-                    this.setProjectInfo(value)
-                    this.$eventHub.$emit('create_task_info', 'project_id', value.id)
+                if (value.isCategory) {
+                    this.setCategoryInfo(value)
+                    this.$eventHub.$emit('create_task_info', 'category_id', value.id)
                     this.$eventHub.$emit('create_task_info', 'section_id', 0)
                 } else {
                     this.setSectionInfo(value)
@@ -216,26 +216,26 @@
             },
             selectSection (value) {
                 // セクションを選択
-                if (value.target_project_name !== 'インボックス') {
-                    this.$eventHub.$emit('create_task_info', 'project_id', value.target_project)
+                if (value.target_category_name !== 'インボックス') {
+                    this.$eventHub.$emit('create_task_info', 'category_id', value.target_category)
                 }
                 this.$eventHub.$emit('create_task_info', 'section_id', value.id)
             },
-            filterProjectSectionName (value) {
+            filterCategorySectionName (value) {
                 // プロジェクト名・セクション名を検索する
                 return value.name.indexOf(this.filterValue) === 0
             },
-            setProjectInfo (value) {
+            setCategoryInfo (value) {
                 // プロジェクト選択時情報をセット
-                this.project = {
+                this.category = {
                     name: value.name,
                     section: ''
                 }
             },
             setSectionInfo (value) {
                 // セクション選択時情報をセット
-                this.project = {
-                    name: value.target_project_name,
+                this.category = {
+                    name: value.target_category_name,
                     section: value.name
                 }
             }
@@ -243,7 +243,7 @@
     }
 </script>
 <style lang='scss'>
-    .project_name {
+    .category_name {
         padding-top: 15px;
         height: 48px;
     }

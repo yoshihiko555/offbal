@@ -24,29 +24,29 @@
             <vs-input
                 class="px-3 mt-3"
                 size="small"
-                placeholder="プロジェクト名を検索"
+                placeholder="カテゴリー名を検索"
                 v-model="filterValue"
             ></vs-input>
             <v-list-item-group>
                 <!-- フィルター絞る前 -->
                 <div v-if="filterValue.length === 0">
                     <div
-                        v-for="(project, i) in projects"
+                        v-for="(category, i) in categorys"
                         :key="i"
                     >
                         <v-list-item
-                            class="project_name"
-                            @click="selectProject(project)"
+                            class="category_name"
+                            @click="selectCategory(category)"
                         >
                             <v-icon
                                 class="mr-2"
-                                :color="project.color"
+                                :color="category.color"
                             >mdi-circle-medium</v-icon>
-                            {{ project.name }}
+                            {{ category.name }}
                         </v-list-item>
                         <v-list-item
                             class="pl-8"
-                            v-for="(section, i) in project.sections"
+                            v-for="(section, i) in category.sections"
                             :key="i"
                             @click="selectSection(section)"
                         >
@@ -66,9 +66,9 @@
                         :key="i"
                     >
                         <v-list-item
-                            v-if="item.isProject"
-                            class="project_name"
-                            @click="selectProject(item)"
+                            v-if="item.isCategory"
+                            class="category_name"
+                            @click="selectCategory(item)"
                         >
                             <v-icon
                                 class="mr-2"
@@ -78,7 +78,7 @@
                         </v-list-item>
                         <v-list-item
                             v-else
-                            class="project_name"
+                            class="category_name"
                             @click="selectSection(item)"
                         >
                             <v-icon
@@ -100,7 +100,7 @@
     const Con = new Const()
 
     export default {
-        name: 'SelectProjectSectionBtn',
+        name: 'SelectCategorySectionBtn',
         components: {},
         props: {},
         data: () => ({
@@ -115,13 +115,13 @@
             filterValue: function (val) {
                 this.filteredItems = []
                 if (val.length > 0) {
-                    const projectList = this.projects
-                    for (const [k, project] of Object.entries(projectList)) {
-                        if (this.filterProjectSectionName(project)) {
-                            this.filteredItems.push(project)
+                    const categoryList = this.categorys
+                    for (const [k, category] of Object.entries(categoryList)) {
+                        if (this.filterCategorySectionName(category)) {
+                            this.filteredItems.push(category)
                         }
-                        for (const [j, section] of Object.entries(project.sections)) {
-                            if (this.filterProjectSectionName(section)) {
+                        for (const [j, section] of Object.entries(category.sections)) {
+                            if (this.filterCategorySectionName(section)) {
                                 this.filteredItems.push(section)
                             }
                         }
@@ -131,28 +131,28 @@
         },
         computed: {
             ...mapGetters([
-                'projects',
+                'categorys',
             ]),
         },
         methods: {
-            filterProjectSectionName (value) {
-                // プロジェクト名・セクション名を検索する
+            filterCategorySectionName (value) {
+                // カテゴリー名・セクション名を検索する
                 return value.name.indexOf(this.filterValue) === 0
             },
-            selectProject (project) {
+            selectCategory (category) {
                 const data = {
-                    project_id: project.id,
+                    category_id: category.id,
                     section_id: 0,
                 }
-                this.$emit('move-project-section', data)
+                this.$emit('move-category-section', data)
                 this.close()
             },
             selectSection (section) {
                 const data = {
-                    project_id: section.target_project,
+                    category_id: section.target_category,
                     section_id: section.id,
                 }
-                this.$emit('move-project-section', data)
+                this.$emit('move-category-section', data)
                 this.close()
             },
             open () {

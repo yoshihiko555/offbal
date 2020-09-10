@@ -13,8 +13,8 @@ from django.db.models import Sum
 from .serializers import (
     UserSerializer,
     SettingSerializer,
-    ProjectSerializer,
-    ProjectMemberShipSerializer,
+    CategorySerializer,
+    CategoryMemberShipSerializer,
     SectionSerializer,
     TaskSerializer,
     LabelSerializer,
@@ -24,9 +24,9 @@ from .models import (
     mUser,
     Week,
     mSetting,
-    Project,
-    mUserProjectRelation,
-    ProjectMemberShip,
+    Category,
+    mUserCategoryRelation,
+    CategoryMemberShip,
     Section,
     Task,
     SubTask,
@@ -37,7 +37,7 @@ from .models import (
 from django.utils import timezone
 
 from .filters import (
-    ProjectFilter,
+    CategoryFilter,
     KarmaFilter,
 )
 
@@ -70,12 +70,12 @@ class UserViewSet(BaseModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
-class ProjectViewSet(BaseModelViewSet):
+class CategoryViewSet(BaseModelViewSet):
 
     permission_classes = (permissions.AllowAny,)
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    filter_class = ProjectFilter
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    filter_class = CategoryFilter
 
     def create(self, request, *args, **kwargs):
         self.auth0_id = request.data['auth0_id']
@@ -85,17 +85,17 @@ class ProjectViewSet(BaseModelViewSet):
             self.perform_create(serializer)
             try:
                 user = mUser.objects.get(auth0_id=request.data['auth0_id'])
-                mUserProjectRelation.objects.create(
+                mUserCategoryRelation.objects.create(
                     user=user,
-                    project=serializer.instance,
+                    category=serializer.instance,
                     index=self.autoincrement(user),
                 )
 
             except mUser.DoesNotExist:
                 logger.error('mUserが見つかりませんでした。')
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-            except Project.DoesNotExist:
-                logger.error('Projectが見つかりませんでした。')
+            except Category.DoesNotExist:
+                logger.error('Categoryが見つかりませんでした。')
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
             return Response(self.get_serializer(serializer.instance).data, status=status.HTTP_201_CREATED)
@@ -114,67 +114,67 @@ class ProjectViewSet(BaseModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['GET'], detail=False)
-    def checkProjectDuplication(self, request):
+    def checkCategoryDuplication(self, request):
         '''
-        プロジェクト作成時のプロジェクト名重複チェック
+        カテゴリー作成時のカテゴリー名重複チェック
         '''
         auth0_id = request.query_params['auth0_id']
         name = request.query_params['name']
         try:
             user = mUser.objects.get(auth0_id=auth0_id)
-            user_project = user.project_member.all()
-            user_project.get(name=name)
-        except Project.DoesNotExist:
+            user_category = user.category_member.all()
+            user_category.get(name=name)
+        except Category.DoesNotExist:
             return Response({'status': 'success', 'result': True}, status=status.HTTP_200_OK)
         else:
             return Response({'status': 'success', 'result': False}, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=False)
-    def checkUpdateProjectDuplication(self, request):
+    def checkUpdateCategoryDuplication(self, request):
         '''
-        プロジェクト更新時のプロジェクト名重複チェック
+        カテゴリー更新時のカテゴリー名重複チェック
         '''
         auth0_id = request.query_params['auth0_id']
         current_name = request.query_params['current_name']
         new_name = request.query_params['new_name']
 
         user = mUser.objects.get(auth0_id=auth0_id)
-        user_project = user.project_member.all()
-        # 現在のプロジェクト名以外のプロジェクトを取得
-        filter_project = user_project.exclude(name=current_name)
-        if filter_project.filter(name=new_name).count() == 0:
-            # 重複するプロジェクト名が存在しない
+        user_category = user.category_member.all()
+        # 現在のカテゴリー名以外のカテゴリーを取得
+        filter_category = user_category.exclude(name=current_name)
+        if filter_category.filter(name=new_name).count() == 0:
+            # 重複するカテゴリー名が存在しない
             return Response({'status': 'success', 'result': True}, status=status.HTTP_200_OK)
         return Response({'status': 'success', 'result': False}, status=status.HTTP_200_OK)
 
     @action(methods=['PUT'], detail=False)
-    def updateProjectIndex(self, request, pk=None):
+    def updateCategoryIndex(self, request, pk=None):
         self.auth0_id = request.data['auth0_id']
         user = mUser.objects.get(auth0_id=request.data['auth0_id'])
-        projects = []
-        for i, project in enumerate(request.data['projects'], 1):
-            pro = mUserProjectRelation.objects.get(user=user, project__id=project['id'])
-            pro.index = i
-            projects.append(pro)
+        categorys = []
+        for i, category in enumerate(request.data['categorys'], 1):
+            cate = mUserCategoryRelation.objects.get(user=user, category__id=category['id'])
+            cate.index = i
+            categorys.append(cate)
 
-        mUserProjectRelation.objects.bulk_update(projects, fields=['index'])
-        user_project = user.project_member.all().order_by('muserprojectrelation__index')
-        serializer = self.get_serializer(user_project, many=True)
+        mUserCategoryRelation.objects.bulk_update(categorys, fields=['index'])
+        user_category = user.category_member.all().order_by('musercategoryrelation__index')
+        serializer = self.get_serializer(user_category, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=True)
     def order_tasks(self, request, pk=None):
         self.set_ordering_type(request)
-        project = Project.objects.get(pk=pk)
-        serializer = self.get_serializer(project)
+        category = Category.objects.get(pk=pk)
+        serializer = self.get_serializer(category)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
     def autoincrement(self, user):
         '''
-        対象ユーザーが関与するプロジェクト総数 + 1を返却する
+        対象ユーザーが関与するカテゴリー総数 + 1を返却する
         '''
-        res = user.project_member.all().count() + 1
+        res = user.category_member.all().count() + 1
         return res
 
 class SectionViewSet(BaseModelViewSet):

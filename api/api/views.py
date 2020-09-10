@@ -6,9 +6,9 @@ from .models import (
     mUser,
     Week,
     mSetting,
-    Project,
-    mUserProjectRelation,
-    ProjectMemberShip,
+    Category,
+    mUserCategoryRelation,
+    CategoryMemberShip,
     Section,
     Task,
     SubTask,
@@ -18,8 +18,8 @@ from .models import (
 from .serializers import (
     UserSerializer,
     SettingSerializer,
-    ProjectSerializer,
-    ProjectMemberShipSerializer,
+    CategorySerializer,
+    CategoryMemberShipSerializer,
     SectionSerializer,
     TaskSerializer,
     LabelSerializer,
@@ -48,11 +48,33 @@ class SignupView(generics.CreateAPIView, GetLoginUserMixin):
             mSetting.objects.create(
                 target_user=user
             )
-            project = Project.objects.create(
+            category = Category.objects.create(
                 creator=user,
                 name='インボックス'
             )
-            project.member.add(user)
+            category.member.add(user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AppInitView(generics.ListAPIView, GetLoginUserMixin):
+    permission_classes = (permissions.AllowAny,)
+
+    def list(self, request, *args, **kwargs):
+        self.set_auth0_id(request)
+        user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+        categorys = Category.objects.filter(member=user).order_by('musercategoryrelation__index')
+        category_serializer = CategorySerializer(categorys, many=True, context={ 'view' : self })
+        labels = Label.objects.filter(author=user)
+        label_serializer = LabelSerializer(labels, many=True, context={ 'view' : self })
+        karmas = Karma.objects.filter(target_user=user)
+        karma_serializer = KarmaSerializer(karmas, many=True, context={ 'view' : self })
+        return Response(
+            {
+                'categorys': category_serializer.data,
+                'labels': label_serializer.data,
+                'karma': karma_serializer.data,
+            },
+            status=status.HTTP_200_OK
+        )

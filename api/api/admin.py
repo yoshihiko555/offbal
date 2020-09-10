@@ -3,9 +3,9 @@ from .models import (
     mUser,
     Week,
     mSetting,
-    Project,
-    mUserProjectRelation,
-    ProjectMemberShip,
+    Category,
+    mUserCategoryRelation,
+    CategoryMemberShip,
     Section,
     Task,
     SubTask,
@@ -16,9 +16,9 @@ from .models import (
 admin.site.register(mUser)
 admin.site.register(Week)
 admin.site.register(mSetting)
-admin.site.register(Project)
-admin.site.register(mUserProjectRelation)
-admin.site.register(ProjectMemberShip)
+admin.site.register(Category)
+admin.site.register(mUserCategoryRelation)
+admin.site.register(CategoryMemberShip)
 admin.site.register(Section)
 admin.site.register(Task)
 admin.site.register(SubTask)

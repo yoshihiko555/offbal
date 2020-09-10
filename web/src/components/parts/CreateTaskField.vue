@@ -31,14 +31,14 @@
             ReminderBtn,
         },
         props: {
-            project: {
+            category: {
                 type: Object,
                 required: true
             }
         },
         data: () => ({
             task: {
-                project_id: 0,
+                category_id: 0,
                 section_id: 0,
                 content: '',
                 comment: '',
@@ -56,7 +56,7 @@
             ]),
             create () {
                 if (this.task.content.length === 0) return
-                this.task.project_id = this.project.id
+                this.task.category_id = this.category.id
                 this.$axios({
                     url: '/api/task/',
                     method: 'POST',
@@ -73,7 +73,7 @@
             },
             init () {
                 this.task = {
-                    project_id: 0,
+                    category_id: 0,
                     section_id: 0,
                     content: '',
                     comment: '',

@@ -41,8 +41,8 @@
                             cols="1"
                         >
                             <DeadLineBtn/>
-                            <ProjectBtn
-                                :defaultProjectId=detailProject.id
+                            <CategoryBtn
+                                :defaultCategoryId=detailCategory.id
                             />
                             <LabelBtn/>
                             <PriorityBtn/>
@@ -84,7 +84,7 @@
 <script>
     import { mapGetters, mapMutations } from 'vuex'
     import DeadLineBtn from '@/components/parts/DeadLineBtn'
-    import ProjectBtn from '@/components/parts/ProjectBtn'
+    import CategoryBtn from '@/components/parts/CategoryBtn'
     import LabelBtn from '@/components/parts/LabelBtn'
     import PriorityBtn from '@/components/parts/PriorityBtn'
     import ReminderBtn from '@/components/parts/ReminderBtn'
@@ -93,7 +93,7 @@
         name: 'TaskDialog',
         components: {
             DeadLineBtn,
-            ProjectBtn,
+            CategoryBtn,
             LabelBtn,
             PriorityBtn,
             ReminderBtn,
@@ -106,7 +106,7 @@
         },
         data: () => ({
             task: {
-                project_id: 0,
+                category_id: 0,
                 section_id: 0,
                 content: '',
                 comment: '',
@@ -134,7 +134,7 @@
                 },
             },
             ...mapGetters([
-                'detailProject',
+                'detailCategory',
             ])
         },
         methods: {
@@ -164,7 +164,7 @@
             },
             init () {
                 this.task = {
-                    project_id: 0,
+                    category_id: 0,
                     section_id: 0,
                     content: '',
                     comment: '',

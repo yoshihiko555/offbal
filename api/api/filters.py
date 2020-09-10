@@ -4,8 +4,8 @@ from .models import (
     mUser,
     Week,
     mSetting,
-    Project,
-    ProjectMemberShip,
+    Category,
+    CategoryMemberShip,
     Section,
     Task,
     SubTask,
@@ -16,17 +16,17 @@ from .models import (
 import logging
 logger = logging.getLogger(__name__)
 
-class ProjectFilter(django_filter.FilterSet):
+class CategoryFilter(django_filter.FilterSet):
 
     auth0_id = django_filter.CharFilter(method='user_filter')
 
     class Meta:
-        model = Project
+        model = Category
         fields = []
 
     def user_filter(self, queryset, name, value):
         user = mUser.objects.get(auth0_id=value)
-        res = queryset.filter(member=user).order_by('muserprojectrelation__index')
+        res = queryset.filter(member=user).order_by('musercategoryrelation__index')
         return res
 
 

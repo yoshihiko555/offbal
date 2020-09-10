@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register('user', viewsets.UserViewSet)
-router.register('project', viewsets.ProjectViewSet)
+router.register('category', viewsets.CategoryViewSet)
 router.register('section', viewsets.SectionViewSet)
 router.register('task', viewsets.TaskViewSet)
 router.register('label', viewsets.LabelViewSet)
@@ -15,4 +15,5 @@ app_name = 'api'
 urlpatterns = [
     path('', include(router.urls)),
     path('signup/', views.SignupView.as_view(), name='signup'),
+    path('appinit/', views.AppInitView.as_view(), name='appinit'),
 ]

@@ -3,9 +3,9 @@ from .models import (
     mUser,
     Week,
     mSetting,
-    Project,
-    mUserProjectRelation,
-    ProjectMemberShip,
+    Category,
+    mUserCategoryRelation,
+    CategoryMemberShip,
     Section,
     Task,
     SubTask,
@@ -37,6 +37,7 @@ logger = logging.getLogger(__name__)
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
+        logger.info(kwargs)
 
         fields = kwargs.pop('fields', None)
 
@@ -88,7 +89,7 @@ class SettingSerializer(DynamicFieldsModelSerializer):
             'vacation_mode',
         ]
 
-class ProjectSerializer(DynamicFieldsModelSerializer):
+class CategorySerializer(DynamicFieldsModelSerializer):
 
     auth0_id = serializers.CharField(write_only=True)
     creator = serializers.CharField(read_only=True)
@@ -100,11 +101,11 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
     is_archived = serializers.BooleanField(write_only=True, required=False)
     index = serializers.SerializerMethodField()
 
-    # 画面側でのアイコン描画判定用 (プロジェクトかセクションか)
-    isProject = serializers.BooleanField(read_only=True, default=True)
+    # 画面側でのアイコン描画判定用 (カテゴリーかセクションか)
+    isCategory = serializers.BooleanField(read_only=True, default=True)
 
     class Meta:
-        model = Project
+        model = Category
         fields = [
             'id',
             'creator',
@@ -121,7 +122,7 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
             'sections',
             'is_favorite',
             'is_archived',
-            'isProject',
+            'isCategory',
             'index',
         ]
 
@@ -134,17 +135,17 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
 
     def get_tasks(self, obj):
         if hasattr(self, 'ordering_type') and self.ordering_type != None:
-            return TaskSerializer(obj.task_target_project.all().filter(target_section=None).order_by('-' + self.ordering_type), many=True).data
+            return TaskSerializer(obj.task_target_category.all().filter(target_section=None).order_by('-' + self.ordering_type), many=True).data
         else:
-            return TaskSerializer(obj.task_target_project.all().filter(target_section=None), many=True).data
+            return TaskSerializer(obj.task_target_category.all().filter(target_section=None), many=True).data
 
     def get_sections(self, obj):
-        return SectionSerializer(obj.section_target_project.all(), many=True, context=self.context).data
+        return SectionSerializer(obj.section_target_category.all(), many=True, context=self.context).data
 
     def get_index(self, obj):
         try:
             user = mUser.objects.get(auth0_id=self.auth0_id)
-            relation = mUserProjectRelation.objects.get(user=user, project=obj)
+            relation = mUserCategoryRelation.objects.get(user=user, category=obj)
             return relation.index
         except:
             return None
@@ -156,7 +157,7 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
             logger.info('mUserが見つかりませんでした。')
             return None
 
-        project = Project.objects.create(
+        category = Category.objects.create(
                 creator=user,
                 name = validated_data['name'],
                 color = validated_data['color'],
@@ -164,8 +165,8 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
             )
 
         if validated_data['is_favorite']:
-            project.favorite.add(user)
-        return project
+            category.favorite.add(user)
+        return category
 
     def update(self, instance, validated_data):
         try:
@@ -192,24 +193,24 @@ class ProjectSerializer(DynamicFieldsModelSerializer):
         instance.save()
         return instance
 
-class ProjectMemberShipSerializer(DynamicFieldsModelSerializer):
+class CategoryMemberShipSerializer(DynamicFieldsModelSerializer):
 
     class Meta:
-        model = ProjectMemberShip
+        model = CategoryMemberShip
         fields = [
             'invitee_user',
             'invited_user',
-            'target_project',
+            'target_category',
             'accepted',
         ]
 
 class SectionSerializer(DynamicFieldsModelSerializer):
 
     tasks = serializers.SerializerMethodField()
-    target_project_name = serializers.CharField(read_only=True, source='target_project.name')
+    target_category_name = serializers.CharField(read_only=True, source='target_category.name')
 
-    # 画面側でのアイコン描画判定用 (プロジェクトかセクションか)
-    isProject = serializers.BooleanField(read_only=True, default=False)
+    # 画面側でのアイコン描画判定用 (カテゴリーかセクションか)
+    isCategory = serializers.BooleanField(read_only=True, default=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -218,13 +219,13 @@ class SectionSerializer(DynamicFieldsModelSerializer):
         model = Section
         fields = [
             'id',
-            'target_project',
+            'target_category',
             'name',
             'deleted',
             'archived',
             'tasks',
-            'isProject',
-            'target_project_name',
+            'isCategory',
+            'target_category_name',
         ]
 
     def get_tasks(self, obj):
@@ -235,7 +236,7 @@ class SectionSerializer(DynamicFieldsModelSerializer):
 
     def create(self, validated_data):
         section = Section.objects.create(
-                target_project = validated_data['target_project'],
+                target_category = validated_data['target_category'],
                 name = validated_data['name'],
             )
         return section
@@ -246,22 +247,22 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         auth0_id : ユーザーID (必須)
         content : タスク内容 (必須)
         comment : コメント (必須,空でもok)
-        project_id ： プロジェクトのid (必須)
+        category_id ： カテゴリーのid (必須)
         section_id : セクションのid (必須) ※指定無しの場合0
         deadline_str : 有効期限の文字列 (必須,空でもok) [%Y-%m-%d %H:%M:%S]
         remind_str : リマインダーの文字列 (必須,空でもok) [%Y-%m-%d %H:%M:%S]
         label_list : ラベルidのリスト (必須,空でもok)
         priority : 優先度の文字列 (必須) [1~5]
 
-            ※プロジェクト, セクション指定の際
-                1. プロジェクトidとセクションidが0の場合インボックスに作成
-                2. 「プロジェクト」 にタスク追加時はプロジェクトidのみ指定すればok
+            ※カテゴリー, セクション指定の際
+                1. カテゴリーidとセクションidが0の場合インボックスに作成
+                2. 「カテゴリー」 にタスク追加時はカテゴリーidのみ指定すればok
                 3. 「セクション」 にタスク追加時はセクションidのみ指定すればok
     """
 
     auth0_id = serializers.CharField(write_only=True)
 
-    project_id = serializers.IntegerField(write_only=True)
+    category_id = serializers.IntegerField(write_only=True)
     section_id = serializers.IntegerField(write_only=True)
     deadline_str = serializers.CharField(write_only=True, allow_blank=True)
     remind_str = serializers.CharField(write_only=True, allow_blank=True)
@@ -272,8 +273,8 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     )
 
     target_user = serializers.CharField(read_only=True)
-    target_project = serializers.ReadOnlyField(source='target_project.id')
-    target_project_name = serializers.CharField(read_only=True, source='target_project.name')
+    target_category = serializers.ReadOnlyField(source='target_category.id')
+    target_category_name = serializers.CharField(read_only=True, source='target_category.name')
     target_section = serializers.ReadOnlyField(source='target_section.id', default=0)
     target_section_name = serializers.CharField(read_only=True, source='target_section.name', default='')
     label = serializers.SerializerMethodField()
@@ -289,8 +290,8 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         fields = [
             'id',
             'target_user',
-            'target_project',
-            'target_project_name',
+            'target_category',
+            'target_category_name',
             'target_section',
             'target_section_name',
             'content',
@@ -303,7 +304,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'deleted',
             'is_comp_sub_public',
             'auth0_id',
-            'project_id',
+            'category_id',
             'section_id',
             'deadline_str',
             'remind_str',
@@ -347,21 +348,21 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         logger.debug('============TASKを作る================')
         logger.debug(validated_data)
 
-        project_id = validated_data['project_id']
+        category_id = validated_data['category_id']
         section_id = validated_data['section_id']
 
         try:
             user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
             section = Section.objects.get(id=section_id) if section_id != 0 else None
             if section != None:
-                project = section.target_project
-            project = Project.objects.get(id=project_id) if project_id != 0 else Project.objects.get(name='インボックス', creator=user)
+                category = section.target_category
+            category = Category.objects.get(id=category_id) if category_id != 0 else Category.objects.get(name='インボックス', creator=user)
 
         except mUser.DoesNotExist:
             logger.error('mUserが見つかりませんでした。')
             return None
-        except Project.DoesNotExist:
-            logger.error('Projectが見つかりませんでした。')
+        except Category.DoesNotExist:
+            logger.error('Categoryが見つかりませんでした。')
             return None
         except Section.DoesNotExist:
             logger.error('Sectionが見つかりませんでした。')
@@ -377,7 +378,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             content=validated_data['content'],
             comment=validated_data['comment'],
             target_user=user,
-            target_project=project,
+            target_category=category,
             target_section=section,
             priority=validated_data['priority'],
             deadline=deadline,
@@ -396,24 +397,24 @@ class TaskSerializer(DynamicFieldsModelSerializer):
 
     def update(self, instance, validated_data):
 
-        project_id = validated_data['project_id']
+        category_id = validated_data['category_id']
         section_id = validated_data['section_id']
 
         try:
             user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
             section = Section.objects.get(id=section_id) if section_id != 0 else None
             if section != None:
-                project = section.target_project
-            project = Project.objects.get(id=project_id) if project_id != 0 else Project.objects.get(name='インボックス', creator=user)
+                category = section.target_category
+            category = Category.objects.get(id=category_id) if category_id != 0 else Category.objects.get(name='インボックス', creator=user)
 
-            instance.target_project = project
+            instance.target_category = category
             instance.target_section = section
 
         except mUser.DoesNotExist:
             logger.error('mUserが見つかりませんでした。')
             return None
-        except Project.DoesNotExist:
-            logger.error('Projectが見つかりませんでした。')
+        except Category.DoesNotExist:
+            logger.error('Categoryが見つかりませんでした。')
             return None
         except Section.DoesNotExist:
             logger.error('Sectionが見つかりませんでした。')

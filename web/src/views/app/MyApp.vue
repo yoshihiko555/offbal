@@ -32,18 +32,31 @@
             drawer: true,
         }),
         created () {
-            this.getProjectsAction()
-            // this.getFavoriteProjectsAction()
-            this.getLabelsAction()
+            // this.getCategorysAction()
+            // this.getFavoriteCategorysAction()
+            // this.getLabelsAction()
+            this.appinit()
         },
         computed: {
         },
         methods: {
             ...mapActions([
-                'getProjectsAction',
-                'getFavoriteProjectsAction',
+                'getCategorysAction',
+                'getFavoriteCategorysAction',
                 'getLabelsAction',
             ]),
+            appinit () {
+            	this.$axios({
+            		url: '/api/appinit/',
+            		method: 'GET',
+            	})
+            	.then(res => {
+            		console.log(res)
+            	})
+            	.catch(e => {
+            		console.log(e)
+            	})
+            }
         },
     }
 </script>

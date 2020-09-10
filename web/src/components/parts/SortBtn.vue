@@ -62,16 +62,16 @@
         },
         computed: {
             ...mapGetters([
-                'detailProject',
+                'detailCategory',
             ])
         },
         methods: {
             ...mapActions([
-                'updateProjectAction',
+                'updateCategoryAction',
             ]),
         	sort (type) {
                 this.$axios({
-                    url: `/api/project/${this.detailProject.id}/order_tasks/`,
+                    url: `/api/category/${this.detailCategory.id}/order_tasks/`,
                     method: 'GET',
                     params: {
                         ordering_type: type,
@@ -79,7 +79,7 @@
                 })
                 .then(res => {
                     console.log(res)
-                    this.updateProjectAction(res.data)
+                    this.updateCategoryAction(res.data)
                 })
                 .catch(e => {
                     console.log(e)

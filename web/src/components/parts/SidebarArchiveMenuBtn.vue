@@ -37,14 +37,14 @@
     export default {
         name: 'SidebarArchiveMenuBtn',
         props: {
-        	project: {
+        	category: {
         		type: Object,
         		requied: true,
         	},
         },
         data () {
         	return {
-        		cloneProject: {},
+        		cloneCategory: {},
                 menus: [
                     {
                         name: 'アンアーカイブ',
@@ -52,36 +52,36 @@
                         call: this.unarchive,
                     },
                     {
-                        name: 'プロジェクトを削除',
+                        name: 'カテゴリーを削除',
                         icon: 'mdi-trash-can-outline',
-                        call: this.deleteProject,
+                        call: this.deleteCategory,
                     },
                 ],
         	}
         },
         methods: {
             ...mapMutations([
-                'deleteArchivedProjects',
+                'deleteArchivedCategorys',
             ]),
             ...mapActions([
-                'deleteProjectAction',
-                'updateProjectAction',
+                'deleteCategoryAction',
+                'updateCategoryAction',
             ]),
-        	deleteProject () {
-        		this.deleteProjectAction(this.project)
+        	deleteCategory () {
+        		this.deleteCategoryAction(this.category)
         	},
             unarchive () {
-                this.cloneProject = _.cloneDeep(this.project)
-        		this.cloneProject.is_archived = false
+                this.cloneCategory = _.cloneDeep(this.category)
+        		this.cloneCategory.is_archived = false
         		this.$axios({
-        			url: `/api/project/${this.cloneProject.id}/`,
+        			url: `/api/category/${this.cloneCategory.id}/`,
         			method: 'PUT',
-        			data: this.cloneProject,
+        			data: this.cloneCategory,
         		})
         		.then(res => {
                     console.log(res)
-                    this.updateProjectAction(res.data)
-                    this.deleteArchivedProjects(res.data)
+                    this.updateCategoryAction(res.data)
+                    this.deleteArchivedCategorys(res.data)
         		})
         		.catch(e => {
         			console.log(e)

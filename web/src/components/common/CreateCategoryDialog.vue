@@ -7,17 +7,17 @@
             <h5
                 align="center"
             >
-                プロジェクトを編集する
+                新規カテゴリーを追加
             </h5>
             <ValidationObserver v-slot="{ invalid }" ref='form'>
                 <v-row>
                     <v-col cols='12'>
-                        <!-- プロジェクト名 -->
-                        <ValidationProvider v-slot='{ errors }' name='プロジェクト名' vid='name' rules='required'>
+                        <!-- カテゴリー名 -->
+                        <ValidationProvider v-slot='{ errors }' name='カテゴリー名' vid='name' rules='required'>
                             <vs-input
                                 class="my-6"
-                                v-model="project.name"
-                                label='プロジェクト名'
+                                v-model="category.name"
+                                label='カテゴリー名'
                                 :loading='loading'
                             >
                                 <template #message-danger>
@@ -26,10 +26,10 @@
                             </vs-input>
                         </ValidationProvider>
 
-                        <!-- プロジェクトカラー -->
-                        <ValidationProvider v-slot='{ errors }' name='プロジェクト名' rules='required'>
+                        <!-- カテゴリーカラー -->
+                        <ValidationProvider v-slot='{ errors }' name='カテゴリー名' rules='required'>
                             <vs-select
-                                v-model="project.color"
+                                v-model="category.color"
                                 label="カラー"
                                 class="my-3"
                             >
@@ -52,7 +52,7 @@
                         <!-- お気に入りフラグ -->
                         <div class="favorite_wrap">
                             <p>お気に入り</p>
-                            <vs-switch v-model="project.is_favorite">
+                            <vs-switch v-model="category.is_favorite">
                                 <template #on>
                                     <i class='bx bxs-star' ></i>
                                 </template>
@@ -62,7 +62,7 @@
                             </vs-switch>
                         </div>
 
-                        <div class="create_project_btn_wrap">
+                        <div class="create_category_btn_wrap">
                             <vs-button
                                 dark
                                 relief
@@ -73,9 +73,9 @@
                             <vs-button
                                 relief
                                 :disabled='invalid'
-                                @click.prevent="update"
+                                @click.prevent="create"
                             >
-                                <i class="bx bxs-paper-plane"></i> 更新
+                                <i class="bx bxs-paper-plane"></i> 送信
                             </vs-button>
                         </div>
 
@@ -88,78 +88,79 @@
 
 <script>
     import _ from 'lodash'
-    import { mapActions } from 'vuex'
+	import { mapActions } from 'vuex'
     import { Const } from '@/assets/js/const'
     const Con = new Const()
 
     export default {
-        name: 'EditProjectDialog',
+        name: 'CreateCategoryDialog',
         data: () => ({
             dialog: false,
-            project: {},
-            cloneProject: {},
-            colorList: Con.PROJECT_COLOR,
+            category: {
+                name: '',
+                color: '',
+                is_favorite: false,
+            },
+            colorList: Con.CATEGORY_COLOR,
             loading: false,
-            initFlg: true,
         }),
         watch: {
-            'project.name': function (val) {
-				if (val && !this.initFlg) {
+            'category.name': function (val) {
+				if (val) {
 					this.loading = true
-					this.checkProjetName(val)
+					this.checkCategoryName(val)
 				}
             }
         },
         methods: {
             ...mapActions([
-                'updateProjectAction',
-                'addFavoriteProjectsAction',
-                'deleteFavoriteProjectsAction',
+                'addCategorysAction',
+                'addFavoriteCategorysAction',
             ]),
-            open (project) {
-                this.project = _.cloneDeep(project)
-                this.project.is_favorite = project.favorite
-                // 重複チェックのために変更前の状態を保持する
-                this.cloneProject = _.cloneDeep(project)
+            open () {
+            	this.init()
                 this.dialog = true
-                setTimeout(() => { this.initFlg  = false }, 0)
             },
             close () {
-                this.project = {}
                 this.dialog = false
             },
-            update () {
-                console.log(this.project)
+            create () {
+                console.log(this.category)
                 this.$axios({
-                    url: `/api/project/${this.project.id}/`,
-                    method: 'PUT',
-                    data: this.project,
+                	url: '/api/category/',
+                	method: 'POST',
+                	data: this.category,
                 })
                 .then(res => {
-                    console.log(res)
-                    this.updateProjectAction(res.data)
-                    if (res.data.favorite) this.addFavoriteProjectsAction(res.data)
-                    else this.deleteFavoriteProjectsAction(res.data)
-                    this.close()
+                	console.log(res)
+                    this.addCategorysAction(res.data)
+                    if (res.data.favorite) this.addFavoriteCategorysAction(res.data)
+                	this.close()
                 })
                 .catch(e => {
-                    console.log(e.response)
+                	console.log(e.response)
                 })
             },
-            checkProjetName: _.debounce(function checkProjetName (val) {
+            init () {
+            	this.category = {
+            			name: '',
+            			color: '',
+            			is_favorite: false,
+            	}
+            },
+            checkCategoryName: _.debounce(function checkCategoryName (val) {
 				this.$axios({
 					methods: 'GET',
-					url: '/api/project/checkUpdateProjectDuplication/',
+					url: '/api/category/checkCategoryDuplication/',
 					params: {
-                        current_name: this.cloneProject.name,
-						new_name: val
+						name: val
 					}
 				})
 				.then(res => {
                     console.log(res.data)
                     if (!res.data.result) {
                         this.$refs.form.setErrors({
-                            name: ['既にこのプロジェクト名は作成済みです']
+                            name: ['既にこのカテゴリー名は作成済みです']
                         })
                     }
 					this.loading = false
@@ -201,7 +202,7 @@
             width: 20%;
         }
     }
-    .create_project_btn_wrap {
+    .create_category_btn_wrap {
         display: flex;
         justify-content: flex-end;
     }

@@ -9,7 +9,7 @@
             </v-col>
             <v-col cols='4'>
                 <v-card>
-                    <v-card-title class='pb-0'>プロジェクト</v-card-title>
+                    <v-card-title class='pb-0'>カテゴリー</v-card-title>
                     <ReactiveBar class='graph pa-4 mx-auto' :chart-data='weekKarmaPoint'/>
                 </v-card>
             </v-col>

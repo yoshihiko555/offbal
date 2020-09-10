@@ -30,11 +30,11 @@ class UserManager(BaseUserManager):
         mSetting.objects.create(
             target_user=user
         )
-        project = Project.objects.create(
+        category = Category.objects.create(
             creator=user,
             name='インボックス'
         )
-        project.member.add(user)
+        category.member.add(user)
 
         return user
 
@@ -218,18 +218,18 @@ class mSetting(models.Model):
         return name + 'のmSetting'
 
 
-class Project(TimeStampModel):
+class Category(TimeStampModel):
 
     creator = models.ForeignKey(
         mUser,
         on_delete=models.CASCADE,
-        related_name='project_creator_user'
+        related_name='category_creator_user'
     )
 
     member = models.ManyToManyField(
         mUser,
-        through='mUserProjectRelation',
-        related_name='project_member',
+        through='mUserCategoryRelation',
+        related_name='category_member',
         blank=True
     )
 
@@ -268,39 +268,39 @@ class Project(TimeStampModel):
         return self.name
 
 
-class mUserProjectRelation(models.Model):
+class mUserCategoryRelation(models.Model):
     user = models.ForeignKey(
         mUser,
         on_delete=models.CASCADE,
     )
-    project = models.ForeignKey(
-        Project,
+    category = models.ForeignKey(
+        Category,
         on_delete=models.CASCADE,
     )
     index = models.IntegerField(default=1)
 
     def __str__(self):
-        return self.user.auth0_name + 'の' + self.project.name
+        return self.user.auth0_name + 'の' + self.category.name
 
 
-class ProjectMemberShip(TimeStampModel):
+class CategoryMemberShip(TimeStampModel):
 
     invitee_user = models.ForeignKey(
         'api.mUser',
         on_delete=models.CASCADE,
-        related_name='project_membership_invitee_user'
+        related_name='category_membership_invitee_user'
     )
 
     invited_user = models.ForeignKey(
         'api.mUser',
         on_delete=models.CASCADE,
-        related_name='project_membership_invited_user'
+        related_name='category_membership_invited_user'
     )
 
-    target_project = models.ForeignKey(
-        'api.Project',
+    target_category = models.ForeignKey(
+        'api.Category',
         on_delete=models.CASCADE,
-        related_name='project_membership_target_project'
+        related_name='category_membership_target_category'
     )
 
     accepted = models.BooleanField(default=False)
@@ -311,10 +311,10 @@ class ProjectMemberShip(TimeStampModel):
 
 class Section(TimeStampModel):
 
-    target_project = models.ForeignKey(
-        'api.Project',
+    target_category = models.ForeignKey(
+        'api.Category',
         on_delete=models.CASCADE,
-        related_name='section_target_project'
+        related_name='section_target_category'
     )
 
     name = models.CharField(max_length=60)
@@ -334,10 +334,10 @@ class Task(TimeStampModel,
         related_name='task_target_user'
     )
 
-    target_project = models.ForeignKey(
-        Project,
+    target_category = models.ForeignKey(
+        Category,
         on_delete=models.CASCADE,
-        related_name='task_target_project'
+        related_name='task_target_category'
     )
 
     target_section = models.ForeignKey(

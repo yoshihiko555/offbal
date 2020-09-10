@@ -8,164 +8,164 @@ Vue.use(Vuex)
 export default new Vuex.Store({
 	strict: true,
 	state: {
-	    projects: [],
-	    favoriteProjects: [],
+	    categorys: [],
+	    favoriteCategorys: [],
 		labels: [],
-	    detailProject: {},
-	    archivedProjects: [],
+	    detailCategory: {},
+	    archivedCategorys: [],
 	},
 	getters: {
-	    projects: state => state.projects,
-	    favoriteProjects: state => state.favoriteProjects,
+	    categorys: state => state.categorys,
+	    favoriteCategorys: state => state.favoriteCategorys,
 		labels: state => state.labels,
-		detailProject: state => state.detailProject,
-		archivedProjects: state => state.archivedProjects,
+		detailCategory: state => state.detailCategory,
+		archivedCategorys: state => state.archivedCategorys,
 	},
 	mutations: {
-		setProjects (state, payload) {
-            state.projects = payload
+		setCategorys (state, payload) {
+            state.categorys = payload
 		},
 		setLabels (state, payload) {
             state.labels = payload
 		},
-		addProject (state, payload) {
-            state.projects.push(payload)
+		addCategory (state, payload) {
+            state.categorys.push(payload)
 		},
 		addLabel (state, payload) {
             state.labels.push(payload)
 		},
-		updateProject (state, payload) {
-	        // プロジェクト詳細の更新
-	        state.detailProject = payload
+		updateCategory (state, payload) {
+	        // カテゴリー詳細の更新
+	        state.detailCategory = payload
 
-	        // プロジェクト一覧内のプロジェクトの更新
-	        const index = state.projects.findIndex(project => project.id === payload.id)
-	        Vue.set(state.projects, index, payload)
+	        // カテゴリー一覧内のカテゴリーの更新
+	        const index = state.categorys.findIndex(category => category.id === payload.id)
+	        Vue.set(state.categorys, index, payload)
     	},
-		deleteProject (state, payload) {
-	        const index = state.projects.findIndex(project => project.id === payload.id)
-	        state.projects = state.projects.filter((_, i) => i !== index)
+		deleteCategory (state, payload) {
+	        const index = state.categorys.findIndex(category => category.id === payload.id)
+	        state.categorys = state.categorys.filter((_, i) => i !== index)
         },
-        updateProjectIndex (state, payload) {
-            state.projects = payload
+        updateCategoryIndex (state, payload) {
+            state.categorys = payload
         },
-  		setFavoriteProjects (state, payload) {
+  		setFavoriteCategorys (state, payload) {
 	        const favopro = []
-	        for (const project of payload) {
-	            if (project.favorite) favopro.push(project)
+	        for (const category of payload) {
+	            if (category.favorite) favopro.push(category)
 	        }
-	      	state.favoriteProjects = favopro
+	      	state.favoriteCategorys = favopro
   		},
-	  	addFavoriteProjects (state, payload) {
-			state.favoriteProjects.push(payload)
+	  	addFavoriteCategorys (state, payload) {
+			state.favoriteCategorys.push(payload)
 	  	},
-		deleteFavoriteProjects (state, payload) {
-	        const index = state.favoriteProjects.findIndex(project => project.id === payload.id)
-	        if (index !== -1) state.favoriteProjects = state.favoriteProjects.filter((_, i) => i !== index)
+		deleteFavoriteCategorys (state, payload) {
+	        const index = state.favoriteCategorys.findIndex(category => category.id === payload.id)
+	        if (index !== -1) state.favoriteCategorys = state.favoriteCategorys.filter((_, i) => i !== index)
     	},
-	    setDetailProject (state, payload) {
-	        state.detailProject = payload
+	    setDetailCategory (state, payload) {
+	        state.detailCategory = payload
 	    },
 	    addSection (state, payload) {
-	        // プロジェクト詳細
-	        state.detailProject.sections.push(payload)
+	        // カテゴリー詳細
+	        state.detailCategory.sections.push(payload)
 
-	        // 全体の該当プロジェクト
-	        const project = state.projects.find(project => project.id === payload.target_project)
-	        project.sections.push(payload)
+	        // 全体の該当カテゴリー
+	        const category = state.categorys.find(category => category.id === payload.target_category)
+	        category.sections.push(payload)
 	    },
 	    updateSection (state, payload) {
-	        // プロジェクト詳細
-	        const index = state.detailProject.sections.findIndex(section => section.id === payload.id)
-	        Vue.set(state.detailProject.sections, index, payload)
+	        // カテゴリー詳細
+	        const index = state.detailCategory.sections.findIndex(section => section.id === payload.id)
+	        Vue.set(state.detailCategory.sections, index, payload)
 
-	        // 全体の該当プロジェクト
-	        const project = state.projects.find(project => project.id === payload.target_project)
-	        const j = project.sections.findIndex(section => section.id === payload.id)
-	        Vue.set(project.sections, j, payload)
+	        // 全体の該当カテゴリー
+	        const category = state.categorys.find(category => category.id === payload.target_category)
+	        const j = category.sections.findIndex(section => section.id === payload.id)
+	        Vue.set(category.sections, j, payload)
 	    },
 	    deleteSection (state, payload) {
-	        // プロジェクト詳細
-	        const index = state.detailProject.sections.findIndex(section => section.id === payload)
-	        if (index !== -1) state.detailProject.sections = state.detailProject.sections.filter((_, i) => i !== index)
+	        // カテゴリー詳細
+	        const index = state.detailCategory.sections.findIndex(section => section.id === payload)
+	        if (index !== -1) state.detailCategory.sections = state.detailCategory.sections.filter((_, i) => i !== index)
 
-	        // 全体の該当プロジェクト
-	        const project = state.projects.find(project => project.id === state.detailProject.id)
-	        const j = project.sections.findIndex(section => section.id === payload)
-	        if (j !== -1) project.sections = project.sections.filter((_, i) => i !== j)
+	        // 全体の該当カテゴリー
+	        const category = state.categorys.find(category => category.id === state.detailCategory.id)
+	        const j = category.sections.findIndex(section => section.id === payload)
+	        if (j !== -1) category.sections = category.sections.filter((_, i) => i !== j)
 	    },
-	    setArchivedProjects (state, payload) {
+	    setArchivedCategorys (state, payload) {
 	        const archives = []
-	        for (const project of payload) {
-	            if (project.archived) archives.push(project)
+	        for (const category of payload) {
+	            if (category.archived) archives.push(category)
 	        }
-	      	state.archivedProjects = archives
+	      	state.archivedCategorys = archives
 	    },
-	    addArchivedProjects (state, payload) {
-	        state.archivedProjects.push(payload)
+	    addArchivedCategorys (state, payload) {
+	        state.archivedCategorys.push(payload)
 	    },
-	    deleteArchivedProjects (state, payload) {
-	        const index = state.archivedProjects.findIndex(project => project.id === payload.id)
-	        if (index !== -1) state.archivedProjects = state.archivedProjects.filter((_, i) => i !== index)
+	    deleteArchivedCategorys (state, payload) {
+	        const index = state.archivedCategorys.findIndex(category => category.id === payload.id)
+	        if (index !== -1) state.archivedCategorys = state.archivedCategorys.filter((_, i) => i !== index)
 	    },
 		addTask (state, payload) {
-			// 違うプロジェクトだったら追加しない
-			if (state.detailProject.id !== payload.target_project) return
+			// 違うカテゴリーだったら追加しない
+			if (state.detailCategory.id !== payload.target_category) return
 			if (payload.target_section === 0) {
-				// プロジェクトのタスクに追加
-				state.detailProject.tasks.push(payload)
+				// カテゴリーのタスクに追加
+				state.detailCategory.tasks.push(payload)
 
-				// 全体の該当プロジェクト
-				// const project = state.projects.find(project => project.id === payload.target_project)
-				// project.sections.push(payload)
+				// 全体の該当カテゴリー
+				// const category = state.categorys.find(category => category.id === payload.target_category)
+				// category.sections.push(payload)
 			} else {
 				// セクションのタスクに追加
 				console.log('セクションのタスクに追加')
-				const section = state.detailProject.sections.find(section => section.id === payload.target_section)
+				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
 				section.tasks.push(payload)
 			}
 		},
 		deleteTask (state, payload) {
-			// プロジェクト詳細
+			// カテゴリー詳細
 			if (payload.target_section === 0) {
-				const index = state.detailProject.tasks.findIndex(task => task.id === payload.id)
-				if (index !== -1) state.detailProject.tasks = state.detailProject.tasks.filter((_, i) => i !== index)
+				const index = state.detailCategory.tasks.findIndex(task => task.id === payload.id)
+				if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
 			} else {
-				const section = state.detailProject.sections.find(section => section.id === payload.target_section)
+				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
 				const index = section.tasks.findIndex(task => task.id === payload.id)
 				if (index !== -1) section.tasks = section.tasks.filter((_, i) => i !== index)
 			}
 
-	        // 全体の該当プロジェクト
-	        // const project = state.projects.find(project => project.id === state.detailProject.id)
-	        // const j = project.tasks.findIndex(task => task.id === payload)
-	        // if (j !== -1) project.tasks = project.tasks.filter((_, i) => i !== j)
+	        // 全体の該当カテゴリー
+	        // const category = state.categorys.find(category => category.id === state.detailCategory.id)
+	        // const j = category.tasks.findIndex(task => task.id === payload)
+	        // if (j !== -1) category.tasks = category.tasks.filter((_, i) => i !== j)
 	    },
 		updateTask (state, payload) {
 			console.log('updateTask')
 			console.log(payload)
 			if (payload.target_section === 0) {
-				const index = state.detailProject.tasks.findIndex(task => task.id === payload.id)
-				Vue.set(state.detailProject.tasks, index, payload)
+				const index = state.detailCategory.tasks.findIndex(task => task.id === payload.id)
+				Vue.set(state.detailCategory.tasks, index, payload)
 			} else {
-				const section = state.detailProject.sections.find(section => section.id === payload.target_section)
+				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
 				const index = section.tasks.findIndex(task => task.id === payload.id)
 				Vue.set(section.tasks, index, payload)
 			}
 		},
 	},
 	actions: {
-		// プロジェクト一覧取得
-		getProjectsAction (ctx, kwargs) {
+		// カテゴリー一覧取得
+		getCategorysAction (ctx, kwargs) {
 			Vue.prototype.$axios({
-					url: '/api/project/',
+					url: '/api/category/',
 					method: 'GET',
 			})
 			.then(res => {
-					console.log('最新プロジェクト一覧', res)
-					this.commit('setProjects', res.data)
-					this.commit('setFavoriteProjects', res.data)
-					this.commit('setArchivedProjects', res.data)
+					console.log('最新カテゴリー一覧', res)
+					this.commit('setCategorys', res.data)
+					this.commit('setFavoriteCategorys', res.data)
+					this.commit('setArchivedCategorys', res.data)
 			})
 			.catch(e => {
 					console.log(e)
@@ -185,65 +185,65 @@ export default new Vuex.Store({
 				console.log(e)
 			})
 		},
-    	// 作成したプロジェクトを一覧に追加
-		addProjectsAction (ctx, kwargs) {
-			this.commit('addProject', kwargs)
+    	// 作成したカテゴリーを一覧に追加
+		addCategorysAction (ctx, kwargs) {
+			this.commit('addCategory', kwargs)
     	},
 		addLabelsAction (ctx, kwargs) {
 			this.commit('addLabel', kwargs)
 		},
-	    // プロジェクトの更新
-	    updateProjectAction (ctx, kwargs) {
-	        this.commit('updateProject', kwargs)
+	    // カテゴリーの更新
+	    updateCategoryAction (ctx, kwargs) {
+	        this.commit('updateCategory', kwargs)
 	    },
-	    // プロジェクトの削除
-        deleteProjectAction (ctx, kwargs) {
+	    // カテゴリーの削除
+        deleteCategoryAction (ctx, kwargs) {
             Vue.prototype.$axios({
-                url: `/api/project/${kwargs.id}/`,
+                url: `/api/category/${kwargs.id}/`,
                 method: 'DELETE',
             })
             .then(res => {
                 console.log(res)
-                this.commit('deleteProject', kwargs)
-                this.commit('deleteArchivedProjects', kwargs)
+                this.commit('deleteCategory', kwargs)
+                this.commit('deleteArchivedCategorys', kwargs)
             })
             .catch(e => {
                 console.log(e)
             })
 	    },
-	    // お気に入りプロジェクト一覧取得
-	    // getFavoriteProjectsAction (ctx, kwargs) {
+	    // お気に入りカテゴリー一覧取得
+	    // getFavoriteCategorysAction (ctx, kwargs) {
 	    //     Vue.prototype.$axios({
-		// 		url: '/api/project/favorites/',
+		// 		url: '/api/category/favorites/',
 		// 		method: 'GET',
 		// 	})
 		// 	.then(res => {
-		// 		console.log('お気に入りプロジェクト一覧', res)
-		// 		this.commit('setFavoriteProjects', res.data)
+		// 		console.log('お気に入りカテゴリー一覧', res)
+		// 		this.commit('setFavoriteCategorys', res.data)
 		// 	})
 		// 	.catch(e => {
 		// 		console.log(e)
 		// 	})
 	    // },
-	    // お気に入りプロジェクトを追加
-		addFavoriteProjectsAction (ctx, kwargs) {
-			this.commit('addFavoriteProjects', kwargs)
+	    // お気に入りカテゴリーを追加
+		addFavoriteCategorysAction (ctx, kwargs) {
+			this.commit('addFavoriteCategorys', kwargs)
     	},
-	    // お気に入りプロジェクトを削除
-	    deleteFavoriteProjectsAction (ctx, kwargs) {
-	        this.commit('deleteFavoriteProjects', kwargs)
+	    // お気に入りカテゴリーを削除
+	    deleteFavoriteCategorysAction (ctx, kwargs) {
+	        this.commit('deleteFavoriteCategorys', kwargs)
 	    },
-    	// プロジェクト詳細取得
-	    getDetailProjectAction (ctx, id) {
+    	// カテゴリー詳細取得
+	    getDetailCategoryAction (ctx, id) {
 	        Vue.prototype.$axios({
-	            url: `/api/project/${id}/`,
+	            url: `/api/category/${id}/`,
 	            method: 'GET'
 	        })
 	        .then(res => {
-	            console.log('プロジェクト詳細', res)
+	            console.log('カテゴリー詳細', res)
 	            // Ttile設定
 	            setTitle(res.data.name)
-	            this.commit('setDetailProject', res.data)
+	            this.commit('setDetailCategory', res.data)
 	        })
 	        .catch(e => {
 	            console.log(e)

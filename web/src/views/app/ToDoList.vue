@@ -1,9 +1,9 @@
 <template>
     <div id='todo-list'>
 <!--         今だけInbox専用のコンポーネント -->
-<!--         後で、Project毎にコンポーネントが切り替わるようにする -->
+<!--         後で、Category毎にコンポーネントが切り替わるようにする -->
         <h1>Inbox</h1>
-        <v-btn @click="openCreateProject">open project dialog</v-btn>
+        <v-btn @click="openCreateCategory">open category dialog</v-btn>
         <div class='operation_btn_wrap pr-2'>
             <FilterBtn/>
             <SortBtn/>
@@ -20,21 +20,21 @@
         </div>
 
         <!-- モーダル読み込み -->
-        <CreateProjectDialog
-            ref='project'
+        <CreateCategoryDialog
+            ref='category'
         />
     </div>
 </template>
 
 <script>
-    import CreateProjectDialog from '@/components/common/CreateProjectDialog'
+    import CreateCategoryDialog from '@/components/common/CreateCategoryDialog'
     import FilterBtn from '@/components/parts/FilterBtn'
     import SortBtn from '@/components/parts/SortBtn'
 
     export default {
         name: 'Activitys',
         components: {
-            CreateProjectDialog,
+            CreateCategoryDialog,
             FilterBtn,
             SortBtn,
         },
@@ -45,8 +45,8 @@
         computed: {
         },
         methods: {
-            openCreateProject () {
-                this.$refs.project.open()
+            openCreateCategory () {
+                this.$refs.category.open()
             }
         },
     }

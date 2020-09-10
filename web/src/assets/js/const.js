@@ -1,5 +1,5 @@
 class Const {
-    PROJECT_COLOR = [
+    CATEGORY_COLOR = [
         { color: 'grey',    code: '#607D8B' },
         { color: 'red',     code: '#F44336' },
         { color: 'blue',    code: '#2196F3' },
@@ -34,13 +34,13 @@ class Const {
             title: 'Favorite',
             icon: 'mdi-star',
             isNest: false,
-            route: 'DetailProject',
+            route: 'DetailCategory',
         },
         {
-            title: 'Project',
+            title: 'Category',
             icon: 'mdi-format-list-checkbox',
             isNest: true,
-            route: 'DetailProject',
+            route: 'DetailCategory',
         },
         {
             title: 'Label',

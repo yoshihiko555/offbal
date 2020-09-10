@@ -62,7 +62,7 @@
                 name: '',
                 color: '',
             },
-            colorList: Con.PROJECT_COLOR,
+            colorList: Con.CATEGORY_COLOR,
         }),
         methods: {
             ...mapActions([

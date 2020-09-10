@@ -40,9 +40,9 @@
                         <DeadLineBtn
                             :defaultDeadline=task.deadline
                         />
-                        <ProjectBtn
-                            :defaultProjectId=task.target_project
-                            :defaultProject=task.target_project_name
+                        <CategoryBtn
+                            :defaultCategoryId=task.target_category
+                            :defaultCategory=task.target_category_name
                             :defaultSection=task.target_section_name
                         />
                         <LabelBtn
@@ -91,7 +91,7 @@
     import _ from 'lodash'
     import { mapActions, mapMutations } from 'vuex'
     import DeadLineBtn from '@/components/parts/DeadLineBtn'
-    import ProjectBtn from '@/components/parts/ProjectBtn'
+    import CategoryBtn from '@/components/parts/CategoryBtn'
     import LabelBtn from '@/components/parts/LabelBtn'
     import PriorityBtn from '@/components/parts/PriorityBtn'
     import ReminderBtn from '@/components/parts/ReminderBtn'
@@ -105,7 +105,7 @@
         }),
         components: {
             DeadLineBtn,
-            ProjectBtn,
+            CategoryBtn,
             LabelBtn,
             PriorityBtn,
             ReminderBtn,
@@ -132,16 +132,16 @@
                 this.dialog = false
             },
             update () {
-                const { target_project: targetProject, target_section: targetSection } = this.task
-                const { project_id: projectId, section_id: sectionId } = this.updateTaskData
+                const { target_category: targetCategory, target_section: targetSection } = this.task
+                const { category_id: categoryId, section_id: sectionId } = this.updateTaskData
                 this.$axios({
                     url: `/api/task/${this.task.id}/`,
                     method: 'PUT',
                     data: this.updateTaskData
                 })
                 .then(res => {
-                    // プロジェクト、セクションを更新したら消すのと追加
-                    if (targetProject !== projectId || targetSection !== sectionId) {
+                    // カテゴリー、セクションを更新したら消すのと追加
+                    if (targetCategory !== categoryId || targetSection !== sectionId) {
                         this.addTask(res.data)
                         this.deleteTask(this.task)
                     // 変わらなければ、更新
@@ -157,7 +157,7 @@
             },
             createUpdateTaskData (task) {
                 this.updateTaskData = {
-                    project_id: task.target_project,
+                    category_id: task.target_category,
                     section_id: task.target_section,
                     content: task.content,
                     comment: task.comment,

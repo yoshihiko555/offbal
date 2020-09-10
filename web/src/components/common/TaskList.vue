@@ -43,7 +43,7 @@
         },
     	computed: {
     		...mapGetters([
-                'detailProject',
+                'detailCategory',
     		])
     	},
         methods: {

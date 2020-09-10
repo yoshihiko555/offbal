@@ -16,6 +16,11 @@
 		            >
 		            	SignIn
 		            </vs-button>
+		            <vs-button
+		            	@click='test'
+		            >
+		            	test
+		            </vs-button>
 
 		            <vs-button
 		            	dark
@@ -27,15 +32,21 @@
 	            </div>
             </v-row>
         </v-app-bar>
+
+        <SelectCategoryDialog ref='selectCategory'/>
     </div>
 </template>
 
 <script>
+import SelectCategoryDialog from '@/components/common/SelectCategoryDialog'
 import AuthService from '@/auth/AuthService'
 const auth = new AuthService()
 
 export default {
     name: 'Header',
+    components: {
+        SelectCategoryDialog,
+    },
     data: () => ({
 		isAuth: false,
 	}),
@@ -44,17 +55,23 @@ export default {
     	if (!auth.isAuthenticated()) {
 			auth.handleAuthentication()
 			auth.authNotifier.on('authChange', authState => {
+                // 認証情報が変更された
                 this.isAuth = authState.authenticated
+
+                // auth0からユーザー情報の取得
                 auth.getUserProfile((err, res) => {
                 	if (err) {
                 		console.log(err)
                 	} else {
                 		console.log(res)
                 		const namespace = 'https://auth0/user_metadata'
-                		// サインアップならmSetting等を作成する
+                		// サインアップか判定
                 		if (!res[namespace].signup) {
-                            this.initUserData(res.sub, res.name)
+                            // サインアップなので初期データ作成
+                            // this.initUserData(res.sub, res.name)
+                            this.openselectCategory(res.sub, res.name)
                         } else {
+                            // サインインなのでそのままアプリ画面へ
                             if (!this.isAuth) this.$router.push('/')
                             else this.$router.push('/myapp')
                         }
@@ -74,27 +91,33 @@ export default {
     	signout () {
     		auth.logout()
     	},
-        handleAuthentication () {
-  	    	auth.handleAuthentication()
-   	    },
-   	    initUserData (id, name) {
-   	    	this.$axios({
-   	    		url: '/api/signup/',
-   	    		method: 'POST',
-   	    		data: {
-   	    			auth0_id: id,
-   	    			auth0_name: name
-   	    		}
-   	    	})
-   	    	.then(res => {
-                console.log(res)
-                if (!this.isAuth) this.$router.push('/')
-                else this.$router.push('/myapp')
-   	    	})
-   	    	.catch(e => {
-   	    		console.log(e)
-   	    	})
-   	    }
+        // handleAuthentication () {
+  	    // 	auth.handleAuthentication()
+   	    // },
+   	    // initUserData (id, name) {
+   	    // 	this.$axios({
+   	    // 		url: '/api/signup/',
+   	    // 		method: 'POST',
+   	    // 		data: {
+   	    // 			auth0_id: id,
+   	    // 			auth0_name: name
+   	    // 		}
+   	    // 	})
+   	    // 	.then(res => {
+        //         console.log(res)
+        //         // if (!this.isAuth) this.$router.push('/')
+        //         // else this.$router.push('/myapp')
+   	    // 	})
+   	    // 	.catch(e => {
+   	    // 		console.log(e)
+   	    // 	})
+        // },
+        openselectCategory (id, name) {
+            this.$refs.selectCategory.open(id, name)
+        },
+        test () {
+            auth.usermetaUpdate()
+        }
     }
 }
 </script>

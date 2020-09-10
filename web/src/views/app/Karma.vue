@@ -16,9 +16,9 @@
                 </vs-navbar-item>
             </template>
         </vs-navbar>
-        <v-container class="mt-6">
+        <v-container class="mt-6 pa-0">
             <v-row>
-                <v-col>
+                <v-col cols='12' class="pa-0">
                     <component :is='view'/>
                 </v-col>
             </v-row>

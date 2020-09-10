@@ -12,6 +12,7 @@ export default class AuthService {
         this.logout = this.logout.bind(this)
         this.isAuthenticated = this.isAuthenticated.bind(this)
         this.handleAuthentication = this.handleAuthentication.bind(this)
+        this.usermetaUpdate = this.usermetaUpdate.bind(this)
     }
 
     // auth0.WebAuth のインスタンスをAPI および Client
@@ -22,8 +23,27 @@ export default class AuthService {
         redirectUri: 'http://localhost:8080',
         audience: 'https://offbal-api.com.br',
         responseType: 'token id_token',
-        scope: 'openid profile email'
+        scope: 'openid profile email update:current_user_metadata'
     });
+
+    auth0Manage = new auth0.Management({
+        domain: 'dev-orr54nx8.us.auth0.com',
+        token: '',
+    })
+
+    usermetaUpdate () {
+        this.auth0Manage.token = AuthService.getAuthToken()
+        const userId = AuthService.getUserId()
+        const userMetadata = { test: 'hoge' }
+        console.log(this.auth0Manage)
+        this.auth0Manage.patchUserMetadata(userId, userMetadata, function (err, res) {
+            if (err) {
+                console.log(err)
+            } else {
+                console.log(res)
+            }
+        })
+    }
 
     // このメソッドは Auth0 ログインページが
     // トリガーされる authorize() メソッドを呼び出す

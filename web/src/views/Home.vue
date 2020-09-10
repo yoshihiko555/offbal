@@ -28,15 +28,9 @@ export default {
     computed: {
     },
     methods: {
-        signin () {
-            console.log('signin')
-        }
     },
 }
 </script>
 
 <style lang="scss" scoped>
-    .vs-button {
-        margin: 0 auto;
-    }
 </style>

@@ -12,7 +12,9 @@
             	responsive: true,
             	tooltips: {
             		enabled: false,
-            	}
+                },
+                cutoutPercentage: 80,
+                rotation: 90 * (Math.PI / 180),
             }
         }),
         mounted () {

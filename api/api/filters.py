@@ -26,7 +26,8 @@ class CategoryFilter(django_filter.FilterSet):
 
     def user_filter(self, queryset, name, value):
         user = mUser.objects.get(auth0_id=value)
-        res = queryset.filter(member=user).order_by('musercategoryrelation__index')
+        res = queryset.filter(creator=user)
+        # res = queryset.filter(member=user).order_by('musercategoryrelation__index')
         return res
 
 

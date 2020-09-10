@@ -48,11 +48,14 @@ class SignupView(generics.CreateAPIView, GetLoginUserMixin):
             mSetting.objects.create(
                 target_user=user
             )
-            category = Category.objects.create(
-                creator=user,
-                name='インボックス'
-            )
-            category.member.add(user)
+            categorys = []
+            req_categorys = request.data['categorys']
+            for category in req_categorys:
+                categorys.append(Category(
+                    creator=user,
+                    name=category
+                ))
+            Category.objects.bulk_create(categorys)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -64,7 +67,8 @@ class AppInitView(generics.ListAPIView, GetLoginUserMixin):
     def list(self, request, *args, **kwargs):
         self.set_auth0_id(request)
         user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
-        categorys = Category.objects.filter(member=user).order_by('musercategoryrelation__index')
+        categorys = Category.objects.filter(creator=user)
+        # categorys = Category.objects.filter(creator=user).order_by('musercategoryrelation__index')
         category_serializer = CategorySerializer(categorys, many=True, context={ 'view' : self })
         labels = Label.objects.filter(author=user)
         label_serializer = LabelSerializer(labels, many=True, context={ 'view' : self })

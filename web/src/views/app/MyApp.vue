@@ -32,31 +32,20 @@
             drawer: true,
         }),
         created () {
+        	this.appInitAction()
             // this.getCategorysAction()
             // this.getFavoriteCategorysAction()
             // this.getLabelsAction()
-            this.appinit()
         },
         computed: {
         },
         methods: {
             ...mapActions([
-                'getCategorysAction',
-                'getFavoriteCategorysAction',
-                'getLabelsAction',
+            	'appInitAction',
+                // 'getCategorysAction',
+                // 'getFavoriteCategorysAction',
+                // 'getLabelsAction',
             ]),
-            appinit () {
-            	this.$axios({
-            		url: '/api/appinit/',
-            		method: 'GET',
-            	})
-            	.then(res => {
-            		console.log(res)
-            	})
-            	.catch(e => {
-            		console.log(e)
-            	})
-            }
         },
     }
 </script>

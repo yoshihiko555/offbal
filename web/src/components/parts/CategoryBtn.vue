@@ -16,7 +16,7 @@
             z-index=99000
             open-delay=250
         >
-            <span>プロジェクトを選択</span>
+            <span>カテゴリーを選択</span>
         </v-tooltip>
         <v-menu
             :close-on-content-click="false"
@@ -45,7 +45,7 @@
                 <vs-input
                     class="px-3 mt-3"
                     size="small"
-                    placeholder="プロジェクト名を検索"
+                    placeholder="カテゴリー名を検索"
                     v-model="filterValue"
                 ></vs-input>
                 <v-list-item-group>
@@ -203,7 +203,7 @@
         },
         methods: {
             selectCategory (value) {
-                // プロジェクトを選択
+                // カテゴリーを選択
                 if (value.isCategory) {
                     this.setCategoryInfo(value)
                     this.$eventHub.$emit('create_task_info', 'category_id', value.id)
@@ -222,11 +222,11 @@
                 this.$eventHub.$emit('create_task_info', 'section_id', value.id)
             },
             filterCategorySectionName (value) {
-                // プロジェクト名・セクション名を検索する
+                // カテゴリー名・セクション名を検索する
                 return value.name.indexOf(this.filterValue) === 0
             },
             setCategoryInfo (value) {
-                // プロジェクト選択時情報をセット
+                // カテゴリー選択時情報をセット
                 this.category = {
                     name: value.name,
                     section: ''

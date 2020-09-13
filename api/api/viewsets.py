@@ -223,16 +223,19 @@ class TaskViewSet(BaseModelViewSet):
         """
         該当タスクの完了フラグを立てるアクション
         """
+        complete_task_id_list = request.data['task_id']
+        complete_task_list = []
         try:
-            instance = Task.objects.get(pk=request.data['task_id'])
-            instance.completed = True
-            instance.completed_at = timezone.datetime.now()
-            instance.save()
+            for i in complete_task_id_list:
+                instance = Task.objects.get(pk=i)
+                instance.completed = True
+                instance.completed_at = timezone.datetime.now()
+                complete_task_list.append(instance)
+            Task.objects.bulk_update(complete_task_list, ['completed', 'completed_at'])
         except Task.DoesNotExist:
             logger.error('タスクが見つかりませんでした。')
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(self.get_serializer(instance).data,status=status.HTTP_200_OK)
+        return Response(self.get_serializer(complete_task_list, many=True).data, status=status.HTTP_200_OK)
 
 
 

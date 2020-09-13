@@ -37,6 +37,9 @@
                     <v-col
                         cols="1"
                     >
+                        <StartTimeBtn
+                            :defaultStartTime=task.start_time
+                        />
                         <DeadLineBtn
                             :defaultDeadline=task.deadline
                         />
@@ -90,6 +93,7 @@
 <script>
     import _ from 'lodash'
     import { mapActions, mapMutations } from 'vuex'
+    import StartTimeBtn from '@/components/parts/StartTimeBtn'
     import DeadLineBtn from '@/components/parts/DeadLineBtn'
     import CategoryBtn from '@/components/parts/CategoryBtn'
     import LabelBtn from '@/components/parts/LabelBtn'
@@ -104,6 +108,7 @@
             updateTaskData: {},
         }),
         components: {
+            StartTimeBtn,
             DeadLineBtn,
             CategoryBtn,
             LabelBtn,
@@ -163,6 +168,7 @@
                     comment: task.comment,
                     priority: task.priority,
                     label_list: [],
+                    start_time_str: task.start_time,
                     deadline_str: task.deadline,
                     remind_str: task.remind,
                 }

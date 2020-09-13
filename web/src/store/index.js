@@ -142,8 +142,6 @@ export default new Vuex.Store({
 	        // if (j !== -1) category.tasks = category.tasks.filter((_, i) => i !== j)
 	    },
 		updateTask (state, payload) {
-			console.log('updateTask')
-			console.log(payload)
 			if (payload.target_section === 0) {
 				const index = state.detailCategory.tasks.findIndex(task => task.id === payload.id)
 				Vue.set(state.detailCategory.tasks, index, payload)
@@ -152,6 +150,9 @@ export default new Vuex.Store({
 				const index = section.tasks.findIndex(task => task.id === payload.id)
 				Vue.set(section.tasks, index, payload)
 			}
+		},
+		addCompleteTask (state, payload) {
+			state.detailCategory.complete_tasks.push(payload)
 		},
 	},
 	actions: {

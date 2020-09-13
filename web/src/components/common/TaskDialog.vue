@@ -39,7 +39,9 @@
                         </v-col>
                         <v-col
                             cols="1"
+                            class="task_dialog_btn_area"
                         >
+                            <StartTimeBtn/>
                             <DeadLineBtn/>
                             <CategoryBtn
                                 :defaultCategoryId=detailCategory.id
@@ -83,6 +85,7 @@
 </template>
 <script>
     import { mapGetters, mapMutations } from 'vuex'
+    import StartTimeBtn from '@/components/parts/StartTimeBtn'
     import DeadLineBtn from '@/components/parts/DeadLineBtn'
     import CategoryBtn from '@/components/parts/CategoryBtn'
     import LabelBtn from '@/components/parts/LabelBtn'
@@ -92,6 +95,7 @@
     export default {
         name: 'TaskDialog',
         components: {
+            StartTimeBtn,
             DeadLineBtn,
             CategoryBtn,
             LabelBtn,
@@ -110,6 +114,7 @@
                 section_id: 0,
                 content: '',
                 comment: '',
+                start_time_str: '',
                 deadline_str: '',
                 remind_str: '',
                 priority: '1',
@@ -168,6 +173,7 @@
                     section_id: 0,
                     content: '',
                     comment: '',
+                    start_time_str: '',
                     deadline_str: '',
                     remind_str: '',
                     priority: '1',
@@ -193,6 +199,10 @@
             .vs-input {
                 width: 100%;
             }
+        }
+        .task_dialog_btn_area {
+            position: relative;
+            top: -15px;
         }
     }
 </style>

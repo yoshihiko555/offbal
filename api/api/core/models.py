@@ -34,6 +34,7 @@ class TaskModel(models.Model):
         default=Priority.ONE
     )
 
+    start_time = models.DateTimeField(null=True, blank=True)
     deadline = models.DateTimeField(null=True, blank=True)
     remind = models.DateTimeField(null=True, blank=True)
     comment = models.TextField(null=True, blank=True)

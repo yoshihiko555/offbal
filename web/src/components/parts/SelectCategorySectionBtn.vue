@@ -18,80 +18,96 @@
                 >mdi-inbox</v-icon>
             </v-btn>
         </template>
-        <v-list
-            dense
-        >
-            <vs-input
-                class="px-3 mt-3"
-                size="small"
-                placeholder="カテゴリー名を検索"
-                v-model="filterValue"
-            ></vs-input>
-            <v-list-item-group>
-                <!-- フィルター絞る前 -->
-                <div v-if="filterValue.length === 0">
-                    <div
-                        v-for="(category, i) in categorys"
-                        :key="i"
-                    >
-                        <v-list-item
-                            class="category_name"
-                            @click="selectCategory(category)"
-                        >
-                            <v-icon
-                                class="mr-2"
-                                :color="category.color"
-                            >mdi-circle-medium</v-icon>
-                            {{ category.name }}
-                        </v-list-item>
-                        <v-list-item
-                            class="pl-8"
-                            v-for="(section, i) in category.sections"
+        <v-card>
+            <v-card-title>
+                <h5>
+                    カテゴリーを移動する
+                </h5>
+            </v-card-title>
+            <v-list
+                dense
+            >
+                <vs-input
+                    class="px-3 mt-3"
+                    size="small"
+                    placeholder="カテゴリー名を検索"
+                    v-model="filterValue"
+                ></vs-input>
+                <v-list-item-group>
+                    <!-- フィルター絞る前 -->
+                    <div v-if="filterValue.length === 0">
+                        <div
+                            v-for="(category, i) in categorys"
                             :key="i"
-                            @click="selectSection(section)"
                         >
-                            <v-icon
-                                class="mr-2"
-                                color="grey lighten-1"
-                            >mdi-rhombus-medium-outline</v-icon>
-                            {{ section.name }}
-                        </v-list-item>
+                            <v-list-item
+                                class="category_name"
+                                @click="selectCategory(category)"
+                            >
+                                <v-icon
+                                    class="mr-2"
+                                    :color="category.color"
+                                >mdi-circle-medium</v-icon>
+                                {{ category.name }}
+                            </v-list-item>
+                            <v-list-item
+                                class="pl-8"
+                                v-for="(section, i) in category.sections"
+                                :key="i"
+                                @click="selectSection(section)"
+                            >
+                                <v-icon
+                                    class="mr-2"
+                                    color="grey lighten-1"
+                                >mdi-rhombus-medium-outline</v-icon>
+                                {{ section.name }}
+                            </v-list-item>
+                        </div>
                     </div>
-                </div>
-                <!-- フィルター絞る前ここまで -->
-                <!-- フィルター絞る -->
-                <div v-else>
-                    <div
-                        v-for="(item, i) in filteredItems"
-                        :key="i"
-                    >
-                        <v-list-item
-                            v-if="item.isCategory"
-                            class="category_name"
-                            @click="selectCategory(item)"
-                        >
-                            <v-icon
-                                class="mr-2"
-                                :color="item.color"
-                            >mdi-circle-medium</v-icon>
-                            {{ item.name }}
-                        </v-list-item>
-                        <v-list-item
-                            v-else
-                            class="category_name"
-                            @click="selectSection(item)"
-                        >
-                            <v-icon
-                                class="mr-3"
-                                color="grey lighten-1"
-                            >mdi-square-medium-outline</v-icon>
-                            {{ item.name }}
-                        </v-list-item>
+                    <!-- フィルター絞る前ここまで -->
+                    <!-- フィルター絞る -->
+                    <div v-else>
+                        <div v-if="filteredItems.length === 0">
+                            <v-list-item
+                                class="no_data_available"
+                            >
+                                No data available
+                            </v-list-item>
+                        </div>
+                        <div v-else>
+                            <div
+                                v-for="(item, i) in filteredItems"
+                                :key="i"
+                            >
+                                <v-list-item
+                                    v-if="item.isCategory"
+                                    class="category_name"
+                                    @click="selectCategory(item)"
+                                >
+                                    <v-icon
+                                        class="mr-2"
+                                        :color="item.color"
+                                    >mdi-circle-medium</v-icon>
+                                    {{ item.name }}
+                                </v-list-item>
+                                <v-list-item
+                                    v-else
+                                    class="category_name"
+                                    @click="selectSection(item)"
+                                >
+                                    <v-icon
+                                        class="mr-3"
+                                        color="grey lighten-1"
+                                    >mdi-square-medium-outline</v-icon>
+                                    {{ item.name }}
+                                </v-list-item>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <!-- フィルター絞るここまで -->
-            </v-list-item-group>
-        </v-list>
+                    <!-- フィルター絞るここまで -->
+                </v-list-item-group>
+            </v-list>
+        </v-card>
     </v-menu>
 </template>
 <script>
@@ -169,5 +185,13 @@
         width: 0;
         opacity: 0;
         pointer-events: none;
+    }
+    .v-card__title {
+        height: 50px;
+    }
+    .no_data_available {
+        display: block;
+        text-align: center;
+        margin: 20px auto 0;
     }
 </style>

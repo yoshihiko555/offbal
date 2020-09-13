@@ -49,6 +49,7 @@
         methods: {
             ...mapMutations([
                 'deleteTask',
+                'addCompleteTask',
             ]),
             checkTask (task) {
                 this.$axios({
@@ -61,6 +62,7 @@
                 .then(res => {
                     console.log(res)
                     setTimeout(this.deleteTask, 600, res.data)
+                    setTimeout(this.addCompleteTask, 600, res.data)
                 })
                 .catch(e => {
                     console.log(e)

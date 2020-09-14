@@ -153,12 +153,12 @@ class CategoryViewSet(BaseModelViewSet):
         user = mUser.objects.get(auth0_id=request.data['auth0_id'])
         categorys = []
         for i, category in enumerate(request.data['categorys'], 1):
-            cate = mUserCategoryRelation.objects.get(user=user, category__id=category['id'])
+            cate = Category.objects.get(pk=category['id'])
             cate.index = i
             categorys.append(cate)
 
-        mUserCategoryRelation.objects.bulk_update(categorys, fields=['index'])
-        user_category = user.category_member.all().order_by('musercategoryrelation__index')
+        Category.objects.bulk_update(categorys, fields=['index'])
+        user_category = user.category_creator_user.all().order_by('index')
         serializer = self.get_serializer(user_category, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

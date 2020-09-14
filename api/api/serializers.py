@@ -125,6 +125,7 @@ class CategorySerializer(DynamicFieldsModelSerializer):
             'is_archived',
             'isCategory',
             'index',
+            'icon',
         ]
 
 
@@ -151,9 +152,10 @@ class CategorySerializer(DynamicFieldsModelSerializer):
 
     def get_index(self, obj):
         try:
-            user = mUser.objects.get(auth0_id=self.auth0_id)
-            relation = mUserCategoryRelation.objects.get(user=user, category=obj)
-            return relation.index
+            return obj.index
+            # user = mUser.objects.get(auth0_id=self.auth0_id)
+            # relation = mUserCategoryRelation.objects.get(user=user, category=obj)
+            # return relation.index
         except:
             return None
 

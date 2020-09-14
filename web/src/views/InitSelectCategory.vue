@@ -15,7 +15,7 @@
         <v-container>
             <v-row>
                 <v-col v-for='category in defaultCategorys' :key='category.id' cols='4'>
-                    <vs-card type='2' @click='togle(category.name)'>
+                    <vs-card type='2' @click='togle(category)'>
                         <template #title>
                             <h4>{{ category.name }}</h4>
                         </template>
@@ -26,7 +26,7 @@
                             <img :src='getImgUrl(category.name)'>
                         </template>
                         <template #interactions>
-                            <vs-checkbox :val='category.name' v-model='categorys'/>
+                            <vs-checkbox :val='category' v-model='categorys'/>
                         </template>
                     </vs-card>
                 </v-col>
@@ -51,7 +51,7 @@
     const Con = new Const()
 
     export default {
-        name: 'SelectCategoryDialog',
+        name: 'InitSelectCategory',
         data: () => ({
             isShow: true,
             id: null,
@@ -62,16 +62,23 @@
             categorys: [],
         }),
         created () {
+            // 認証が完了していなければ、HOME画面へ
+            if (!auth.isAuthenticated()) return this.$router.push('/')
+
             this.id = AuthService.getAuth0Id()
             this.name = AuthService.getUserName()
-            // TODO URL直で来た時対応
             this.$axios({
             	url: '/api/default-categorys/',
             	method: 'GET',
             })
             .then(res => {
-            	console.log(res)
-            	this.defaultCategorys = res.data
+                console.log('デフォルトカテゴリー一覧', res)
+                if (res.data.result) {
+                    this.defaultCategorys = res.data.default_categorys
+                } else {
+                    // 初期化が完了しているので、そのままアプリ画面へ
+                    this.$router.push('/myapp')
+                }
             })
             .catch(e => {
             	console.log(e)
@@ -83,7 +90,9 @@
             }
         },
         methods: {
+            // ユーザー初期データ作成
             initUserData () {
+                console.log(this.categorys)
                 this.$axios({
                     url: '/api/signup/',
                     method: 'POST',
@@ -105,10 +114,10 @@
             getImgUrl (name) {
             	return require(`@/assets/img/${name}.jpg`)
             },
-            togle (name) {
-                const idx = this.categorys.indexOf(name)
+            togle (category) {
+                const idx = this.categorys.indexOf(category)
                 if (idx !== -1) this.categorys = this.categorys.filter((_, i) => i !== idx)
-                else this.categorys.push(name)
+                else this.categorys.push(category)
             }
         }
     }

@@ -176,36 +176,6 @@ export default new Vuex.Store({
 	        	})
 			})
 		},
-		// カテゴリー一覧取得
-//		getCategorysAction (ctx, kwargs) {
-//			Vue.prototype.$axios({
-//					url: '/api/category/',
-//					method: 'GET',
-//			})
-//			.then(res => {
-//					console.log('最新カテゴリー一覧', res)
-//					this.commit('setCategorys', res.data)
-//					this.commit('setFavoriteCategorys', res.data)
-//					this.commit('setArchivedCategorys', res.data)
-//			})
-//			.catch(e => {
-//					console.log(e)
-//			})
-//		},
-//		// ラベル一覧取得
-//		getLabelsAction (ctx, kwargs) {
-//			Vue.prototype.$axios({
-//				url: '/api/label/',
-//				method: 'GET',
-//			})
-//			.then(res => {
-//				console.log('ラベル一覧', res)
-//				this.commit('setLabels', res.data)
-//			})
-//			.catch(e => {
-//				console.log(e)
-//			})
-//		},
     	// 作成したカテゴリーを一覧に追加
 		addCategorysAction (ctx, kwargs) {
 			this.commit('addCategory', kwargs)
@@ -232,20 +202,6 @@ export default new Vuex.Store({
                 console.log(e)
             })
 	    },
-	    // お気に入りカテゴリー一覧取得
-	    // getFavoriteCategorysAction (ctx, kwargs) {
-	    //     Vue.prototype.$axios({
-		// 		url: '/api/category/favorites/',
-		// 		method: 'GET',
-		// 	})
-		// 	.then(res => {
-		// 		console.log('お気に入りカテゴリー一覧', res)
-		// 		this.commit('setFavoriteCategorys', res.data)
-		// 	})
-		// 	.catch(e => {
-		// 		console.log(e)
-		// 	})
-	    // },
 	    // お気に入りカテゴリーを追加
 		addFavoriteCategorysAction (ctx, kwargs) {
 			this.commit('addFavoriteCategorys', kwargs)

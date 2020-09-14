@@ -16,11 +16,6 @@
 		            >
 		            	SignIn
 		            </vs-button>
-		            <vs-button
-		            	@click='updateUsermetadata'
-		            >
-		            	update
-		            </vs-button>
 	            </div>
             </v-row>
         </v-app-bar>
@@ -55,9 +50,7 @@ export default {
                 		const namespace = 'https://auth0/user_metadata'
                 		// サインアップか判定
                 		if (!res[namespace].signup) {
-                            // サインアップなので初期データ作成
-                            // this.initUserData(res.sub, res.name)
-                            // this.openSelectCategory()
+                            // サインアップなので初期データ作成画面へ
                             this.$router.push('/init-select-category')
                         } else {
                             // サインインなのでそのままアプリ画面へ

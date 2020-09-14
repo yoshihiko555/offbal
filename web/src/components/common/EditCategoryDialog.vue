@@ -117,6 +117,7 @@
                 'deleteFavoriteCategorysAction',
             ]),
             open (category) {
+                this.initFlg = true
                 this.category = _.cloneDeep(category)
                 this.category.is_favorite = category.favorite
                 // 重複チェックのために変更前の状態を保持する

@@ -17,125 +17,36 @@
 
             <!-- メニュー一覧 -->
 			<v-list nav dense>
-                <template v-for='(menu, i) in menus'>
+                <v-list-item
+                    v-for="(menu, i) in menus"
+                    :key='i'
+                    @click='toPage(menu.route)'
+                >
+                    <v-list-item-icon>
+                        <v-icon v-text='menu.icon'/>
+                    </v-list-item-icon>
+                    <v-list-item-title>{{ menu.title }}</v-list-item-title>
+                </v-list-item>
 
-                    <!-- ネスト有 -->
-                    <v-list-group
-                        v-if='menu.isNest'
-                        :key='i'
-                        :prepend-icon="menu.icon"
+                <!-- カテゴリー一覧 -->
+                <draggable
+                    :list='localCategorys'
+                    animation='200'
+                    chosen-class="chosen"
+                    drag-class="drag"
+                    @end='end'
+                >
+                    <v-list-item
+                        v-for="category in localCategorys"
+                        :key='category.id'
+                        @click='toPage("DetailCategory", category)'
                     >
-                        <template #activator>
-                            <v-list-item-title>
-                                {{ menu.title }}
-                            </v-list-item-title>
-                        </template>
-
-                        <!-- カテゴリー -->
-                        <div v-if="menu.title === 'Category'">
-                            <v-list-item>
-                                <v-list-item-title>新規カテゴリー追加</v-list-item-title>
-                                <v-list-item-action>
-                                    <v-btn icon @click='createCategory'><v-icon>mdi-plus</v-icon></v-btn>
-                                </v-list-item-action>
-                            </v-list-item>
-
-                            <draggable
-                                :list='localCategorys'
-                                animation='200'
-                                chosen-class="chosen"
-                                drag-class="drag"
-                                @end='end'
-                            >
-                                <v-list-item
-                                    v-for='category in localCategorys'
-                                    :key='category.id'
-                                    v-show="!category.archived"
-                                    @click='toPage(menu.route, category)'
-                                >
-                                    <v-icon x-small :color="category.color">mdi-circle</v-icon>
-                                    <v-list-item-title class="ml-2">{{ category.name }}</v-list-item-title>
-                                    <v-list-item-action class="ml-0">
-                                        <SidebarCategoryMenuBtn :category='category'/>
-                                    </v-list-item-action>
-                                </v-list-item>
-                            </draggable>
-
-                            <!-- アーカイブカテゴリー -->
-                            <v-expansion-panels
-                                flat
-                                tile
-                                hover
-                                accordion
-                                v-show='archivedCategorys.length > 0'
-                            >
-                                <v-expansion-panel>
-                                    <v-expansion-panel-header hide-actions>
-                                        <span class='archived_title'>アーカイブ</span>
-                                    </v-expansion-panel-header>
-                                    <v-expansion-panel-content>
-                                        <v-list-item
-                                            v-for="archived in archivedCategorys"
-                                            :key='archived.name'
-                                            @click='toPage(menu.route, archived)'
-                                        >
-                                            <v-list-item-title>{{ archived.name }}</v-list-item-title>
-                                            <v-list-item-action class="ml-0">
-                                                <SidebarArchiveMenuBtn :category='archived'/>
-                                            </v-list-item-action>
-                                        </v-list-item>
-                                    </v-expansion-panel-content>
-                                </v-expansion-panel>
-                            </v-expansion-panels>
-                        </div>
-
-                        <!-- ラベル -->
-                        <div v-else>
-                            <v-list-item>
-                                <v-list-item-title>新規ラベル追加</v-list-item-title>
-                                <v-list-item-action>
-                                    <v-btn icon @click='createLabel'><v-icon>mdi-plus</v-icon></v-btn>
-                                </v-list-item-action>
-                            </v-list-item>
-
-                            <v-list-item
-                                v-for='(label, i) in labels'
-                                :key='i'
-                                @click='toPage(menu.route, label)'
-                            >
-                                <v-list-item-title>{{ label.name }}</v-list-item-title>
-                            </v-list-item>
-                        </div>
-
-                    </v-list-group>
-
-                    <!-- ネスト無 -->
-                    <div v-else :key='i'>
-                        <!-- お気に入り以外 -->
-                        <v-list-item
-                            v-if='menu.title !== "Favorite"'
-                            @click='toPage(menu.route)'
-                        >
-                            <v-list-item-icon>
-                                <v-icon v-text='menu.icon'/>
-                            </v-list-item-icon>
-                            <v-list-item-title>{{ menu.title }}</v-list-item-title>
-                        </v-list-item>
-
-                        <!-- お気に入りカテゴリー -->
-                        <v-list-item
-                            v-else
-                            v-for="favo in favoriteCategorys"
-                            :key='favo.id'
-                            @click="toPage(menu.route, favo)"
-                        >
-                            <v-list-item-icon>
-                                <v-icon :color="favo.color" small class="mx-auto">mdi-circle</v-icon>
-                            </v-list-item-icon>
-                            <v-list-item-title>{{ favo.name }}</v-list-item-title>
-                        </v-list-item>
-                    </div>
-                </template>
+                        <v-list-item-icon>
+                            <v-icon :color='category.color' v-text="category.icon"/>
+                        </v-list-item-icon>
+                        <v-list-item-title v-text="category.name"/>
+                    </v-list-item>
+                </draggable>
 	 		</v-list>
 		</v-navigation-drawer>
 

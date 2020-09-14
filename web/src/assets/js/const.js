@@ -5,6 +5,9 @@ class Const {
         { color: 'blue',    code: '#2196F3' },
         { color: 'green',   code: '#009688' },
         { color: 'yellow',  code: '#FFD600' },
+        { color: 'cyan',    code: '#00BCD4' },
+        { color: 'teal',    code: '#009688' },
+        { color: 'orange',  code: '#FF9800' },
     ]
 
     ACTIVE_COLOR = 'red accent-4'
@@ -12,12 +15,12 @@ class Const {
     NON_ACTIVE_COLOR = 'grey lighten-1'
 
     SIDEBAR_MENU = [
-        {
-            title: 'Inbox',
-            icon: 'mdi-inbox',
-            isNest: false,
-            route: 'Inbox',
-        },
+        // {
+        //     title: 'Inbox',
+        //     icon: 'mdi-inbox',
+        //     isNest: false,
+        //     route: 'Inbox',
+        // },
         {
             title: 'Today',
             icon: 'mdi-calendar-today',
@@ -30,30 +33,30 @@ class Const {
             isNest: false,
             route: 'FutureScheduled',
         },
-        {
-            title: 'Favorite',
-            icon: 'mdi-star',
-            isNest: false,
-            route: 'DetailCategory',
-        },
-        {
-            title: 'Category',
-            icon: 'mdi-format-list-checkbox',
-            isNest: true,
-            route: 'DetailCategory',
-        },
-        {
-            title: 'Label',
-            icon: 'mdi-label-multiple-outline',
-            isNest: true,
-            route: 'Labels',
-        },
-        {
-            title: 'Activity',
-            icon: 'mdi-bell-ring',
-            isNest: false,
-            route: 'Activitys',
-        },
+        // {
+        //     title: 'Favorite',
+        //     icon: 'mdi-star',
+        //     isNest: false,
+        //     route: 'DetailCategory',
+        // },
+        // {
+        //     title: 'Category',
+        //     icon: 'mdi-format-list-checkbox',
+        //     isNest: true,
+        //     route: 'DetailCategory',
+        // },
+        // {
+        //     title: 'Label',
+        //     icon: 'mdi-label-multiple-outline',
+        //     isNest: true,
+        //     route: 'Labels',
+        // },
+        // {
+        //     title: 'Activity',
+        //     icon: 'mdi-bell-ring',
+        //     isNest: false,
+        //     route: 'Activitys',
+        // },
     ]
 
     DEFAULT_CATEGORY_MSG = {

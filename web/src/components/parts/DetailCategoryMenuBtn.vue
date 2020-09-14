@@ -26,7 +26,7 @@
                     <v-list-item-title>{{ menu.name }}</v-list-item-title>
                 </v-list-item>
 
-                <v-list-item
+                <!-- <v-list-item
                     v-if='!detailCategory.favorite'
                     @click='togleFavorite'
                 >
@@ -43,7 +43,7 @@
                         <v-icon small v-text='favoMenu[1].icon'/>
                     </v-list-item-icon>
                     <v-list-item-title>{{ favoMenu[1].name }}</v-list-item-title>
-                </v-list-item>
+                </v-list-item> -->
             </v-list>
         </v-menu>
 
@@ -79,37 +79,37 @@
                         icon: 'mdi-plus-circle-outline',
                         call: this.open,
                     },
-                    {
-                        name: 'カテゴリーの編集',
-                        icon: 'mdi-pencil-outline',
-                        call: this.editCategory,
-                    },
-                    {
-                        name: 'カテゴリーを削除',
-                        icon: 'mdi-trash-can-outline',
-                        call: this.deleteCategory,
-                    },
-                    {
-                        name: 'カテゴリーをアーカイブ',
-                        icon: 'mdi-package',
-                        call: this.test,
-                    },
+                    // {
+                    //     name: 'カテゴリーの編集',
+                    //     icon: 'mdi-pencil-outline',
+                    //     call: this.editCategory,
+                    // },
+                    // {
+                    //     name: 'カテゴリーを削除',
+                    //     icon: 'mdi-trash-can-outline',
+                    //     call: this.deleteCategory,
+                    // },
+                    // {
+                    //     name: 'カテゴリーをアーカイブ',
+                    //     icon: 'mdi-package',
+                    //     call: this.test,
+                    // },
                     {
                         name: '完了したタスクを表示',
                         icon: 'mdi-check-circle-outline',
                         call: this.test,
                     },
                 ],
-                favoMenu: [
-                    {
-                        name: 'お気に入りに登録',
-                        icon: 'mdi-heart-outline',
-                    },
-                    {
-                        name: 'お気に入りから削除',
-                        icon: 'mdi-heart-off-outline',
-                    },
-                ],
+                // favoMenu: [
+                //     {
+                //         name: 'お気に入りに登録',
+                //         icon: 'mdi-heart-outline',
+                //     },
+                //     {
+                //         name: 'お気に入りから削除',
+                //         icon: 'mdi-heart-off-outline',
+                //     },
+                // ],
         	}
         },
         computed: {

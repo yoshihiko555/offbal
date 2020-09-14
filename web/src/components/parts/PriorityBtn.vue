@@ -19,9 +19,11 @@
             <span>優先度を設定</span>
         </v-tooltip>
         <v-menu
+            :close-on-content-click="false"
             offset-x
             transition="scroll-y-transition"
             min-width="180px"
+            v-model="menu"
         >
             <template v-slot:activator="{ on, attrs }">
                 <div id="priority_btn">
@@ -35,25 +37,32 @@
                     </v-btn>
                 </div>
             </template>
-            <v-list
-                dense
-            >
-                <v-list-item
-                    v-for="(item, i) in items"
-                    :key="i"
-                    @click="selectPriority(item.value)"
+            <v-card>
+                <v-card-title>
+                    <h5>
+                        優先度設定
+                    </h5>
+                </v-card-title>
+                <v-list
+                    dense
                 >
-                    <v-icon
-                        class="mr-1"
-                        :color="item.color"
-                    >{{ item.icon }}</v-icon>
-                    <v-list-item-title
-                        class="ml-4"
+                    <v-list-item
+                        v-for="(item, i) in items"
+                        :key="i"
+                        @click="selectPriority(item.value)"
                     >
-                        {{ item.text }}
-                    </v-list-item-title>
-                </v-list-item>
-            </v-list>
+                        <v-icon
+                            class="mr-1 ml-2"
+                            :color="item.color"
+                        >{{ item.icon }}</v-icon>
+                        <v-list-item-title
+                            class="ml-5"
+                        >
+                            {{ item.text }}
+                        </v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-card>
         </v-menu>
     </div>
 </template>
@@ -111,6 +120,7 @@
                 text: '優先度1'
             },
             isSelected: false,
+            menu: false
         }),
         created () {
             this.priority.value = this.defaultPriority
@@ -135,10 +145,13 @@
                 this.priority.value = value
                 this.$eventHub.$emit('create_task_info', 'priority', value)
                 this.isSelected = true
+                this.menu = false
             }
         }
     }
 </script>
-<style lang='scss'>
-
+<style lang='scss' scoped>
+    .v-card__title {
+        height: 50px;
+    }
 </style>

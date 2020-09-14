@@ -145,7 +145,7 @@ class CategorySerializer(DynamicFieldsModelSerializer):
         if hasattr(self, 'ordering_type') and self.ordering_type != None:
             return TaskSerializer(obj.task_target_category.all().filter(Q(target_section=None) & Q(completed=True)).order_by('-' + self.ordering_type), many=True).data
         else:
-            return TaskSerializer(obj.task_target_category.all().filter(Q(target_section=None) & Q(completed=True)), many=True).data
+            return TaskSerializer(obj.task_target_category.all().filter(Q(target_section=None) & Q(completed=True)).order_by('completed_at'), many=True).data
 
     def get_sections(self, obj):
         return SectionSerializer(obj.section_target_category.all(), many=True, context=self.context).data
@@ -288,6 +288,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         allow_empty=True,
         write_only=True,
     )
+    start_time_str = serializers.CharField(write_only=True, allow_blank=True)
 
     target_user = serializers.CharField(read_only=True)
     target_category = serializers.ReadOnlyField(source='target_category.id')
@@ -295,6 +296,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     target_section = serializers.ReadOnlyField(source='target_section.id', default=0)
     target_section_name = serializers.CharField(read_only=True, source='target_section.name', default='')
     label = serializers.SerializerMethodField()
+    start_time = serializers.SerializerMethodField()
     deadline = serializers.SerializerMethodField()
     remind = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
@@ -330,10 +332,17 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'updated_at',
             'sub_tasks',
             'completed_at',
+            'start_time',
+            'start_time_str',
         ]
 
     def get_label(self, obj):
         return LabelSerializer(obj.label.all(), many=True).data
+
+    def get_start_time(self, obj):
+        if obj.start_time == None:
+            return ''
+        return utc_to_jst(obj.start_time)
 
     def get_deadline(self, obj):
         if obj.deadline == None:
@@ -358,7 +367,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
 
     def get_sub_tasks(self, obj):
         # とりあえず置いておく
-        return None
+        return []
 
     def create(self, validated_data):
 
@@ -385,9 +394,11 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             logger.error('Sectionが見つかりませんでした。')
             return None
 
+        st_str = validated_data['start_time_str']
         dl_str = validated_data['deadline_str']
         rm_str = validated_data['remind_str']
 
+        start_time = datetime.strptime(st_str, '%Y-%m-%d %H:%M:%S') if st_str != '' else None
         deadline = datetime.strptime(dl_str, '%Y-%m-%d %H:%M:%S') if dl_str != '' else None
         remind = datetime.strptime(rm_str, '%Y-%m-%d %H:%M:%S') if rm_str != '' else None
 
@@ -398,6 +409,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             target_category=category,
             target_section=section,
             priority=validated_data['priority'],
+            start_time=start_time,
             deadline=deadline,
             remind=remind,
         )
@@ -437,15 +449,18 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             logger.error('Sectionが見つかりませんでした。')
             return None
 
+        st_str = validated_data['start_time_str']
         dl_str = validated_data['deadline_str']
         rm_str = validated_data['remind_str']
 
+        start_time = datetime.strptime(st_str, '%Y-%m-%d %H:%M:%S') if st_str != '' else None
         deadline = datetime.strptime(dl_str, '%Y-%m-%d %H:%M:%S') if dl_str != '' else None
         remind = datetime.strptime(rm_str, '%Y-%m-%d %H:%M:%S') if rm_str != '' else None
 
         instance.content = validated_data['content']
         instance.comment = validated_data['comment']
         instance.priority = validated_data['priority']
+        instance.start_time = start_time
         instance.deadline = deadline
         instance.remind = remind
 

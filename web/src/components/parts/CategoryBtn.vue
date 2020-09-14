@@ -21,7 +21,7 @@
         <v-menu
             :close-on-content-click="false"
             offset-x
-            min-width="200px"
+            min-width="350px"
             max-height="380px"
             transition="scroll-y-transition"
             v-model="menu"
@@ -39,80 +39,96 @@
                     </v-btn>
                 </div>
             </template>
-            <v-list
-                dense
-            >
-                <vs-input
-                    class="px-3 mt-3"
-                    size="small"
-                    placeholder="カテゴリー名を検索"
-                    v-model="filterValue"
-                ></vs-input>
-                <v-list-item-group>
-                    <!-- フィルター絞る前 -->
-                    <div v-if="filterValue.length === 0">
-                        <div
-                            v-for="(category, i) in categorys"
-                            :key="i"
-                        >
-                            <v-list-item
-                                class="category_name"
-                                @click="selectCategory(category)"
-                            >
-                                <v-icon
-                                    class="mr-2"
-                                    :color="category.color"
-                                >mdi-circle-medium</v-icon>
-                                {{ category.name }}
-                            </v-list-item>
-                            <v-list-item
-                                class="pl-8"
-                                v-for="(section, i) in category.sections"
+            <v-card>
+                <v-card-title>
+                    <h5>
+                        カテゴリー設定
+                    </h5>
+                </v-card-title>
+                <v-list
+                    dense
+                >
+                    <vs-input
+                        class="px-5 mt-3 mb-2"
+                        size="small"
+                        placeholder="カテゴリー名を検索"
+                        v-model="filterValue"
+                    ></vs-input>
+                    <v-list-item-group>
+                        <!-- フィルター絞る前 -->
+                        <div v-if="filterValue.length === 0">
+                            <div
+                                v-for="(category, i) in categorys"
                                 :key="i"
-                                @click="selectCategory(section)"
                             >
-                                <v-icon
-                                    class="mr-2"
-                                    color="grey lighten-1"
-                                >mdi-rhombus-medium-outline</v-icon>
-                                {{ section.name }}
-                            </v-list-item>
+                                <v-list-item
+                                    class="category_name"
+                                    @click="selectCategory(category)"
+                                >
+                                    <v-icon
+                                        class="mr-2"
+                                        :color="category.color"
+                                    >mdi-circle-medium</v-icon>
+                                    {{ category.name }}
+                                </v-list-item>
+                                <v-list-item
+                                    class="pl-8"
+                                    v-for="(section, i) in category.sections"
+                                    :key="i"
+                                    @click="selectCategory(section)"
+                                >
+                                    <v-icon
+                                        class="mr-2"
+                                        color="grey lighten-1"
+                                    >mdi-rhombus-medium-outline</v-icon>
+                                    {{ section.name }}
+                                </v-list-item>
+                            </div>
                         </div>
-                    </div>
-                    <!-- フィルター絞る前ここまで -->
-                    <!-- フィルター絞る -->
-                    <div v-else>
-                        <div
-                            v-for="(item, i) in filteredItems"
-                            :key="i"
-                        >
-                            <v-list-item
-                                v-if="item.isCategory"
-                                class="category_name"
-                                @click="selectCategory(item)"
-                            >
-                                <v-icon
-                                    class="mr-2"
-                                    :color="item.color"
-                                >mdi-circle-medium</v-icon>
-                                {{ item.name }}
-                            </v-list-item>
-                            <v-list-item
-                                v-else
-                                class="category_name"
-                                @click="selectCategory(item)"
-                            >
-                                <v-icon
-                                    class="mr-3"
-                                    color="grey lighten-1"
-                                >mdi-square-medium-outline</v-icon>
-                                {{ item.name }}
-                            </v-list-item>
+                        <!-- フィルター絞る前ここまで -->
+                        <!-- フィルター絞る -->
+                        <div v-else>
+                            <div v-if="filteredItems.length === 0">
+                                <v-list-item
+                                    class="no_data_available"
+                                >
+                                    No data available
+                                </v-list-item>
+                            </div>
+                            <div v-else>
+                                <div
+                                    v-for="(item, i) in filteredItems"
+                                    :key="i"
+                                >
+                                    <v-list-item
+                                        v-if="item.isCategory"
+                                        class="category_name"
+                                        @click="selectCategory(item)"
+                                    >
+                                        <v-icon
+                                            class="mr-2"
+                                            :color="item.color"
+                                        >mdi-circle-medium</v-icon>
+                                        {{ item.name }}
+                                    </v-list-item>
+                                    <v-list-item
+                                        v-else
+                                        class="category_name"
+                                        @click="selectCategory(item)"
+                                    >
+                                        <v-icon
+                                            class="mr-3"
+                                            color="grey lighten-1"
+                                        >mdi-square-medium-outline</v-icon>
+                                        {{ item.name }}
+                                    </v-list-item>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <!-- フィルター絞るここまで -->
-                </v-list-item-group>
-            </v-list>
+                        <!-- フィルター絞るここまで -->
+                    </v-list-item-group>
+                </v-list>
+            </v-card>
         </v-menu>
     </div>
 </template>
@@ -177,6 +193,7 @@
                         }
                     }
                 }
+                console.log(this.filteredItems.length)
             },
             category: {
                 handler: function (val) {
@@ -242,9 +259,22 @@
         },
     }
 </script>
-<style lang='scss'>
+<style lang='scss' scoped>
+    .vs-input-parent::v-deep {
+        .vs-input {
+            width: 100%;
+        }
+    }
     .category_name {
         padding-top: 15px;
         height: 48px;
+    }
+    .v-card__title {
+        height: 50px;
+    }
+    .no_data_available {
+        display: block;
+        text-align: center;
+        margin: 20px auto 0;
     }
 </style>

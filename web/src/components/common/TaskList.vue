@@ -9,7 +9,10 @@
             >
                 <vs-checkbox
                     color="primary"
+                    v-model="complete_tasks"
+                    :val="task.id"
                     @change="checkTask(task)"
+                    line-through
                 ></vs-checkbox>
             </v-list-item-action>
             <v-list-item-content>
@@ -38,6 +41,7 @@
             'tasks',
         ],
         data: () => ({
+            complete_tasks: [],
         }),
         mounted: function () {
         },
@@ -48,24 +52,27 @@
     	},
         methods: {
             ...mapMutations([
-                'deleteTask',
+                'deleteTasks',
+                'addCompleteTasks',
             ]),
-            checkTask (task) {
+            checkTask: _.debounce(function checkTask (task) {
                 this.$axios({
                     url: '/api/task/complete/',
                     method: 'POST',
                     data: {
-                        task_id: task.id,
+                        task_id: this.complete_tasks,
                     }
                 })
                 .then(res => {
                     console.log(res)
-                    setTimeout(this.deleteTask, 600, res.data)
+                    this.deleteTasks(res.data)
+                    this.addCompleteTasks(res.data)
                 })
                 .catch(e => {
                     console.log(e)
                 })
-            },
+                this.complete_tasks = []
+            }, 800),
         },
     }
 </script>

@@ -114,10 +114,6 @@ export default new Vuex.Store({
 			if (payload.target_section === 0) {
 				// カテゴリーのタスクに追加
 				state.detailCategory.tasks.push(payload)
-
-				// 全体の該当カテゴリー
-				// const category = state.categorys.find(category => category.id === payload.target_category)
-				// category.sections.push(payload)
 			} else {
 				// セクションのタスクに追加
 				console.log('セクションのタスクに追加')
@@ -135,15 +131,20 @@ export default new Vuex.Store({
 				const index = section.tasks.findIndex(task => task.id === payload.id)
 				if (index !== -1) section.tasks = section.tasks.filter((_, i) => i !== index)
 			}
-
-	        // 全体の該当カテゴリー
-	        // const category = state.categorys.find(category => category.id === state.detailCategory.id)
-	        // const j = category.tasks.findIndex(task => task.id === payload)
-	        // if (j !== -1) category.tasks = category.tasks.filter((_, i) => i !== j)
 	    },
+		deleteTasks (state, payload) {
+			for (const i in payload) {
+				if (payload[i].target_section === 0) {
+					const index = state.detailCategory.tasks.findIndex(task => task.id === payload[i].id)
+					if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
+				} else {
+					const section = state.detailCategory.sections.find(section => section.id === payload[i].target_section)
+					const index = section.tasks.findIndex(task => task.id === payload[i].id)
+					if (index !== -1) section.tasks = section.tasks.filter((_, i) => i !== index)
+				}
+			}
+		},
 		updateTask (state, payload) {
-			console.log('updateTask')
-			console.log(payload)
 			if (payload.target_section === 0) {
 				const index = state.detailCategory.tasks.findIndex(task => task.id === payload.id)
 				Vue.set(state.detailCategory.tasks, index, payload)
@@ -153,6 +154,14 @@ export default new Vuex.Store({
 				Vue.set(section.tasks, index, payload)
 			}
 		},
+		addCompleteTask (state, payload) {
+			state.detailCategory.complete_tasks.push(payload)
+		},
+		addCompleteTasks (state, payload) {
+			for (const i in payload) {
+				state.detailCategory.complete_tasks.push(payload[i])
+			}
+		}
 	},
 	actions: {
 		// アプリ画面初期描画時の処理

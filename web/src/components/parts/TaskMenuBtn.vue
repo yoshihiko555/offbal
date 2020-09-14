@@ -110,6 +110,7 @@
                     comment: task.comment,
                     priority: task.priority,
                     label_list: [],
+                    start_time_str: task.start_time,
                     deadline_str: task.deadline,
                     remind_str: task.remind,
                 }
@@ -142,6 +143,7 @@
                     section_id: 0,
                     content: '',
                     comment: '',
+                    start_time_str: '',
                     deadline_str: '',
                     remind_str: '',
                     priority: '1',
@@ -156,6 +158,7 @@
                     comment: this.task.comment,
                     priority: this.task.priority,
                     label_list: [],
+                    start_time_str: this.task.start_time,
                     deadline_str: this.task.deadline,
                     remind_str: this.task.remind,
                 }

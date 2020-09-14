@@ -35,7 +35,9 @@
             ref='edit'
             @close-edit='closeEdit'
         />
-
+        <CompleteTaskList
+            :complete_tasks=detailCategory.complete_tasks
+        />
         <div class='today_todo_count_wrap pr-2'>
             <vs-button
                 icon
@@ -59,6 +61,7 @@
     import TaskList from '@/components/common/TaskList'
     import SectionList from '@/components/common/SectionList'
     import CreateTaskField from '@/components/parts/CreateTaskField'
+    import CompleteTaskList from '@/components/common/CompleteTaskList'
 
     import { mapGetters, mapActions } from 'vuex'
 
@@ -74,6 +77,7 @@
             TaskList,
             SectionList,
             CreateTaskField,
+            CompleteTaskList,
         },
         data: () => ({
             isCreateBtn: true,        // セクション追加ボタン

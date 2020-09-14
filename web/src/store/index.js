@@ -157,20 +157,24 @@ export default new Vuex.Store({
 	actions: {
 		// アプリ画面初期描画時の処理
 		appInitAction (ctx, kwargs) {
-        	Vue.prototype.$axios({
-        		url: '/api/appinit/',
-        		method: 'GET',
-        	})
-        	.then(res => {
-        		console.log('アプリ初期描画', res)
-				this.commit('setCategorys', res.data.categorys)
-				this.commit('setFavoriteCategorys', res.data.categorys)
-				this.commit('setArchivedCategorys', res.data.categorys)
-				this.commit('setLabels', res.data.labels)
-        	})
-        	.catch(e => {
-        		console.log(e)
-        	})
+			return new Promise((resolve, reject) => {
+	        	Vue.prototype.$axios({
+	        		url: '/api/appinit/',
+	        		method: 'GET',
+	        	})
+	        	.then(res => {
+	        		console.log('アプリ初期描画', res)
+					this.commit('setCategorys', res.data.categorys)
+					this.commit('setFavoriteCategorys', res.data.categorys)
+					this.commit('setArchivedCategorys', res.data.categorys)
+					this.commit('setLabels', res.data.labels)
+					resolve(res)
+	        	})
+	        	.catch(e => {
+	        		console.log(e)
+	        		reject(e)
+	        	})
+			})
 		},
 		// カテゴリー一覧取得
 //		getCategorysAction (ctx, kwargs) {

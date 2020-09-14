@@ -24,12 +24,12 @@ export default {
 				// auth0_idを格納
 				if (config.method === 'get') {
 					config.params = config.params || {}
-                    config.params.auth0_id = AuthService.getUserId()
+                    config.params.auth0_id = AuthService.getAuth0Id()
                 } else if (config.method === 'delete') {
                     // deleteは何もしない
 				} else {
 					// それ以外は全てdataにauth0_idを格納
-					config.data.auth0_id = AuthService.getUserId()
+					config.data.auth0_id = AuthService.getAuth0Id()
 				}
 			}
 		 	return config

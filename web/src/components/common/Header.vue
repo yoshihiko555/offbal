@@ -17,35 +17,23 @@
 		            	SignIn
 		            </vs-button>
 		            <vs-button
-		            	@click='test'
+		            	@click='updateUsermetadata'
 		            >
-		            	test
-		            </vs-button>
-
-		            <vs-button
-		            	dark
-		            	v-show='isAuth'
-		            	@click='signout'
-		            >
-		            	SignOut
+		            	update
 		            </vs-button>
 	            </div>
             </v-row>
         </v-app-bar>
-
-        <SelectCategoryDialog ref='selectCategory'/>
     </div>
 </template>
 
 <script>
-import SelectCategoryDialog from '@/components/common/SelectCategoryDialog'
 import AuthService from '@/auth/AuthService'
 const auth = new AuthService()
 
 export default {
     name: 'Header',
     components: {
-        SelectCategoryDialog,
     },
     data: () => ({
 		isAuth: false,
@@ -69,7 +57,8 @@ export default {
                 		if (!res[namespace].signup) {
                             // サインアップなので初期データ作成
                             // this.initUserData(res.sub, res.name)
-                            this.openselectCategory(res.sub, res.name)
+                            // this.openSelectCategory()
+                            this.$router.push('/init-select-category')
                         } else {
                             // サインインなのでそのままアプリ画面へ
                             if (!this.isAuth) this.$router.push('/')
@@ -87,9 +76,6 @@ export default {
     methods: {
     	signin () {
     		auth.login()
-    	},
-    	signout () {
-    		auth.logout()
     	},
         // handleAuthentication () {
   	    // 	auth.handleAuthentication()
@@ -112,11 +98,11 @@ export default {
    	    // 		console.log(e)
    	    // 	})
         // },
-        openselectCategory (id, name) {
-            this.$refs.selectCategory.open(id, name)
-        },
-        test () {
-            auth.usermetaUpdate()
+        // openSelectCategory () {
+           // this.$refs.selectCategory.open()
+        // },
+        updateUsermetadata () {
+            auth.updateUsermetadata()
         }
     }
 }

@@ -33,18 +33,19 @@
         }),
         created () {
         	this.appInitAction()
-            // this.getCategorysAction()
-            // this.getFavoriteCategorysAction()
-            // this.getLabelsAction()
+        	.then(res => {
+        		console.log(res)
+        	})
+        	.catch(e => {
+        		console.log(e.response)
+        		if (!e.response.data.result) this.$router.push('/init-select-category')
+        	})
         },
         computed: {
         },
         methods: {
             ...mapActions([
             	'appInitAction',
-                // 'getCategorysAction',
-                // 'getFavoriteCategorysAction',
-                // 'getLabelsAction',
             ]),
         },
     }

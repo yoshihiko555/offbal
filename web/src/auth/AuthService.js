@@ -12,7 +12,7 @@ export default class AuthService {
         this.logout = this.logout.bind(this)
         this.isAuthenticated = this.isAuthenticated.bind(this)
         this.handleAuthentication = this.handleAuthentication.bind(this)
-        this.usermetaUpdate = this.usermetaUpdate.bind(this)
+        this.updateUsermetadata = this.updateUsermetadata.bind(this)
     }
 
     // auth0.WebAuth のインスタンスをAPI および Client
@@ -21,22 +21,22 @@ export default class AuthService {
         domain: 'dev-orr54nx8.us.auth0.com',
         clientID: 'PBarwrwjyH8XR7ItR9dTVKilLZRhhEeh',
         redirectUri: 'http://localhost:8080',
+        // audience: 'https://dev-orr54nx8.us.auth0.com/api/v2/',
         audience: 'https://offbal-api.com.br',
         responseType: 'token id_token',
-        scope: 'openid profile email update:current_user_metadata'
+        scope: 'openid profile email'
     });
 
-    auth0Manage = new auth0.Management({
-        domain: 'dev-orr54nx8.us.auth0.com',
-        token: '',
-    })
-
-    usermetaUpdate () {
-        this.auth0Manage.token = AuthService.getAuthToken()
-        const userId = AuthService.getUserId()
-        const userMetadata = { test: 'hoge' }
-        console.log(this.auth0Manage)
-        this.auth0Manage.patchUserMetadata(userId, userMetadata, function (err, res) {
+    updateUsermetadata () {
+        const auth0Manage = new auth0.Management({
+            domain: 'dev-orr54nx8.us.auth0.com',
+            token: AuthService.getAuthToken(),
+        })
+        const userId = AuthService.getAuth0Id()
+        const userMetadata = { signup: false }
+        console.log('Manage情報', auth0Manage)
+        console.log('auth0情報', this.auth0)
+        auth0Manage.patchUserMetadata(userId, userMetadata, function (err, res) {
             if (err) {
                 console.log(err)
             } else {
@@ -75,6 +75,7 @@ export default class AuthService {
         localStorage.setItem('id_token', authResult.idToken)
         localStorage.setItem('expires_at', expiresAt)
         localStorage.setItem('auth0_id', authResult.idTokenPayload.sub)
+        localStorage.setItem('username', authResult.idTokenPayload.name)
         this.authNotifier.emit('authChange', { authenticated: true })
     }
 
@@ -85,6 +86,7 @@ export default class AuthService {
         localStorage.removeItem('id_token')
         localStorage.removeItem('expires_at')
         localStorage.removeItem('auth0_id')
+        localStorage.removeItem('username')
         this.authNotifier.emit('authChange', false)
         // ホームルートに移動する
          if (router.currentRoute.fullPath !== '/') {
@@ -105,9 +107,14 @@ export default class AuthService {
         return localStorage.getItem('access_token')
     }
 
-    // UserIdを取得する静的メソッド
-    static getUserId () {
+    // Auth0Idを取得する静的メソッド
+    static getAuth0Id () {
     	return localStorage.getItem('auth0_id')
+    }
+
+    // Usernameを取得する静的メソッド
+    static getUserName () {
+    	return localStorage.getItem('username')
     }
 
     // ユーザー プロファイルを得るメソッド

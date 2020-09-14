@@ -16,4 +16,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('signup/', views.SignupView.as_view(), name='signup'),
     path('appinit/', views.AppInitView.as_view(), name='appinit'),
+    path('default-categorys/', views.DefaultCategorysView.as_view(), name='default-categorys'),
 ]

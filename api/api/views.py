@@ -14,6 +14,7 @@ from .models import (
     SubTask,
     Label,
     Karma,
+    DefaultCategory,
 )
 from .serializers import (
     UserSerializer,
@@ -23,7 +24,8 @@ from .serializers import (
     SectionSerializer,
     TaskSerializer,
     LabelSerializer,
-    KarmaSerializer
+    KarmaSerializer,
+    DefaultCategorySerializer,
 )
 
 from .mixins import (
@@ -65,20 +67,38 @@ class AppInitView(generics.ListAPIView, GetLoginUserMixin):
     permission_classes = (permissions.AllowAny,)
 
     def list(self, request, *args, **kwargs):
+        logger.info(request.query_params)
         self.set_auth0_id(request)
-        user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
-        categorys = Category.objects.filter(creator=user)
-        # categorys = Category.objects.filter(creator=user).order_by('musercategoryrelation__index')
-        category_serializer = CategorySerializer(categorys, many=True, context={ 'view' : self })
-        labels = Label.objects.filter(author=user)
-        label_serializer = LabelSerializer(labels, many=True, context={ 'view' : self })
-        karmas = Karma.objects.filter(target_user=user)
-        karma_serializer = KarmaSerializer(karmas, many=True, context={ 'view' : self })
-        return Response(
-            {
-                'categorys': category_serializer.data,
-                'labels': label_serializer.data,
-                'karma': karma_serializer.data,
-            },
-            status=status.HTTP_200_OK
-        )
+        try:
+            user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+            categorys = Category.objects.filter(creator=user)
+            # categorys = Category.objects.filter(creator=user).order_by('musercategoryrelation__index')
+            category_serializer = CategorySerializer(categorys, many=True, context={ 'view' : self })
+            labels = Label.objects.filter(author=user)
+            label_serializer = LabelSerializer(labels, many=True, context={ 'view' : self })
+            karmas = Karma.objects.filter(target_user=user)
+            karma_serializer = KarmaSerializer(karmas, many=True, context={ 'view' : self })
+            return Response(
+                {
+                    'categorys': category_serializer.data,
+                    'labels': label_serializer.data,
+                    'karma': karma_serializer.data,
+                    'result': True,
+                },
+                status=status.HTTP_200_OK
+            )
+        except:
+            logger.info('初期化が完了していない')
+            return Response(
+                {
+                    'result': False,
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class DefaultCategorysView(generics.ListAPIView, GetLoginUserMixin):
+    permission_classes = (permissions.AllowAny,)
+    queryset = DefaultCategory.objects.all()
+    serializer_class = DefaultCategorySerializer
+

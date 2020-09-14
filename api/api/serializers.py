@@ -11,6 +11,7 @@ from .models import (
     SubTask,
     Label,
     Karma,
+    DefaultCategory,
 )
 
 import logging
@@ -520,3 +521,11 @@ class KarmaSerializer(DynamicFieldsModelSerializer):
 
     def get_updated_at(self, obj):
         return utc_to_jst(obj.updated_at)
+
+
+class DefaultCategorySerializer(DynamicFieldsModelSerializer):
+    class Meta:
+        model = DefaultCategory
+        fields = '__all__'
+
+

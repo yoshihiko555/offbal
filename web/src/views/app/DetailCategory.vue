@@ -2,9 +2,9 @@
     <div id='category-list'>
         <div class="detail_category_header">
             <h1 class="category_title">{{ detailCategory.name }}</h1>
-            <DetailCategoryMenuBtn
+            <!-- <DetailCategoryMenuBtn
                 @open-create='openCreate'
-            />
+            /> -->
             <v-spacer/>
             <div class='operation_btn_wrap pr-2'>
                 <FilterBtn/>

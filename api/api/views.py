@@ -73,7 +73,7 @@ class AppInitView(generics.ListAPIView, GetLoginUserMixin):
         self.set_auth0_id(request)
         try:
             user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
-            categorys = Category.objects.filter(creator=user).order_by('index')
+            categorys = Category.objects.filter(creator=user, is_active=True).order_by('index')
             category_serializer = CategorySerializer(categorys, many=True, context={ 'view' : self })
             labels = Label.objects.filter(author=user)
             label_serializer = LabelSerializer(labels, many=True, context={ 'view' : self })
@@ -88,7 +88,8 @@ class AppInitView(generics.ListAPIView, GetLoginUserMixin):
                 },
                 status=status.HTTP_200_OK
             )
-        except:
+        except Exception as e:
+            logger.info(e)
             logger.info('初期化が完了していない')
             return Response(
                 {
@@ -112,6 +113,7 @@ class DefaultCategorysView(generics.ListAPIView, GetLoginUserMixin):
             logger.info('初期化が完了している')
             return Response(
                 {
+                    'default_categorys': serializer.data,
                     'result': False,
                 },
                 status=status.HTTP_200_OK

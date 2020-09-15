@@ -48,15 +48,20 @@
                     </v-list-item>
                 </draggable>
 	 		</v-list>
+             <vs-button @click="changeCategory">カテゴリーを入れ替える</vs-button>
 		</v-navigation-drawer>
 
         <!-- モーダル読み込み -->
-        <CreateCategoryDialog
+        <!-- <CreateCategoryDialog
             ref='category'
-        />
+        /> -->
 
         <CreateLabelDialog
             ref='label'
+        />
+
+        <ChangeCategoryDialog
+            ref='category'
         />
     </div>
 </template>
@@ -67,6 +72,7 @@
     import CreateLabelDialog from '@/components/common/CreateLabelDialog'
     import SidebarArchiveMenuBtn from '@/components/parts/SidebarArchiveMenuBtn'
     import draggable from 'vuedraggable'
+    import ChangeCategoryDialog from '@/components/common/ChangeCategoryDialog'
 
     import { mapGetters, mapMutations } from 'vuex'
     import _ from 'lodash'
@@ -81,6 +87,7 @@
             CreateLabelDialog,
             SidebarArchiveMenuBtn,
             draggable,
+            ChangeCategoryDialog
         },
         data () {
             return {
@@ -140,9 +147,12 @@
             createLabel () {
                 this.$refs.label.open()
             },
+            changeCategory () {
+                this.$refs.category.open()
+            },
             end: _.debounce(function end (e) {
                 this.$axios({
-                    url: '/api/category/updateCategoryIndex/',
+                    url: '/api/category/update_category_index/',
                     method: 'PUT',
                     data: {
                         categorys: this.localCategorys,

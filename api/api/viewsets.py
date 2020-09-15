@@ -148,7 +148,7 @@ class CategoryViewSet(BaseModelViewSet):
         return Response({'status': 'success', 'result': False}, status=status.HTTP_200_OK)
 
     @action(methods=['PUT'], detail=False)
-    def updateCategoryIndex(self, request, pk=None):
+    def update_category_index(self, request, pk=None):
         self.auth0_id = request.data['auth0_id']
         user = mUser.objects.get(auth0_id=request.data['auth0_id'])
         categorys = []
@@ -169,12 +169,56 @@ class CategoryViewSet(BaseModelViewSet):
         serializer = self.get_serializer(category)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(methods=['PUT'], detail=False)
+    def change_categorys(self, request, pk=None):
+        self.auth0_id = request.data['auth0_id']
+        user = mUser.objects.get(auth0_id=request.data['auth0_id'])
+        user_categorys = user.category_creator_user.all()
+        # 存在しないカテゴリーを作成する処理
+        create_categorys = []
+        for category in request.data['categorys']:
+            if not user_categorys.filter(name=category['name']).exists():
+                create_categorys.append(Category(
+                    creator=user,
+                    name=category['name'],
+                    color=category['color'],
+                    icon=category['icon'],
+                    index=self.autoincrement(user)
+                ))
+        logger.info('追加で作成するカテゴリー')
+        logger.info(create_categorys)
+        Category.objects.bulk_create(create_categorys)
+
+        # 選択されなかったカテゴリーのis_activeを更新
+        update_categorys = []
+        for user_category in user_categorys:
+            flg = True
+            for category in request.data['categorys']:
+                if user_category.name == category['name']:
+                    flg = False
+                    break
+            if flg:
+                # 選択されなかった
+                user_category.is_active = False
+                update_categorys.append(user_category)
+            else:
+                # 選択された
+                user_category.is_active = True
+                update_categorys.append(user_category)
+
+        logger.info('更新するカテゴリー')
+        logger.info(update_categorys)
+        Category.objects.bulk_update(update_categorys, fields=['is_active'])
+        res = user_categorys.filter(is_active=True).order_by('index')
+        serializer = self.get_serializer(res, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     def autoincrement(self, user):
         '''
         対象ユーザーが関与するカテゴリー総数 + 1を返却する
         '''
-        res = user.category_member.all().count() + 1
+        res = user.category_creator_user.all().count() + 1
         return res
 
 class SectionViewSet(BaseModelViewSet):

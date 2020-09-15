@@ -17,6 +17,7 @@ from .serializers import (
     CategoryMemberShipSerializer,
     SectionSerializer,
     TaskSerializer,
+    SubTaskSerializer,
     LabelSerializer,
     KarmaSerializer
 )
@@ -223,7 +224,7 @@ class TaskViewSet(BaseModelViewSet):
         """
         該当タスクの完了フラグを立てるアクション
         """
-        complete_task_id_list = request.data['task_id']
+        complete_task_id_list = request.data['complete_task_id_list']
         complete_task_list = []
         try:
             for i in complete_task_id_list:
@@ -237,6 +238,57 @@ class TaskViewSet(BaseModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(self.get_serializer(complete_task_list, many=True).data, status=status.HTTP_200_OK)
 
+
+class SubTaskViewSet(BaseModelViewSet):
+
+    permission_classes = (permissions.AllowAny,)
+    queryset = SubTask.objects.all()
+    serializer_class = SubTaskSerializer
+
+    def create(self, request, *args, **kwargs):
+
+        logger.debug("create")
+        logger.debug(request.data)
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(self.get_serializer(serializer.instance).data, status=status.HTTP_201_CREATED)
+
+        logger.debug(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['POST'], detail=False)
+    def complete(self, request):
+        """
+        該当サブタスクの完了フラグを立てるアクション
+            完了したサブタスクIDリストを返す
+        """
+        task_id = request.data['task_id']
+        compelete_sub_task_id_list = request.data['compelete_sub_task_id_list']
+        sub_task_list = []
+        # complete_sub_task_list = []
+        try:
+            task = Task.objects.get(pk=task_id)
+            subTasks = task.subtask_target_task.all().iterator()
+            for subTask in subTasks:
+                if subTask.id in compelete_sub_task_id_list:
+                    subTask.completed = True
+                    if subTask.completed_at == None: subTask.completed_at = timezone.datetime.now()
+                    # complete_sub_task_list.append(subTask)
+                else:
+                    subTask.completed = False
+                    subTask.completed_at = None
+                sub_task_list.append(subTask)
+            SubTask.objects.bulk_update(sub_task_list, ['completed', 'completed_at'])
+        except Task.DoesNotExist:
+            logger.error('タスクが見つかりませんでした。')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'target_task': task_id,
+            'sub_task_list': compelete_sub_task_id_list
+        }, status=status.HTTP_200_OK)
 
 
 class LabelViewSet(BaseModelViewSet):

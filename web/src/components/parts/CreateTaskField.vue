@@ -2,9 +2,9 @@
     <div
         class="create_task_field_wrap"
     >
-        <v-form
+        <!-- <v-form
             @submit.prevent
-        >
+        > -->
             <v-row
                 class="mx-5 mt-5 mb-2"
             >
@@ -12,10 +12,11 @@
                     v-model="task.content"
                     placeholder="新規タスクを追加"
                     @keyup.enter="create"
+                    @keypress="setCreate"
                 >
                 </vs-input>
             </v-row>
-        </v-form>
+        <!-- </v-form> -->
     </div>
 </template>
 
@@ -42,11 +43,13 @@
                 section_id: 0,
                 content: '',
                 comment: '',
+                start_time_str: '',
                 deadline_str: '',
                 remind_str: '',
                 priority: '1',
                 label_list: [],
             },
+            taskSubmitValue: false
         }),
         created () {
         },
@@ -54,8 +57,12 @@
             ...mapMutations([
                 'addTask',
             ]),
+            setCreate () {
+                this.taskSubmitValue = true
+            },
             create () {
-                if (this.task.content.length === 0) return
+                const length = this.task.content.length
+                if (length === 0 || !this.taskSubmitValue) return
                 this.task.category_id = this.category.id
                 this.$axios({
                     url: '/api/task/',
@@ -70,6 +77,7 @@
                     console.log(e)
                 })
                 this.init()
+                this.taskSubmitValue = false
             },
             init () {
                 this.task = {
@@ -77,6 +85,7 @@
                     section_id: 0,
                     content: '',
                     comment: '',
+                    start_time_str: '',
                     deadline_str: '',
                     remind_str: '',
                     priority: '1',

@@ -10,75 +10,76 @@
             >
                 新規タスクを追加
             </h5>
-            <ValidationObserver v-slot="{ invalid }">
-                <!-- <v-form
-                    @submit.prevent
-                > -->
-                    <v-row
-                        class="task_dialog_task_area_wrap"
+            <ValidationObserver ref="task" v-slot="{ invalid }">
+                <v-row
+                    class="task_dialog_task_area_wrap"
+                >
+                    <v-col
+                        cols="11"
+                        class="task_dialog_task_input_area"
                     >
-                        <v-col
-                            cols="11"
-                            class="task_dialog_task_input_area"
-                        >
-                            <ValidationProvider v-slot="{ errors }" name='タスク' rules="required">
-                                <v-textarea
-                                    class="mt-3"
-                                    outlined
-                                    label="例: 英単語、プログラミング、ブログ、読書"
-                                    v-model="task.content"
-                                    rows="5"
-                                    no-resize
-                                    :counter="100"
-                                >
-                                    <template #message-danger>
-                                        {{ errors[0] }}
-                                    </template>
-                                </v-textarea>
-                            </ValidationProvider>
-                        </v-col>
-                        <v-col
-                            cols="1"
-                            class="task_dialog_btn_area"
-                        >
-                            <StartTimeBtn/>
-                            <DeadLineBtn/>
-                            <CategoryBtn
-                                :defaultCategoryId=detailCategory.id
-                            />
-                            <LabelBtn/>
-                            <PriorityBtn/>
-                            <ReminderBtn/>
-                        </v-col>
-                    </v-row>
-                    <v-row>
-                        <v-col
-                            cols="9"
-                        >
-                            <vs-input
-                                class="mt-1"
-                                v-model="task.comment"
-                                placeholder="コメント"
+                        <ValidationProvider v-slot="{ errors }" name='タスク' rules="required">
+                            <v-textarea
+                                class="mt-3"
+                                outlined
+                                label="例: 英単語、プログラミング、ブログ、読書"
+                                v-model="task.content"
+                                rows="5"
+                                no-resize
+                                :counter="100"
                             >
-                                <template #icon>
-                                    <v-icon
-                                        color="teal accent-3"
-                                    >mdi-comment-outline</v-icon>
+                                <template #message-danger>
+                                    {{ errors[0] }}
                                 </template>
-                            </vs-input>
-                        </v-col>
-                        <v-col
-                            cols="3"
+                            </v-textarea>
+                        </ValidationProvider>
+                    </v-col>
+                    <v-col
+                        cols="1"
+                        class="task_dialog_btn_area"
+                    >
+                        <StartTimeBtn/>
+                        <DeadLineBtn/>
+                        <CategoryBtn
+                            :defaultCategoryId=detailCategory.id
+                        />
+                        <LabelBtn/>
+                        <PriorityBtn/>
+                        <ReminderBtn/>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col
+                        cols="9"
+                    >
+                        <vs-input
+                            class="mt-1"
+                            v-model="task.comment"
+                            placeholder="コメント"
                         >
-                            <vs-button
-                                relief
-                                color="#40e0d0"
-                                :disabled="invalid"
-                                @click.prevent="addLocalTask"
-                            >タスクを追加</vs-button>
-                        </v-col>
-                    </v-row>
-                <!-- </v-form> -->
+                            <template #icon>
+                                <v-icon
+                                    color="teal accent-3"
+                                >mdi-comment-outline</v-icon>
+                            </template>
+                        </vs-input>
+                    </v-col>
+                    <v-col
+                        cols="3"
+                    >
+                        <vs-button
+                            relief
+                            color="#40e0d0"
+                            :disabled="invalid"
+                            @click.prevent="addLocalTask"
+                        >
+                            タスクを追加
+                            <template #animate>
+                                <i class="bx bxs-paper-plane"></i> 送信
+                            </template>
+                        </vs-button>
+                    </v-col>
+                </v-row>
             </ValidationObserver>
         </v-container>
     </vs-dialog>

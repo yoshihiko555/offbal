@@ -193,7 +193,6 @@
                         }
                     }
                 }
-                console.log(this.filteredItems.length)
             },
             category: {
                 handler: function (val) {

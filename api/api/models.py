@@ -392,6 +392,29 @@ class Task(TimeStampModel,
 
     is_comp_sub_public = models.BooleanField(default=False)
 
+    label = models.ManyToManyField(
+        'api.Label',
+        blank=True
+    )
+
+    class Priority(models.TextChoices):
+        ONE = '1', _('One')
+        TWO = '2', _('Two')
+        THREE = '3', _('Three')
+        FOUR = '4', _('Four')
+        FIVE = '5', _('Five')
+
+    priority = models.CharField(
+        max_length=50,
+        choices=Priority.choices,
+        default=Priority.ONE
+    )
+
+    start_time = models.DateTimeField(null=True, blank=True)
+    deadline = models.DateTimeField(null=True, blank=True)
+    remind = models.DateTimeField(null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
+    
 
 class SubTask(TimeStampModel,
               TaskModel):

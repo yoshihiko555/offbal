@@ -1,5 +1,5 @@
 <template>
-    <div id='category-list'>
+    <div id='category-list' class="detail_category_wrap" :class="{ 'is-task-drawer': drawer }">
         <div class="detail_category_header">
             <h1 class="category_title">{{ detailCategory.name }}</h1>
             <DetailCategoryMenuBtn
@@ -38,16 +38,22 @@
         <CompleteTaskList
             :complete_tasks=detailCategory.complete_tasks
         />
-        <div class='today_todo_count_wrap pr-2'>
-            <vs-button
-                icon
-                relief
-                size="large"
-                to='/myapp/karma/'
-            >
-                <i class='bx bx-list-check'></i>2/5
-            </vs-button>
-        </div>
+        <v-row>
+            <v-spacer></v-spacer>
+            <div class='today_todo_count_wrap pr-2'>
+                <vs-button
+                    icon
+                    relief
+                    size="large"
+                    to='/myapp/karma/'
+                >
+                    <i class='bx bx-list-check'></i>2/5
+                </vs-button>
+            </div>
+        </v-row>
+        <TaskDetail
+            @toggleDrawer='drawer = !drawer'
+        />
     </div>
 </template>
 
@@ -62,6 +68,7 @@
     import SectionList from '@/components/common/SectionList'
     import CreateTaskField from '@/components/parts/CreateTaskField'
     import CompleteTaskList from '@/components/common/CompleteTaskList'
+    import TaskDetail from '@/components/common/TaskDetail'
 
     import { mapGetters, mapActions } from 'vuex'
 
@@ -78,11 +85,13 @@
             SectionList,
             CreateTaskField,
             CompleteTaskList,
+            TaskDetail,
         },
         data: () => ({
             isCreateBtn: true,        // セクション追加ボタン
             isCreateField: false,     // セクション追加フィールド
             isEditField: false,       // セクション更新フィールド
+            drawer: false,
         }),
         created () {
             this.getDetailCategoryAction(this.$route.params.id)
@@ -137,8 +146,18 @@
         }
     }
     .today_todo_count_wrap::v-deep {
-        position: absolute;
-        right: 0;
-        bottom: 0;
+        // position: absolute;
+        // right: 0;
+        // bottom: 0;
+    }
+    .detail_category_wrap {
+        max-width: calc(100% - 10px);
+        position: relative;
+        transition: .2s;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .is-task-drawer {
+        margin-right: 500px;
+        max-width: calc(100% - 500px);
     }
 </style>

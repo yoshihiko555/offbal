@@ -44,32 +44,33 @@
                     >
                         <h5>ラベル設定</h5>
                     </v-card-title>
-                    <ValidationObserver v-slot="{ invalid }">
-                        <ValidationProvider name="ラベル名" rules="required">
-                            <v-row>
-                                <v-col cols="8" class="top-left">
-                                    <vs-input
-                                        v-model="labelData.name"
-                                        placeholder="ラベルを追加"
-                                        class="add_label_input_area"
-                                    >
-                                    </vs-input>
-                                </v-col>
-                                <v-col cols="4" class="top-right">
-                                    <vs-button
-                                        relief
-                                        :disabled="invalid"
-                                        class="addLabelBtn"
-                                        @click.prevent="create"
-                                    >
+                        <v-row>
+                            <v-spacer></v-spacer>
+                            <v-col cols="7" class="top-left">
+                                <vs-input
+                                    v-model="labelData.name"
+                                    placeholder="ラベルを追加"
+                                    class="add_label_input_area"
+                                >
+                                </vs-input>
+                            </v-col>
+                            <v-col cols="4" class="top-right">
+                                <vs-button
+                                    relief
+                                    class="addLabelBtn"
+                                    :disabled="isDisabled"
+                                    @click="create"
+                                >
+                                    作成
+                                    <template #animate>
                                         <i class="bx bxs-paper-plane"></i> 送信
-                                    </vs-button>
-                                </v-col>
-                            </v-row>
-                        </ValidationProvider>
-                    </ValidationObserver>
+                                    </template>
+                                </vs-button>
+                            </v-col>
+                        </v-row>
                     <v-row>
-                        <v-col cols="12" class="middle">
+                        <v-spacer></v-spacer>
+                        <v-col cols="10" class="middle">
                             <v-card-actions
                                 class="label_select_area_wrap"
                             >
@@ -78,7 +79,7 @@
                                     v-model='selectLabelList'
                                     multiple
                                     filter
-                                    collapse-chips
+                                    chips
                                 >
                                     <vs-option
                                         v-for='(label, i) in labels'
@@ -91,6 +92,7 @@
                                 </vs-select>
                             </v-card-actions>
                         </v-col>
+                        <v-spacer></v-spacer>
                     </v-row>
                     <v-row>
                         <v-col cols="12" class="bottom">
@@ -159,6 +161,11 @@
                     multi = true
                 }
                 return res
+            },
+            isDisabled () {
+                // バリデーションどうするか
+                if (this.labelData.name.length > 0) return false
+                return true
             }
         },
         methods: {
@@ -203,15 +210,13 @@
         }
     }
     .top-left {
-        padding: 10px 0 0 30px;
     }
     .top-right {
-        padding: 10px 0 0 0;
         position: relative;
         top: -4px;
     }
     .middle {
-        padding: 0 20px 0;
+        padding: 0;
     }
     .bottom {
         padding: 0;

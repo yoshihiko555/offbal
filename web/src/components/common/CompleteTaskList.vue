@@ -13,7 +13,9 @@
                     v-for="(task, i) in complete_tasks"
                     :key="i"
                 >
-                    <v-list-item-title>
+                    <v-list-item-title
+                        class="ml-3"
+                    >
                         {{ task.content }}
                     </v-list-item-title>
                 </v-list-item>
@@ -25,9 +27,13 @@
     export default {
         name: 'CompleteTaskList',
         components: {},
-        props: [
-            'complete_tasks'
-        ],
+        props: {
+            complete_tasks: {
+                type: Array,
+                required: false,
+                default: () => ([])
+            },
+        },
         data: () => ({
         }),
         methods: {},

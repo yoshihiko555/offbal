@@ -161,6 +161,14 @@ export default new Vuex.Store({
 			for (const i in payload) {
 				state.detailCategory.complete_tasks.push(payload[i])
 			}
+		},
+		addSubTask (state, payload) {
+			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
+			task.sub_tasks.push(payload)
+		},
+		addCompleteSubTasks (state, payload) {
+			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
+			task.complete_sub_tasks = payload.sub_task_list
 		}
 	},
 	actions: {

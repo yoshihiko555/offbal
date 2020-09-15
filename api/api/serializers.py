@@ -298,7 +298,12 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     remind = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
+
+    # サブタスク全部（表示に使用)
     sub_tasks = serializers.SerializerMethodField()
+
+    # 完了したサブタスクのpkリスト（完了数カウント,チェックボックスの初期描画に使用）
+    complete_sub_tasks = serializers.SerializerMethodField()
     completed_at = serializers.SerializerMethodField()
 
     class Meta:
@@ -328,6 +333,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'created_at',
             'updated_at',
             'sub_tasks',
+            'complete_sub_tasks',
             'completed_at',
             'start_time',
             'start_time_str',
@@ -363,8 +369,11 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         return utc_to_jst(obj.completed_at)
 
     def get_sub_tasks(self, obj):
-        # とりあえず置いておく
-        return []
+        return SubTaskSerializer(obj.subtask_target_task.all(), many=True).data
+
+    def get_complete_sub_tasks(self, obj):
+        complete_sub_tasks = obj.subtask_target_task.all().filter(completed=True)
+        return [subtask.pk for subtask in complete_sub_tasks]
 
     def create(self, validated_data):
 
@@ -472,6 +481,54 @@ class TaskSerializer(DynamicFieldsModelSerializer):
 
         instance.save()
         return instance
+
+class SubTaskSerializer(DynamicFieldsModelSerializer):
+
+    created_at = serializers.SerializerMethodField()
+    updated_at = serializers.SerializerMethodField()
+    completed_at = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SubTask
+        fields = [
+            'id',
+            'target_task',
+            'content',
+            'completed',
+            'completed_at',
+            'created_at',
+            'updated_at',
+        ]
+
+    def get_created_at(self, obj):
+        return utc_to_jst(obj.created_at)
+
+    def get_updated_at(self, obj):
+        return utc_to_jst(obj.updated_at)
+
+    def get_completed_at(self, obj):
+        if obj.completed_at == None:
+            return ''
+        return utc_to_jst(obj.completed_at)
+
+    def create(self, validated_data):
+        logger.debug("サブタスクを作る")
+        logger.debug(validated_data)
+
+        content = validated_data['content']
+
+        try:
+            task = Task.objects.get(pk=validated_data['target_task'])
+        except Task.DoesNotExist:
+            logger.error('タスクが見つかりませんでした。')
+            return
+
+        subTask = SubTask.objects.create(
+            target_task=task,
+            content=content
+        )
+
+        return subTask
 
 
 class LabelSerializer(DynamicFieldsModelSerializer):

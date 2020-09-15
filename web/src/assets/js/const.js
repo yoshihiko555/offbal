@@ -42,12 +42,12 @@ class Const {
             isNest: true,
             route: 'DetailCategory',
         },
-        {
-            title: 'Label',
-            icon: 'mdi-label-multiple-outline',
-            isNest: true,
-            route: 'Labels',
-        },
+        // {
+        //     title: 'Label',
+        //     icon: 'mdi-label-multiple-outline',
+        //     isNest: true,
+        //     route: 'Labels',
+        // },
         {
             title: 'Activity',
             icon: 'mdi-bell-ring',

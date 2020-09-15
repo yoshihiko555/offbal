@@ -7,6 +7,7 @@ router.register('user', viewsets.UserViewSet)
 router.register('category', viewsets.CategoryViewSet)
 router.register('section', viewsets.SectionViewSet)
 router.register('task', viewsets.TaskViewSet)
+router.register('sub_task', viewsets.SubTaskViewSet)
 router.register('label', viewsets.LabelViewSet)
 router.register('karma', viewsets.KarmaViewSet)
 

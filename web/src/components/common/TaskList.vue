@@ -13,12 +13,25 @@
                     :val="task.id"
                     @change="checkTask(task)"
                     line-through
-                ></vs-checkbox>
+                >
+                    <!-- <v-list-item-title
+                        class="task_content"
+                        v-text="task.content"
+                    ></v-list-item-title> -->
+                </vs-checkbox>
             </v-list-item-action>
             <v-list-item-content>
                 <v-list-item-title
+                    class="task_content"
                     v-text="task.content"
+                    @click="showTaskDetail(task)"
                 ></v-list-item-title>
+                <v-list-item-subtitle
+                    v-if="task.sub_tasks.length > 0"
+                    @click="showTaskDetail(task)"
+                >
+                    {{ restOfSubTasks(task) }}
+                </v-list-item-subtitle>
             </v-list-item-content>
             <TaskMenuBtn
                 :task=task
@@ -60,7 +73,7 @@
                     url: '/api/task/complete/',
                     method: 'POST',
                     data: {
-                        task_id: this.complete_tasks,
+                        complete_task_id_list: this.complete_tasks,
                     }
                 })
                 .then(res => {
@@ -72,10 +85,25 @@
                     console.log(e)
                 })
                 this.complete_tasks = []
+                this.closeTaskDetail()
             }, 800),
+            showTaskDetail (task) {
+                this.$eventHub.$emit('showTaskDetail', task)
+            },
+            closeTaskDetail () {
+                this.$eventHub.$emit('closeTaskDetail')
+            },
+            restOfSubTasks (task) {
+                const subTasks = task.sub_tasks.length
+                const completeSubTasks = task.complete_sub_tasks.length
+                return completeSubTasks + ' of ' + subTasks + ' task completed.'
+            }
         },
     }
 </script>
 
 <style lang="scss" scoped>
+    .task_content {
+        cursor: pointer;
+    }
 </style>

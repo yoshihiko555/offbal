@@ -19,8 +19,6 @@
     import Sidebar from '@/components/common/Sidebar'
 
     import { mapActions } from 'vuex'
-    import AuthService from '@/auth/AuthService'
-    const auth = new AuthService()
 
     export default {
         name: 'MyApp',
@@ -33,18 +31,20 @@
         }),
         created () {
         	this.appInitAction()
-            // this.getCategorysAction()
-            // this.getFavoriteCategorysAction()
-            // this.getLabelsAction()
+        	.then(res => {
+                // 何もしない
+        	})
+        	.catch(e => {
+                console.log(e.response)
+                // 初期データが作成されてないので、作成画面へ
+        		if (!e.response.data.result) this.$router.push('/init-select-category')
+        	})
         },
         computed: {
         },
         methods: {
             ...mapActions([
             	'appInitAction',
-                // 'getCategorysAction',
-                // 'getFavoriteCategorysAction',
-                // 'getLabelsAction',
             ]),
         },
     }

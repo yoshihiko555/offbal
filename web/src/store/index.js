@@ -174,51 +174,25 @@ export default new Vuex.Store({
 	actions: {
 		// アプリ画面初期描画時の処理
 		appInitAction (ctx, kwargs) {
-        	Vue.prototype.$axios({
-        		url: '/api/appinit/',
-        		method: 'GET',
-        	})
-        	.then(res => {
-        		console.log('アプリ初期描画', res)
-				this.commit('setCategorys', res.data.categorys)
-				this.commit('setFavoriteCategorys', res.data.categorys)
-				this.commit('setArchivedCategorys', res.data.categorys)
-				this.commit('setLabels', res.data.labels)
-        	})
-        	.catch(e => {
-        		console.log(e)
-        	})
+			return new Promise((resolve, reject) => {
+	        	Vue.prototype.$axios({
+	        		url: '/api/appinit/',
+	        		method: 'GET',
+	        	})
+	        	.then(res => {
+	        		console.log('アプリ初期描画', res)
+					this.commit('setCategorys', res.data.categorys)
+					this.commit('setFavoriteCategorys', res.data.categorys)
+					this.commit('setArchivedCategorys', res.data.categorys)
+					this.commit('setLabels', res.data.labels)
+					resolve(res)
+	        	})
+	        	.catch(e => {
+	        		console.log(e)
+	        		reject(e)
+	        	})
+			})
 		},
-		// カテゴリー一覧取得
-//		getCategorysAction (ctx, kwargs) {
-//			Vue.prototype.$axios({
-//					url: '/api/category/',
-//					method: 'GET',
-//			})
-//			.then(res => {
-//					console.log('最新カテゴリー一覧', res)
-//					this.commit('setCategorys', res.data)
-//					this.commit('setFavoriteCategorys', res.data)
-//					this.commit('setArchivedCategorys', res.data)
-//			})
-//			.catch(e => {
-//					console.log(e)
-//			})
-//		},
-//		// ラベル一覧取得
-//		getLabelsAction (ctx, kwargs) {
-//			Vue.prototype.$axios({
-//				url: '/api/label/',
-//				method: 'GET',
-//			})
-//			.then(res => {
-//				console.log('ラベル一覧', res)
-//				this.commit('setLabels', res.data)
-//			})
-//			.catch(e => {
-//				console.log(e)
-//			})
-//		},
     	// 作成したカテゴリーを一覧に追加
 		addCategorysAction (ctx, kwargs) {
 			this.commit('addCategory', kwargs)
@@ -245,20 +219,6 @@ export default new Vuex.Store({
                 console.log(e)
             })
 	    },
-	    // お気に入りカテゴリー一覧取得
-	    // getFavoriteCategorysAction (ctx, kwargs) {
-	    //     Vue.prototype.$axios({
-		// 		url: '/api/category/favorites/',
-		// 		method: 'GET',
-		// 	})
-		// 	.then(res => {
-		// 		console.log('お気に入りカテゴリー一覧', res)
-		// 		this.commit('setFavoriteCategorys', res.data)
-		// 	})
-		// 	.catch(e => {
-		// 		console.log(e)
-		// 	})
-	    // },
 	    // お気に入りカテゴリーを追加
 		addFavoriteCategorysAction (ctx, kwargs) {
 			this.commit('addFavoriteCategorys', kwargs)

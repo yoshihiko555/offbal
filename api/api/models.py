@@ -253,6 +253,22 @@ class DefaultCategory(models.Model):
         default=Color.GREY
     )
 
+    class Icon(models.TextChoices):
+        WORK = 'mdi-briefcase-outline', _('Grey')
+        SLEEP = 'mdi-sleep', _('Sleep')
+        FAMILY = 'mdi-home-heart', _('Family')
+        MOTION = 'mdi-run', _('Motion')
+        FRIEND = 'mdi-account-group',_('Friend')
+        LOVE = 'mdi-account-heart-outline', _('Love')
+        HEALTH = 'mdi-bottle-tonic-plus-outline', _('Health')
+        HOBBY = 'mdi-gamepad-variant-outline', _('Hobby')
+
+    icon = models.CharField(
+        max_length=100,
+        choices=Icon.choices,
+        default=Icon.WORK,
+    )
+
     def __str__(self):
         return self.name
 
@@ -290,6 +306,22 @@ class Category(TimeStampModel):
         default=Color.GREY
     )
 
+    class Icon(models.TextChoices):
+        WORK = 'mdi-briefcase-outline', _('Grey')
+        SLEEP = 'mdi-sleep', _('Sleep')
+        FAMILY = 'mdi-home-heart', _('Family')
+        MOTION = 'mdi-run', _('Motion')
+        FRIEND = 'mdi-account-group',_('Friend')
+        LOVE = 'mdi-account-heart-outline', _('Love')
+        HEALTH = 'mdi-bottle-tonic-plus-outline', _('Health')
+        HOBBY = 'mdi-gamepad-variant-outline', _('Hobby')
+
+    icon = models.CharField(
+        max_length=100,
+        choices=Icon.choices,
+        default=Icon.WORK,
+    )
+
     # favorite = models.BooleanField(default=False)
     favorite = models.ManyToManyField(
         mUser,
@@ -305,11 +337,13 @@ class Category(TimeStampModel):
         related_name='archived_user',
         blank=True,
     )
+    index = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
 
-
+# TODO 不要モデル
 class mUserCategoryRelation(models.Model):
     user = models.ForeignKey(
         mUser,

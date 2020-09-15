@@ -11,6 +11,7 @@ from .models import (
     SubTask,
     Label,
     Karma,
+    DefaultCategory,
 )
 
 import logging
@@ -90,7 +91,6 @@ class SettingSerializer(DynamicFieldsModelSerializer):
 class CategorySerializer(DynamicFieldsModelSerializer):
 
     auth0_id = serializers.CharField(write_only=True)
-    creator = serializers.CharField(read_only=True)
     tasks = serializers.SerializerMethodField()
     complete_tasks = serializers.SerializerMethodField()
     sections = serializers.SerializerMethodField()
@@ -98,7 +98,6 @@ class CategorySerializer(DynamicFieldsModelSerializer):
     archived = serializers.SerializerMethodField()
     is_favorite = serializers.BooleanField(write_only=True, required=False)
     is_archived = serializers.BooleanField(write_only=True, required=False)
-    index = serializers.SerializerMethodField()
 
     # 画面側でのアイコン描画判定用 (カテゴリーかセクションか)
     isCategory = serializers.BooleanField(read_only=True, default=True)
@@ -124,6 +123,8 @@ class CategorySerializer(DynamicFieldsModelSerializer):
             'is_archived',
             'isCategory',
             'index',
+            'icon',
+            'is_active',
         ]
 
 
@@ -147,14 +148,6 @@ class CategorySerializer(DynamicFieldsModelSerializer):
 
     def get_sections(self, obj):
         return SectionSerializer(obj.section_target_category.all(), many=True, context=self.context).data
-
-    def get_index(self, obj):
-        try:
-            user = mUser.objects.get(auth0_id=self.auth0_id)
-            relation = mUserCategoryRelation.objects.get(user=user, category=obj)
-            return relation.index
-        except:
-            return None
 
     def create(self, validated_data):
         try:
@@ -592,3 +585,11 @@ class KarmaSerializer(DynamicFieldsModelSerializer):
 
     def get_updated_at(self, obj):
         return utc_to_jst(obj.updated_at)
+
+
+class DefaultCategorySerializer(DynamicFieldsModelSerializer):
+    class Meta:
+        model = DefaultCategory
+        fields = '__all__'
+
+

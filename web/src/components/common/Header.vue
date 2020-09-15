@@ -16,14 +16,6 @@
 		            >
 		            	SignIn
 		            </vs-button>
-
-		            <vs-button
-		            	dark
-		            	v-show='isAuth'
-		            	@click='signout'
-		            >
-		            	SignOut
-		            </vs-button>
 	            </div>
             </v-row>
         </v-app-bar>
@@ -36,6 +28,8 @@ const auth = new AuthService()
 
 export default {
     name: 'Header',
+    components: {
+    },
     data: () => ({
 		isAuth: false,
 	}),
@@ -44,17 +38,22 @@ export default {
     	if (!auth.isAuthenticated()) {
 			auth.handleAuthentication()
 			auth.authNotifier.on('authChange', authState => {
+                // 認証情報が変更された
                 this.isAuth = authState.authenticated
+
+                // auth0からユーザー情報の取得
                 auth.getUserProfile((err, res) => {
                 	if (err) {
                 		console.log(err)
                 	} else {
                 		console.log(res)
                 		const namespace = 'https://auth0/user_metadata'
-                		// サインアップならmSetting等を作成する
+                		// サインアップか判定
                 		if (!res[namespace].signup) {
-                            this.initUserData(res.sub, res.name)
+                            // サインアップなので初期データ作成画面へ
+                            this.$router.push('/init-select-category')
                         } else {
+                            // サインインなのでそのままアプリ画面へ
                             if (!this.isAuth) this.$router.push('/')
                             else this.$router.push('/myapp')
                         }
@@ -71,30 +70,33 @@ export default {
     	signin () {
     		auth.login()
     	},
-    	signout () {
-    		auth.logout()
-    	},
-        handleAuthentication () {
-  	    	auth.handleAuthentication()
-   	    },
-   	    initUserData (id, name) {
-   	    	this.$axios({
-   	    		url: '/api/signup/',
-   	    		method: 'POST',
-   	    		data: {
-   	    			auth0_id: id,
-   	    			auth0_name: name
-   	    		}
-   	    	})
-   	    	.then(res => {
-                console.log(res)
-                if (!this.isAuth) this.$router.push('/')
-                else this.$router.push('/myapp')
-   	    	})
-   	    	.catch(e => {
-   	    		console.log(e)
-   	    	})
-   	    }
+        // handleAuthentication () {
+  	    // 	auth.handleAuthentication()
+   	    // },
+   	    // initUserData (id, name) {
+   	    // 	this.$axios({
+   	    // 		url: '/api/signup/',
+   	    // 		method: 'POST',
+   	    // 		data: {
+   	    // 			auth0_id: id,
+   	    // 			auth0_name: name
+   	    // 		}
+   	    // 	})
+   	    // 	.then(res => {
+        //         console.log(res)
+        //         // if (!this.isAuth) this.$router.push('/')
+        //         // else this.$router.push('/myapp')
+   	    // 	})
+   	    // 	.catch(e => {
+   	    // 		console.log(e)
+   	    // 	})
+        // },
+        // openSelectCategory () {
+           // this.$refs.selectCategory.open()
+        // },
+        updateUsermetadata () {
+            auth.updateUsermetadata()
+        }
     }
 }
 </script>

@@ -140,6 +140,7 @@
             			id: params.id,
             		}
             	})
+                this.$eventHub.$emit('closeTaskDetail')
             },
             createCategory () {
             	this.$refs.category.open()

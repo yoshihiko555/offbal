@@ -123,6 +123,7 @@ export default new Vuex.Store({
 		},
 		deleteTask (state, payload) {
 			// カテゴリー詳細
+			console.log(payload)
 			if (payload.target_section === 0) {
 				const index = state.detailCategory.tasks.findIndex(task => task.id === payload.id)
 				if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
@@ -169,6 +170,10 @@ export default new Vuex.Store({
 		addCompleteSubTasks (state, payload) {
 			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			task.complete_sub_tasks = payload.sub_task_list
+		},
+		changeComment (state, payload) {
+			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
+			task.comment = payload.comment
 		}
 	},
 	actions: {

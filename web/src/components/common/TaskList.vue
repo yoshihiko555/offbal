@@ -85,7 +85,6 @@
                     console.log(e)
                 })
                 this.complete_tasks = []
-                this.closeTaskDetail()
             }, 800),
             showTaskDetail (task) {
                 this.$eventHub.$emit('showTaskDetail', task)

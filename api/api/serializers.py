@@ -21,6 +21,8 @@ from datetime import (
     datetime,
     timedelta
 )
+
+from django.utils import timezone as timezone_django
 from django.db.models import Q
 
 from .utils import (
@@ -397,7 +399,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         dl_str = validated_data['deadline_str']
         rm_str = validated_data['remind_str']
 
-        start_time = datetime.strptime(st_str, '%Y-%m-%d %H:%M:%S') if st_str != '' else None
+        start_time = datetime.strptime(st_str, '%Y-%m-%d %H:%M:%S') if st_str != '' else timezone_django.datetime.now()
         deadline = datetime.strptime(dl_str, '%Y-%m-%d %H:%M:%S') if dl_str != '' else None
         remind = datetime.strptime(rm_str, '%Y-%m-%d %H:%M:%S') if rm_str != '' else None
 
@@ -591,5 +593,3 @@ class DefaultCategorySerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = DefaultCategory
         fields = '__all__'
-
-

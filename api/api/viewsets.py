@@ -267,20 +267,53 @@ class TaskViewSet(BaseModelViewSet):
     def complete(self, request):
         """
         該当タスクの完了フラグを立てるアクション
+            単体:
+                key: complete_task_id
+                value: 該当タスクのid
+            複数:
+                key: complete_task_id_list
+                value: 該当タスクのidのリスト
         """
-        complete_task_id_list = request.data['complete_task_id_list']
-        complete_task_list = []
+        if 'complete_task_id' in request.data:
+            complete_task_id = request.data['complete_task_id']
+            try:
+                task = Task.objects.get(pk=complete_task_id)
+                task.completed = True
+                task.completed_at = timezone.datetime.now()
+                task.save()
+            except Task.DoesNotExist:
+                logger.error('タスクが見つかりませんでした。')
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(self.get_serializer(task).data, status=status.HTTP_200_OK)
+
+        else:
+            complete_task_id_list = request.data['complete_task_id_list']
+            complete_task_list = []
+            try:
+                for i in complete_task_id_list:
+                    instance = Task.objects.get(pk=i)
+                    instance.completed = True
+                    instance.completed_at = timezone.datetime.now()
+                    complete_task_list.append(instance)
+                Task.objects.bulk_update(complete_task_list, ['completed', 'completed_at'])
+            except Task.DoesNotExist:
+                logger.error('タスクが見つかりませんでした。')
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(self.get_serializer(complete_task_list, many=True).data, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False)
+    def change_comment(self, request):
+        """
+        タスクのコメントを変更するアクション
+        """
         try:
-            for i in complete_task_id_list:
-                instance = Task.objects.get(pk=i)
-                instance.completed = True
-                instance.completed_at = timezone.datetime.now()
-                complete_task_list.append(instance)
-            Task.objects.bulk_update(complete_task_list, ['completed', 'completed_at'])
+            task = Task.objects.get(pk=request.data['task_id'])
+            task.comment = request.data['comment']
+            task.save()
         except Task.DoesNotExist:
             logger.error('タスクが見つかりませんでした。')
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(self.get_serializer(complete_task_list, many=True).data, status=status.HTTP_200_OK)
+        return Response(self.get_serializer(task).data, status=status.HTTP_200_OK)
 
 
 class SubTaskViewSet(BaseModelViewSet):
@@ -307,6 +340,7 @@ class SubTaskViewSet(BaseModelViewSet):
         """
         該当サブタスクの完了フラグを立てるアクション
             完了したサブタスクIDリストを返す
+            ※既に完了したものも送られてくる可能性があるため、サブタスクを一括更新
         """
         task_id = request.data['task_id']
         compelete_sub_task_id_list = request.data['compelete_sub_task_id_list']

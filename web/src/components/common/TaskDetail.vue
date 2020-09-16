@@ -65,10 +65,35 @@
                     </v-list>
                 </v-card>
                 <v-list>
+                    <v-tooltip
+                        top
+                        activator="#start_time_btn"
+                        z-index=99000
+                    >
+                        <span>タスク開始時刻を変更する</span>
+                    </v-tooltip>
+                    <v-tooltip
+                        top
+                        activator="#deadline_btn"
+                        z-index=99000
+                    >
+                        <span>期限を変更する</span>
+                    </v-tooltip>
+                    <v-tooltip
+                        top
+                        activator="#remind_btn"
+                        z-index=99000
+                    >
+                        <span>リマインドを変更する</span>
+                    </v-tooltip>
                     <v-card class="mb-2 py-2">
                         <v-list-item>
-                            <v-list-item-icon>
-                                <v-icon>mdi-clock-start</v-icon>
+                            <v-list-item-icon id="start_time_btn" class="mr-5">
+                                <v-btn
+                                    icon
+                                >
+                                    <v-icon>mdi-clock-start</v-icon>
+                                </v-btn>
                             </v-list-item-icon>
                             <v-list-item-content>
                                 <v-list-item-title v-if="cloneTask.start_time !== ''">{{ cloneTask.start_time }} に開始</v-list-item-title>
@@ -77,8 +102,12 @@
                         </v-list-item>
                         <v-divider></v-divider>
                         <v-list-item>
-                            <v-list-item-icon>
-                                <v-icon>mdi-calendar-clock</v-icon>
+                            <v-list-item-icon id="deadline_btn" class="mr-5">
+                                <v-btn
+                                    icon
+                                >
+                                    <v-icon>mdi-calendar-clock</v-icon>
+                                </v-btn>
                             </v-list-item-icon>
                             <v-list-item-content>
                                 <v-list-item-title v-if="cloneTask.deadline !== ''">{{ cloneTask.deadline }} まで</v-list-item-title>
@@ -87,8 +116,12 @@
                         </v-list-item>
                         <v-divider></v-divider>
                         <v-list-item>
-                            <v-list-item-icon>
-                                <v-icon>mdi-alarm</v-icon>
+                            <v-list-item-icon id="remind_btn" class="mr-5">
+                                <v-btn
+                                    icon
+                                >
+                                    <v-icon>mdi-alarm</v-icon>
+                                </v-btn>
                             </v-list-item-icon>
                             <v-list-item-content>
                                 <v-list-item-title v-if="cloneTask.remind !== ''">{{ cloneTask.remind }} に通知</v-list-item-title>
@@ -99,7 +132,10 @@
                     <v-card>
                         <v-list-item>
                             <v-list-item-content>
-                                <v-text-field v-model="cloneTask.comment" placeholder="コメントを追加"></v-text-field>
+                                <v-text-field
+                                    v-model="cloneTask.comment"
+                                    placeholder="コメントを追加"
+                                ></v-text-field>
                             </v-list-item-content>
                         </v-list-item>
                     </v-card>
@@ -136,29 +172,41 @@
             this.$eventHub.$on('showTaskDetail', this.showTaskDetail)
             this.$eventHub.$on('closeTaskDetail', this.closeTaskDetail)
         },
-        watch: {},
+        watch: {
+            'cloneTask.comment': _.debounce(function (val) {
+                if (this.task.comment !== undefined && this.task.comment !== val) {
+                    this.changeCommentAction(val)
+                }
+            }, 500),
+        },
         computed: {},
         methods: {
             ...mapMutations([
                 'addSubTask',
+                'deleteTask',
+                'addCompleteTask',
                 'addCompleteSubTasks',
+                'changeComment',
             ]),
             closeTaskDetail () {
                 this.drawer = false
-                this.$emit('toggleDrawer')
-                this.task = {}
+                this.$eventHub.$emit('change-toggle-drawer', false)
+                setTimeout(this.init, 100)
             },
             showTaskDetail (task) {
+                // 何も開いてなかったら開く
                 if (this.task.content === undefined) {
-                    this.drawer = !this.drawer
-                    this.$emit('toggleDrawer')
-                } else {
-                    if (this.task.content === task.content) {
-                        this.closeTaskDetail()
-                        return
-                    }
+                    this.drawer = true
+                    this.$eventHub.$emit('change-toggle-drawer', true)
                 }
-
+                // 同じタスクをクリックしたら閉じる
+                if (this.task.content === task.content) {
+                    this.closeTaskDetail()
+                }
+                // タスク情報セット=>既に詳細開いていたら書き換わる
+                this.setTaskDetail(task)
+            },
+            setTaskDetail (task) {
                 this.task = task
                 this.cloneTask = _.cloneDeep(task)
                 this.complete_sub_tasks = _.cloneDeep(task.complete_sub_tasks)
@@ -180,11 +228,27 @@
                     console.log(e)
                 })
             }, 800),
-            checkTask () {
+            checkTask: _.debounce(function checkTask () {
                 if (this.task.completed !== this.cloneTask.completed) {
                     console.log('完了状態変更 : ' + this.task.completed + ' -> ' + this.cloneTask.completed)
+                    this.$axios({
+                        url: '/api/task/complete/',
+                        method: 'POST',
+                        data: {
+                            complete_task_id: this.cloneTask.id,
+                        }
+                    })
+                    .then(res => {
+                        console.log(res)
+                        this.deleteTask(res.data)
+                        this.addCompleteTask(res.data)
+                    })
+                    .catch(e => {
+                        console.log(e)
+                    })
+                    this.closeTaskDetail()
                 }
-            },
+            }, 800),
             setCreateSubTask () {
                 this.subTaskSubmitValue = true
             },
@@ -201,6 +265,11 @@
                     console.log(res)
                     this.addSubTask(res.data)
                     this.cloneTask.sub_tasks.push(res.data)
+                    // console.log('push')
+                    // console.log('cloneTask.sub_tasks : ')
+                    // console.log(this.cloneTask.sub_tasks)
+                    // console.log('res.data : ')
+                    // console.log(res.data)
                 })
                 .catch(e => {
                     console.log(e)
@@ -211,6 +280,37 @@
                 }
                 this.subTaskSubmitValue = false
             },
+            init () {
+                this.task = {}
+                this.cloneTask = {
+                    content: '',
+                    comment: '',
+                    completed: false,
+                }
+                this.complete_sub_tasks = []
+                this.subTask = {
+                    target_task: 0,
+                    content: '',
+                }
+            },
+            changeCommentAction (comment) {
+                console.log(comment)
+                this.$axios({
+                    url: '/api/task/change_comment/',
+                    method: 'POST',
+                    data: {
+                        task_id: this.cloneTask.id,
+                        comment: comment
+                    }
+                })
+                .then(res => {
+                    console.log(res)
+                    this.changeComment(res.data)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            }
         },
     }
 </script>

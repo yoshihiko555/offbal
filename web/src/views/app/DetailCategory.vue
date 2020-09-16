@@ -51,9 +51,7 @@
                 </vs-button>
             </div>
         </v-row>
-        <TaskDetail
-            @toggleDrawer='drawer = !drawer'
-        />
+        <TaskDetail/>
     </div>
 </template>
 
@@ -96,6 +94,7 @@
         created () {
             this.getDetailCategoryAction(this.$route.params.id)
             this.$eventHub.$on('open-edit', this.openEdit)
+            this.$eventHub.$on('change-toggle-drawer', this.changeToggleDrawer)
         },
         beforeRouteUpdate (to, from, next) {
             if (to.params.id !== from.params.id) this.getDetailCategoryAction(to.params.id)
@@ -127,6 +126,9 @@
                 this.isCreateBtn = true
                 this.isEditField = false
             },
+            changeToggleDrawer (value) {
+                this.drawer = value
+            }
         },
     }
 </script>

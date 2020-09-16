@@ -2,8 +2,6 @@
     <vs-dialog
         v-model="isShow"
         blur
-        prevent-close
-        not-close
         class='pa-0'
     >
         <template #header>
@@ -20,13 +18,13 @@
                             <h4>{{ category.name }}</h4>
                         </template>
                         <template #text>
-                            <p>{{ msgs[category.id] }}</p>
+                            <p>{{ category.message }}</p>
                         </template>
                         <template #img>
                             <img :src='getImgUrl(category.name)'>
                         </template>
                         <template #interactions>
-                            <vs-checkbox :val='category.name' v-model='options'/>
+                            <vs-checkbox :val='category' v-model='selectCategorys' @click.stop=''/>
                         </template>
                     </vs-card>
                 </v-col>
@@ -36,7 +34,7 @@
                         :disabled='valid'
                         @click="changeCategorys"
                     >
-                        offbalを始める
+                        カテゴリーを<br>入れ替える
                     </vs-button>
                 </v-col>
             </v-row>
@@ -59,9 +57,7 @@
             id: null,
             valid: true,
             defaultCategorys: [],
-            msgs: Con.DEFAULT_CATEGORY_MSG,
-            selectCategorys: [],    // 送信用
-            options: [],            // 選択用
+            selectCategorys: [],
         }),
         created () {
         },
@@ -72,7 +68,6 @@
         },
         watch: {
         	selectCategorys: function (val) {
-                console.log(val)
                 this.valid = (val.length === 5) ? false : true
             }
         },
@@ -81,6 +76,9 @@
                 'setCategorys',
             ]),
             open () {
+            	// 初期化
+            	this.selectCategorys = []
+
                 this.$axios({
                     url: '/api/default-categorys/',
                     method: 'GET',
@@ -88,9 +86,10 @@
                 .then(res => {
                     console.log('デフォルトカテゴリー一覧', res)
                     this.defaultCategorys = res.data.default_categorys
-                    this.selectCategorys = _.cloneDeep(this.categorys)
-                    this.categorys.forEach(element => {
-                        this.options.push(element.name)
+                    // 初期選択状態を格納
+                    this.defaultCategorys.forEach(el => {
+                    	const idx = this.categorys.findIndex(i => i.name === el.name)
+                    	if (idx !== -1) this.selectCategorys.push(el)
                     })
                     this.id = AuthService.getAuth0Id()
                     this.isShow = true
@@ -99,9 +98,8 @@
                     console.log(e)
                 })
             },
-            // ユーザー初期データ作成
             changeCategorys () {
-                console.log(this.selectCategorys)
+                console.log('選択カテゴリー', this.selectCategorys)
                 this.$axios({
                     url: '/api/category/change_categorys/',
                     method: 'PUT',
@@ -124,15 +122,9 @@
             },
             togle (category) {
                 const idx = this.selectCategorys.findIndex(i => i.name === category.name)
-                if (idx !== -1) {
-                    this.selectCategorys = this.selectCategorys.filter((_, i) => i !== idx)
-                    this.options = this.options.filter((_, i) => i !== idx)
-                } else {
-                    this.selectCategorys.push(category)
-                    this.options.push(category.name)
-                }
-                console.log(this.options)
-            }
+                if (idx !== -1) this.selectCategorys = this.selectCategorys.filter((_, i) => i !== idx)
+                else this.selectCategorys.push(category)
+            },
         }
     }
 </script>
@@ -144,6 +136,7 @@
     .vs-card__title {
         h4 {
             color: #fff;
+            padding-bottom: 15px !important;
         }
     }
     p {

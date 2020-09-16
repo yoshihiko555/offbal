@@ -36,6 +36,7 @@ from .models import (
 )
 
 from django.utils import timezone
+from datetime import date
 
 from .filters import (
     CategoryFilter,
@@ -150,6 +151,9 @@ class CategoryViewSet(BaseModelViewSet):
 
     @action(methods=['PUT'], detail=False)
     def update_category_index(self, request, pk=None):
+        '''
+        カテゴリーのDADでの並び替えアクション
+        '''
         self.auth0_id = request.data['auth0_id']
         user = mUser.objects.get(auth0_id=request.data['auth0_id'])
         categorys = []
@@ -159,12 +163,15 @@ class CategoryViewSet(BaseModelViewSet):
             categorys.append(cate)
 
         Category.objects.bulk_update(categorys, fields=['index'])
-        user_category = user.category_creator_user.all().order_by('index')
+        user_category = user.category_creator_user.filter(is_active=True).order_by('index')
         serializer = self.get_serializer(user_category, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=True)
     def order_tasks(self, request, pk=None):
+        '''
+        並び替えボタンでのタスク並び替えアクション
+        '''
         self.set_ordering_type(request)
         category = Category.objects.get(pk=pk)
         serializer = self.get_serializer(category)
@@ -172,10 +179,20 @@ class CategoryViewSet(BaseModelViewSet):
 
     @action(methods=['PUT'], detail=False)
     def change_categorys(self, request, pk=None):
+        '''
+        カテゴリー切り替え時のアクション
+
+        request.data:
+            - auth0_id : ログイン中のユーザーID
+            - categorys : 選択されたカテゴリー一覧
+        '''
+
+        # ユーザー情報を取得
         self.auth0_id = request.data['auth0_id']
         user = mUser.objects.get(auth0_id=request.data['auth0_id'])
         user_categorys = user.category_creator_user.all()
-        # 存在しないカテゴリーを作成する処理
+
+        # ユーザーにまだ紐づいていないカテゴリーを作成する処理
         create_categorys = []
         for category in request.data['categorys']:
             if not user_categorys.filter(name=category['name']).exists():
@@ -190,25 +207,19 @@ class CategoryViewSet(BaseModelViewSet):
         logger.info(create_categorys)
         Category.objects.bulk_create(create_categorys)
 
-        # 選択されなかったカテゴリーのis_activeを更新
+        # カテゴリーのis_activeを更新
         update_categorys = []
         for user_category in user_categorys:
-            flg = True
+            active_flg = False
             for category in request.data['categorys']:
                 if user_category.name == category['name']:
-                    flg = False
+                    # 選択されたカテゴリーなので有効フラグをTrueに変更
+                    active_flg = True
                     break
-            if flg:
-                # 選択されなかった
-                user_category.is_active = False
-                update_categorys.append(user_category)
-            else:
-                # 選択された
-                user_category.is_active = True
-                update_categorys.append(user_category)
 
-        logger.info('更新するカテゴリー')
-        logger.info(update_categorys)
+            user_category.is_active = active_flg
+            update_categorys.append(user_category)
+
         Category.objects.bulk_update(update_categorys, fields=['is_active'])
         res = user_categorys.filter(is_active=True).order_by('index')
         serializer = self.get_serializer(res, many=True)
@@ -394,13 +405,22 @@ class KarmaViewSet(BaseModelViewSet):
     filter_class = KarmaFilter
 
     @action(methods=['GET'], detail=False)
-    def info(self, request, pk=None):
+    def result(self, request, pk=None):
         user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+
+        # 1日のタスク量を取得
+        setting = mSetting.objects.get(target_user=user)
+        daily_task_number = setting.daily_task_number
+
+        today_comp_task_count = user.task_target_user.filter(completed=True, completed_at__date=date.today()).count()
+
         total_result = Karma.objects.filter(target_user=user).aggregate(sum_of_point=Sum('point'))
         # カルマポイントがない場合は0を入れる
         total = total_result['sum_of_point'] if total_result['sum_of_point'] != None else 0
         info = self.get_karma_info(total)
         data = {
+            'today_comp_task_count': today_comp_task_count,
+            'daily_task_number': daily_task_number,
             'rank': info['rank'],
             'msg': info['msg'],
             'totalPoint': total,

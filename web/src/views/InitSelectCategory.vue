@@ -20,7 +20,7 @@
                             <h4>{{ category.name }}</h4>
                         </template>
                         <template #text>
-                            <p>{{ msgs[category.id] }}</p>
+                            <p>{{ category.message }}</p>
                         </template>
                         <template #img>
                             <img :src='getImgUrl(category.name)'>
@@ -130,6 +130,8 @@
     .vs-card__title {
         h4 {
             color: #fff;
+            padding-bottom: 15px !important;
+
         }
     }
     p {

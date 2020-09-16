@@ -5,7 +5,8 @@
         "fields": {
             "name": "work",
             "color": "cyan",
-            "icon": "mdi-briefcase-outline"
+            "icon": "mdi-briefcase-outline",
+            "message": "あなたの仕事を管理しましょう"
         }
     },
     {
@@ -14,7 +15,8 @@
         "fields": {
             "name": "sleep",
             "color": "teal",
-            "icon": "mdi-sleep"
+            "icon": "mdi-sleep",
+             "message": "睡眠の質をあげましょう"
         }
     },
     {
@@ -23,7 +25,8 @@
         "fields": {
             "name": "family",
             "color": "yellow",
-            "icon": "mdi-home-heart"
+            "icon": "mdi-home-heart",
+             "message": "家族を大切にしましょう"
         }
     },
     {
@@ -32,7 +35,8 @@
         "fields": {
             "name": "motion",
             "color": "blue",
-            "icon": "mdi-run"
+            "icon": "mdi-run",
+             "message": "体を動かしましょう"
         }
     },
     {
@@ -41,7 +45,8 @@
         "fields": {
             "name": "friend",
             "color": "orange",
-            "icon": "mdi-account-group"
+            "icon": "mdi-account-group",
+             "message": "親しき中にも礼儀あり"
         }
     },
     {
@@ -50,7 +55,8 @@
         "fields": {
             "name": "love",
             "color": "red",
-            "icon": "mdi-account-heart-outline"
+            "icon": "mdi-account-heart-outline",
+             "message": "ドキドキしましょう"
         }
     },
     {
@@ -59,7 +65,8 @@
         "fields": {
             "name": "health",
             "color": "pink",
-            "icon": "mdi-bottle-tonic-plus-outline"
+            "icon": "mdi-bottle-tonic-plus-outline",
+             "message": "健康的な生活を目指しましょう"
         }
     },
         {
@@ -68,7 +75,8 @@
         "fields": {
             "name": "hobby",
             "color": "gray",
-            "icon": "mdi-gamepad-variant-outline"
+            "icon": "mdi-gamepad-variant-outline",
+             "message": "熱中できる趣味を探しましょう"
         }
     }
 ]

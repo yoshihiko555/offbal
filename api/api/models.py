@@ -254,7 +254,7 @@ class DefaultCategory(models.Model):
     )
 
     class Icon(models.TextChoices):
-        WORK = 'mdi-briefcase-outline', _('Grey')
+        WORK = 'mdi-briefcase-outline', _('Work')
         SLEEP = 'mdi-sleep', _('Sleep')
         FAMILY = 'mdi-home-heart', _('Family')
         MOTION = 'mdi-run', _('Motion')
@@ -268,6 +268,8 @@ class DefaultCategory(models.Model):
         choices=Icon.choices,
         default=Icon.WORK,
     )
+
+    message = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
@@ -341,7 +343,7 @@ class Category(TimeStampModel):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.name
+        return self.creator.auth0_name + 'の' + self.name
 
 # TODO 不要モデル
 class mUserCategoryRelation(models.Model):
@@ -448,7 +450,7 @@ class Task(TimeStampModel,
     deadline = models.DateTimeField(null=True, blank=True)
     remind = models.DateTimeField(null=True, blank=True)
     comment = models.TextField(null=True, blank=True)
-    
+
 
 class SubTask(TimeStampModel,
               TaskModel):

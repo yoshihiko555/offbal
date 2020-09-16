@@ -48,6 +48,10 @@ from .mixins import (
     CreateKarmaMixin,
 )
 
+from .utils import (
+    ReturnDateTime,
+)
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -182,7 +186,13 @@ class CategoryViewSet(BaseModelViewSet):
         '''
         カテゴリー切り替え時のアクション
 
-        request.data:
+        **レコード登録**
+            選択されたカテゴリーの中でユーザーに紐付かないカテゴリーが存在すれば作成する
+
+        **レコード更新**
+            選択されなかったカテゴリーは有効フラグを折る
+
+        **リクエストデータ**
             - auth0_id : ログイン中のユーザーID
             - categorys : 選択されたカテゴリー一覧
         '''
@@ -406,33 +416,65 @@ class KarmaViewSet(BaseModelViewSet):
 
     @action(methods=['GET'], detail=False)
     def result(self, request, pk=None):
+        '''
+        現在のカルマ情報を返却するアクション
+        '''
         user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
 
-        # 1日のタスク量を取得
+        # 1日の最大タスク量を取得
         setting = mSetting.objects.get(target_user=user)
         daily_task_number = setting.daily_task_number
 
+        # 今日の完了タスク数を取得
         today_comp_task_count = user.task_target_user.filter(completed=True, completed_at__date=date.today()).count()
 
+        # 現在の合計カルマポイントを取得        
         total_result = Karma.objects.filter(target_user=user).aggregate(sum_of_point=Sum('point'))
         # カルマポイントがない場合は0を入れる
         total = total_result['sum_of_point'] if total_result['sum_of_point'] != None else 0
         info = self.get_karma_info(total)
+
+        # 今週分の完了タスクを取得
+        week_comp_tasks = user.task_target_user.filter(
+            completed=True,
+            completed_at__date__gte=ReturnDateTime.get_monday_of_this_week(),
+            completed_at__date__lte=ReturnDateTime.get_sunday_of_this_week(),
+        )
+        week_count_list = []
+        # 月曜から完了タスク数をリストに格納していく
+        for i in range(1, 8):
+            week_count_list.append(week_comp_tasks.filter(completed_at__iso_week_day=i).count())
+
         data = {
             'today_comp_task_count': today_comp_task_count,
             'daily_task_number': daily_task_number,
             'rank': info['rank'],
             'msg': info['msg'],
-            'totalPoint': total,
+            'total_point': total,
+            'next_point': info['next_point'],
+            'up_to_next_point': info['up_to_next_point'],
+            'week_count_list': week_count_list,
         }
         return Response(data=data, status=status.HTTP_200_OK)
 
     def get_karma_info(self, point):
+        '''
+        カルマ情報を返却する
+            params:
+                - point : 現在の合計ポイント
+
+            return:
+                ポイントに応じたカルマ情報
+        '''
         if point < 100:
-            return { 'rank': '初心者', 'msg': 'あなたは初心者だ'}
+            up_to_next_point = 100 - point
+            return { 'rank': '初心者', 'msg': 'あなたは初心者だ', 'next_point': 100, 'up_to_next_point': up_to_next_point}
         elif point < 200:
-            return { 'rank': '中級者', 'msg': 'あなたは中級者なのです'}
+            up_to_next_point = 200 - point
+            return { 'rank': '中級者', 'msg': 'あなたは中級者なのです', 'next_point': 200, 'up_to_next_point': up_to_next_point}
         elif point < 300:
-            return { 'rank': '上級者', 'msg': 'あなたは上級者だ。頑張れ'}
+            up_to_next_point = 300 - point
+            return { 'rank': '上級者', 'msg': 'あなたは上級者だ。頑張れ', 'next_point': 300, 'up_to_next_point': up_to_next_point}
         else:
-            return { 'rank': 'マスター', 'msg': 'あなたはマスターしてる。さらに頑張れ'}
+            return { 'rank': 'マスター', 'msg': 'あなたはマスターしてる。さらに頑張れ', 'next_point': 0, 'up_to_next_point': 0}
+

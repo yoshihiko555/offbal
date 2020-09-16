@@ -1,22 +1,22 @@
 <template>
     <v-container fluid>
-        <v-row class="mb-2">
+        <v-row class="mb-2 graph_wrap">
             <v-col cols='4'>
                 <v-card>
-                    <v-card-title class="py-1">次のランク</v-card-title>
-                    <ReactiveDoughnut class='graph pa-4 mx-auto' :chart-data='todayKarmaPoint'/>
+                    <v-card-title class="py-1">1日のタスク</v-card-title>
+                    <ReactiveDoughnut v-if='load' class='graph pa-4 mx-auto' :chart-data='todayTaskPoint'/>
                 </v-card>
             </v-col>
             <v-col cols='4'>
                 <v-card>
                     <v-card-title class='pb-0'>今週のタスク</v-card-title>
-                    <ReactiveBar class='pa-4 mx-auto' :chart-data='weekKarmaPoint' :height='height'/>
+                    <ReactiveBar v-if='load' class='pa-4 mx-auto' :chart-data='weekTaskPoint' :height='height'/>
                 </v-card>
             </v-col>
             <v-col cols='4'>
                 <v-card>
-                    <v-card-title class='py-1'>1日のタスク</v-card-title>
-                    <ReactiveDoughnut class='graph pa-4 mx-auto' :chart-data='todayKarmaPoint' :height='height'/>
+                    <v-card-title class='py-1'>次のランク</v-card-title>
+                    <ReactiveDoughnut v-if='load' class='graph pa-4 mx-auto' :chart-data='karmaRankInfo'/>
                 </v-card>
             </v-col>
         </v-row>
@@ -38,7 +38,7 @@
                             <p>次のランクまでのポイント</p>
                         </v-col>
                         <v-col cols='8'>
-                            <p>90</p>
+                            <p>{{ info.up_to_next_point}}</p>
                             </v-col>
                     </v-row>
                     <v-row class="px-4">
@@ -54,7 +54,7 @@
                             <p>合計値</p>
                         </v-col>
                         <v-col cols='8'>
-                            <p>{{ info.totalPoint }}</p>
+                            <p>{{ info.total_point }}</p>
                         </v-col>
                     </v-row>
                 </v-card>
@@ -73,6 +73,7 @@
 <script>
     import ReactiveBar from '@/components/parts/ReactiveBar'
     import ReactiveDoughnut from '@/components/parts/ReactiveDoughnut'
+    import _ from 'loadsh'
 
     export default {
         name: 'KarmaResult',
@@ -81,16 +82,13 @@
         	ReactiveDoughnut,
         },
         data: () => ({
-            info: {
-                rank: '',
-                msg: '',
-                totalPoint: 0,
-            },
-            // テスト用データ
-            todayKarmaPoint: {
+            info: {},
+            height: 264,
+            load: false,
+            todayTaskPoint: {
                 datasets: [
                     {
-                        data: [2, 5],
+                        data: [],
                         backgroundColor: [
                             '#376892',
                             '#e8e8e8',
@@ -99,13 +97,24 @@
                     },
                 ]
             },
-            height: 264,
-            weekKarmaPoint: {
+            karmaRankInfo: {
+                datasets: [
+                    {
+                        data: [],
+                        backgroundColor: [
+                            '#009688',
+                            '#e8e8e8',
+                        ],
+                        borderColor: 'transparent'
+                    },
+                ]
+            },
+            weekTaskPoint: {
             	labels: ['月', '火', '水', '木', '金', '土', '日'],
                 datasets: [
                     {
                     	label: '週間結果',
-                        data: [10, 5, 3, 4, 5, 10, 9],
+                        data: [],
                         backgroundColor: [
                             '#00BCD4',
                             '#F44336',
@@ -120,13 +129,18 @@
             }
         }),
         created () {
+            this.init()
             this.$axios({
-                url: '/api/karma/info/',
+                url: '/api/karma/result/',
                 method: 'GET',
             })
             .then(res => {
                 console.log(res)
                 this.info = res.data
+                this.setTodayTaskPoint(res.data.today_comp_task_count, res.data.daily_task_number)
+                this.setKarmaRankInfo(res.data.total_point, res.data.next_point)
+                this.setWeekTaskPoint(res.data.week_count_list)
+                this.load = true
             })
             .catch(e => {
                 console.log(e)
@@ -135,11 +149,42 @@
     	computed: {
     	},
         methods: {
+            setTodayTaskPoint (current, total) {
+                const clone = _.cloneDeep(this.todayTaskPoint)
+                clone.datasets[0].data.push(current)
+                clone.datasets[0].data.push(total)
+                this.todayTaskPoint = clone
+            },
+            setKarmaRankInfo (current, next) {
+                const clone = _.cloneDeep(this.karmaRankInfo)
+                clone.datasets[0].data.push(current)
+                clone.datasets[0].data.push(next)
+                this.karmaRankInfo = clone
+            },
+            setWeekTaskPoint (list) {
+                const clone = _.cloneDeep(this.weekTaskPoint)
+                for (const i in list) {
+                    const cnt = list[i]
+                    clone.datasets[0].data.push(cnt)
+                }
+                this.weekTaskPoint = clone
+            },
+            init () {
+                this.init = {}
+                this.todayTaskPoint.datasets[0].data = []
+                this.karmaRankInfo.datasets[0].data = []
+                this.weekTaskPoint.datasets[0].data = []
+            }
         },
     }
 </script>
 
 <style lang="scss" scoped>
+    .graph_wrap::v-deep {
+        .v-card {
+            min-height: 344px;
+        }
+    }
     .graph {
         max-width: 300px;
     }

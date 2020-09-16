@@ -36,7 +36,7 @@ from .models import (
 )
 
 from django.utils import timezone
-from datetime import date
+from datetime import date, datetime
 
 from .filters import (
     CategoryFilter,
@@ -337,6 +337,39 @@ class TaskViewSet(BaseModelViewSet):
         return Response(self.get_serializer(task).data, status=status.HTTP_200_OK)
 
 
+    @action(methods=['POST'], detail=False)
+    def change_task_detail(self, request):
+        """
+        タスク詳細から個別にデータを更新するアクション
+        """
+        params = {
+            'comment': self.changeTaskDetail,
+            'start_time': self.changeTaskDetail,
+            'deadline': self.changeTaskDetail,
+            'remind': self.changeTaskDetail,
+        }
+
+        for value in params:
+            if value in request.data:
+                return params[value](key=value, data=request.data)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def changeTaskDetail(self, key, data):
+        try:
+            task = Task.objects.get(pk=data['task_id'])
+            if key == 'comment': task.comment = data['comment']
+            elif key == 'start_time': task.start_time = datetime.strptime(data['start_time'], '%Y-%m-%d %H:%M:%S')
+            elif key == 'deadline': task.deadline = datetime.strptime(data['deadline'], '%Y-%m-%d %H:%M:%S')
+            elif key == 'remind': task.remind = datetime.strptime(data['remind'], '%Y-%m-%d %H:%M:%S')
+            task.save()
+        except Task.DoesNotExist:
+            logger.error('タスクが見つかりませんでした。')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        logger.debug(task)
+        return Response(self.get_serializer(task).data, status=status.HTTP_200_OK)
+
+
 class SubTaskViewSet(BaseModelViewSet):
 
     permission_classes = (permissions.AllowAny,)
@@ -428,7 +461,7 @@ class KarmaViewSet(BaseModelViewSet):
         # 今日の完了タスク数を取得
         today_comp_task_count = user.task_target_user.filter(completed=True, completed_at__date=date.today()).count()
 
-        # 現在の合計カルマポイントを取得        
+        # 現在の合計カルマポイントを取得
         total_result = Karma.objects.filter(target_user=user).aggregate(sum_of_point=Sum('point'))
         # カルマポイントがない場合は0を入れる
         total = total_result['sum_of_point'] if total_result['sum_of_point'] != None else 0
@@ -477,4 +510,3 @@ class KarmaViewSet(BaseModelViewSet):
             return { 'rank': '上級者', 'msg': 'あなたは上級者だ。頑張れ', 'next_point': 300, 'up_to_next_point': up_to_next_point}
         else:
             return { 'rank': 'マスター', 'msg': 'あなたはマスターしてる。さらに頑張れ', 'next_point': 0, 'up_to_next_point': 0}
-

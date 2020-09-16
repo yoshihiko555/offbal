@@ -84,48 +84,104 @@
                         activator="#remind_btn"
                         z-index=99000
                     >
-                        <span>リマインドを変更する</span>
+                        <span>リマインダーを変更する</span>
                     </v-tooltip>
                     <v-card class="mb-2 py-2">
                         <v-list-item>
                             <v-list-item-icon id="start_time_btn" class="mr-5">
-                                <v-btn
-                                    icon
+                                <v-menu
+                                    offset-x
+                                    min-width="400px"
+                                    transition="scroll-y-transition"
+                                    :close-on-content-click="false"
                                 >
-                                    <v-icon>mdi-clock-start</v-icon>
-                                </v-btn>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn
+                                            icon
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        >
+                                            <v-icon>mdi-clock-start</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <Datetime
+                                        v-model="cloneTask.start_time"
+                                        :minute-interval="30"
+                                        :min-date="start"
+                                        inline
+                                        no-keyboard
+                                        format="YYYY-MM-DD HH:mm:ss"
+                                    />
+                                </v-menu>
                             </v-list-item-icon>
                             <v-list-item-content>
-                                <v-list-item-title v-if="cloneTask.start_time !== ''">{{ cloneTask.start_time }} に開始</v-list-item-title>
-                                <v-list-item-title v-else>{{ cloneTask.created_at }} に開始</v-list-item-title>
+                                <v-list-item-title>{{ cloneTask.start_time }} に開始</v-list-item-title>
                             </v-list-item-content>
                         </v-list-item>
                         <v-divider></v-divider>
                         <v-list-item>
                             <v-list-item-icon id="deadline_btn" class="mr-5">
-                                <v-btn
-                                    icon
+                                <v-menu
+                                    offset-x
+                                    min-width="400px"
+                                    transition="scroll-y-transition"
+                                    :close-on-content-click="false"
                                 >
-                                    <v-icon>mdi-calendar-clock</v-icon>
-                                </v-btn>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-btn
+                                            icon
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        >
+                                            <v-icon>mdi-calendar-clock</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <Datetime
+                                        v-model="cloneTask.deadline"
+                                        :minute-interval="30"
+                                        :min-date="start"
+                                        inline
+                                        no-keyboard
+                                        format="YYYY-MM-DD HH:mm:ss"
+                                    />
+                                </v-menu>
                             </v-list-item-icon>
                             <v-list-item-content>
                                 <v-list-item-title v-if="cloneTask.deadline !== ''">{{ cloneTask.deadline }} まで</v-list-item-title>
-                                <v-list-item-title v-else>期限を設定する</v-list-item-title>
+                                <v-list-item-subtitle v-else>期限を設定する</v-list-item-subtitle>
                             </v-list-item-content>
                         </v-list-item>
                         <v-divider></v-divider>
                         <v-list-item>
                             <v-list-item-icon id="remind_btn" class="mr-5">
-                                <v-btn
-                                    icon
+                                <v-menu
+                                    offset-x
+                                    min-width="400px"
+                                    transition="scroll-y-transition"
+                                    :close-on-content-click="false"
                                 >
-                                    <v-icon>mdi-alarm</v-icon>
-                                </v-btn>
+                                    <template activator="#ttt" v-slot:activator="{ on, attrs }">
+                                        <v-btn
+                                            icon
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        >
+                                            <v-icon>mdi-alarm</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <Datetime
+                                        v-model="cloneTask.remind"
+                                        :minute-interval="30"
+                                        :min-date="start"
+                                        inline
+                                        no-keyboard
+                                        format="YYYY-MM-DD HH:mm:ss"
+                                    />
+                                </v-menu>
                             </v-list-item-icon>
                             <v-list-item-content>
                                 <v-list-item-title v-if="cloneTask.remind !== ''">{{ cloneTask.remind }} に通知</v-list-item-title>
-                                <v-list-item-title v-else>リマインダーを設定する</v-list-item-title>
+                                <v-list-item-subtitle v-else>リマインダーを設定する</v-list-item-subtitle>
                             </v-list-item-content>
                         </v-list-item>
                     </v-card>
@@ -147,10 +203,15 @@
 <script>
     import { mapMutations } from 'vuex'
     import _ from 'lodash'
+    import moment from 'moment'
+    import Datetime from 'vue-ctk-date-time-picker'
+    import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
 
     export default {
         name: 'TaskDetail',
-        components: {},
+        components: {
+            Datetime
+        },
         data () {
             return {
                 task: {},
@@ -175,11 +236,31 @@
         watch: {
             'cloneTask.comment': _.debounce(function (val) {
                 if (this.task.comment !== undefined && this.task.comment !== val) {
-                    this.changeCommentAction(val)
+                    this.changeTaskDetail('comment', val)
+                }
+            }, 500),
+            'cloneTask.start_time': _.debounce(function (val) {
+                if (this.task.start_time !== undefined && this.task.start_time !== val) {
+                    this.changeTaskDetail('start_time', val)
+                }
+            }, 500),
+            'cloneTask.deadline': _.debounce(function (val) {
+                if (this.task.deadline !== undefined && this.task.deadline !== val) {
+                    this.changeTaskDetail('deadline', val)
+                }
+            }, 500),
+            'cloneTask.remind': _.debounce(function (val) {
+                if (this.task.remind !== undefined && this.task.remind !== val) {
+                    this.changeTaskDetail('remind', val)
                 }
             }, 500),
         },
-        computed: {},
+        computed: {
+            start () {
+                const start = moment()
+                return start.format('YYYY-MM-DDTHH:mm:ss')
+            },
+        },
         methods: {
             ...mapMutations([
                 'addSubTask',
@@ -230,7 +311,6 @@
             }, 800),
             checkTask: _.debounce(function checkTask () {
                 if (this.task.completed !== this.cloneTask.completed) {
-                    console.log('完了状態変更 : ' + this.task.completed + ' -> ' + this.cloneTask.completed)
                     this.$axios({
                         url: '/api/task/complete/',
                         method: 'POST',
@@ -265,11 +345,6 @@
                     console.log(res)
                     this.addSubTask(res.data)
                     this.cloneTask.sub_tasks.push(res.data)
-                    // console.log('push')
-                    // console.log('cloneTask.sub_tasks : ')
-                    // console.log(this.cloneTask.sub_tasks)
-                    // console.log('res.data : ')
-                    // console.log(res.data)
                 })
                 .catch(e => {
                     console.log(e)
@@ -293,19 +368,18 @@
                     content: '',
                 }
             },
-            changeCommentAction (comment) {
-                console.log(comment)
+            changeTaskDetail (key, value) {
                 this.$axios({
-                    url: '/api/task/change_comment/',
+                    url: '/api/task/change_task_detail/',
                     method: 'POST',
                     data: {
                         task_id: this.cloneTask.id,
-                        comment: comment
+                        [key]: value
                     }
                 })
                 .then(res => {
                     console.log(res)
-                    this.changeComment(res.data)
+                    if (key === 'comment') this.changeComment(res.data)
                 })
                 .catch(e => {
                     console.log(e)

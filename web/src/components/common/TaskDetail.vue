@@ -232,6 +232,7 @@
         created () {
             this.$eventHub.$on('showTaskDetail', this.showTaskDetail)
             this.$eventHub.$on('closeTaskDetail', this.closeTaskDetail)
+            this.$eventHub.$on('closeSameTaskDetail', this.closeSameTaskDetail)
         },
         watch: {
             'cloneTask.comment': _.debounce(function (val) {
@@ -267,12 +268,24 @@
                 'deleteTask',
                 'addCompleteTask',
                 'addCompleteSubTasks',
-                'changeComment',
+                'updateComment',
+                'updateStartTime',
+                'updateDeadLine',
+                'updateRemind',
             ]),
             closeTaskDetail () {
                 this.drawer = false
                 this.$eventHub.$emit('change-toggle-drawer', false)
                 setTimeout(this.init, 100)
+            },
+            closeSameTaskDetail (task) {
+                // タスクリストのチェックボックスチェック時に、
+                // 同じタスクの詳細を開いていたら閉じる。
+                if (this.cloneTask.id === task.id) {
+                    this.drawer = false
+                    this.$eventHub.$emit('change-toggle-drawer', false)
+                    setTimeout(this.init, 100)
+                }
             },
             showTaskDetail (task) {
                 // 何も開いてなかったら開く
@@ -379,7 +392,22 @@
                 })
                 .then(res => {
                     console.log(res)
-                    if (key === 'comment') this.changeComment(res.data)
+                    switch (key) {
+                        case 'comment':
+                            this.updateComment(res.data)
+                            break
+                        case 'start_time':
+                            this.updateStartTime(res.data)
+                            break
+                        case 'deadline':
+                            this.updateDeadLine(res.data)
+                            break
+                        case 'remind':
+                            this.updateRemind(res.data)
+                            break
+                        default:
+                            break
+                    }
                 })
                 .catch(e => {
                     console.log(e)

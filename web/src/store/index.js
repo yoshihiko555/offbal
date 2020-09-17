@@ -171,9 +171,21 @@ export default new Vuex.Store({
 			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			task.complete_sub_tasks = payload.sub_task_list
 		},
-		changeComment (state, payload) {
+		updateComment (state, payload) {
 			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
 			task.comment = payload.comment
+		},
+		updateStartTime (state, payload) {
+			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
+			task.start_time = payload.start_time
+		},
+		updateDeadLine (state, payload) {
+			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
+			task.deadline = payload.deadline
+		},
+		updateRemind (state, payload) {
+			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
+			task.remind = payload.remind
 		}
 	},
 	actions: {

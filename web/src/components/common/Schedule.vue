@@ -31,7 +31,6 @@
                     :type='type'
                     :events='events'
                     :event-color="getEventColor"
-                    @change='getEvents'
                 />
             </v-col>
         </v-row>
@@ -46,12 +45,23 @@
         data: () => ({
             type: 'month',
             value: '',
-            // テスト用データ
             events: [],
+            // テスト用データ
             colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
             names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
         }),
         created () {
+        	this.$axios({
+        		url: '/api/task/get_schedule/',
+        		method: 'GET',
+        	})
+        	.then(res => {
+        		console.log(res)
+        		this.setEvents(res.data.incomp_tasks)
+        	})
+        	.catch(e => {
+        		console.log(e)
+        	})
         },
     	computed: {
     	},
@@ -64,6 +74,7 @@
             changeType (type) {
                 this.type = type
             },
+            // テスト用データの生成
             getEvents ({ start, end }) {
                 const events = []
 
@@ -80,13 +91,14 @@
                     const second = new Date(first.getTime() + secondTimestamp)
 
                     events.push({
-                    name: this.names[this.rnd(0, this.names.length - 1)],
-                    start: first,
-                    end: second,
-                    color: this.colors[this.rnd(0, this.colors.length - 1)],
-                    timed: !allDay,
-                })
-            }
+                        name: this.names[this.rnd(0, this.names.length - 1)],
+                        start: first,
+                        end: second,
+                        color: this.colors[this.rnd(0, this.colors.length - 1)],
+                        // timed: !allDay,
+                        timed: false
+                    })
+                }
 
                 this.events = events
             },
@@ -96,6 +108,24 @@
             rnd (a, b) {
                 return Math.floor((b - a + 1) * Math.random()) + a
             },
+            setEvents (tasks) {
+            	const events = []
+
+            	for (const task of tasks) {
+                    const start = task.start_time.replace(/-/g, '/')
+                    const startStamp = new Date(start)
+                    const end = task.deadline.replace(/-/g, '/')
+                    const endStamp = new Date(end)
+                    events.push({
+                        name: task.content,
+                        start: startStamp,
+                        end: endStamp,
+                        color: task.target_category_color,
+                        timed: false    // 時間表示切替のフラグ
+                    })
+            	}
+            	this.events = events
+            }
         },
     }
 </script>

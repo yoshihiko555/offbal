@@ -7,8 +7,9 @@
         extends: Doughnut,
         name: 'ReactiveDoughnut',
         mixins: [reactiveProp],
+        props: ['options'],
         data: () => ({
-            options: {
+            defaultOptions: {
             	responsive: true,
             	tooltips: {
             		enabled: false,
@@ -36,7 +37,8 @@
                     )
         		}
         	})
-            this.renderChart(this.chartData, this.options)
+        	const mergeOptions = { ...this.defaultOptions, ...this.options }
+            this.renderChart(this.chartData, mergeOptions)
         }
     }
 </script>

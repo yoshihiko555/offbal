@@ -285,6 +285,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     target_user = serializers.CharField(read_only=True)
     target_category = serializers.ReadOnlyField(source='target_category.id')
     target_category_name = serializers.CharField(read_only=True, source='target_category.name')
+    target_category_color = serializers.CharField(read_only=True, source='target_category.color')
     target_section = serializers.ReadOnlyField(source='target_section.id', default=0)
     target_section_name = serializers.CharField(read_only=True, source='target_section.name', default='')
     label = serializers.SerializerMethodField()
@@ -308,6 +309,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'target_user',
             'target_category',
             'target_category_name',
+            'target_category_color',
             'target_section',
             'target_section_name',
             'content',

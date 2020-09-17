@@ -131,7 +131,7 @@
         created () {
             this.init()
             this.$axios({
-                url: '/api/karma/result/',
+                url: '/api/karma/get_info/',
                 method: 'GET',
             })
             .then(res => {

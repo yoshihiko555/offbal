@@ -370,6 +370,117 @@ class TaskViewSet(BaseModelViewSet):
         return Response(self.get_serializer(task).data, status=status.HTTP_200_OK)
 
 
+    @action(methods=['GET'], detail=False)
+    def get_info(self, request):
+        '''
+        現在のタスク情報を返却するアクション
+        '''
+        user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+        user_tasks = user.task_target_user.all()
+
+        # 1日の最大タスク量を取得
+        setting = mSetting.objects.get(target_user=user)
+        daily_task_number = setting.daily_task_number
+
+        # 今日の完了タスク数を取得
+        today_comp_task_count = user_tasks.filter(completed=True, completed_at__date=date.today()).count()
+
+        # 現在の未完了タスク数を取得
+        incomp_task_count = user_tasks.filter(completed=False).count()
+
+        # 現在の完了タスクを取得
+        comp_tasks = user_tasks.filter(completed=True)
+
+        # 現在の完了タスク数を取得
+        comp_task_count = comp_tasks.count()
+
+        # 有効カテゴリー毎の完了タスクを取得
+        user_category = user.category_creator_user.filter(is_active=True)
+        res_category_tasks = self.get_active_category_comp_tasks(user_category, comp_tasks)
+
+        # 優先度毎の完了タスクを取得
+        res_priority_tasks = self.get_priority_comp_tasks(comp_tasks)
+
+        # 今週分の完了タスクを取得
+        week_comp_tasks = user_tasks.filter(
+            completed=True,
+            completed_at__date__gte=ReturnDateTime.get_monday_of_this_week(),
+            completed_at__date__lte=ReturnDateTime.get_sunday_of_this_week(),
+        )
+
+        week_count_list = []
+        # 月曜から完了タスク数をリストに格納していく
+        for i in range(1, 8):
+            week_count_list.append(week_comp_tasks.filter(completed_at__iso_week_day=i).count())
+
+
+        data = {
+            'today_comp_task_count': today_comp_task_count,
+            'daily_task_number': daily_task_number,
+            'week_count_list': week_count_list,
+            'incomp_task_count': incomp_task_count,
+            'comp_task_count': comp_task_count,
+            'res_category_tasks': res_category_tasks,
+            'res_priority_tasks': res_priority_tasks,
+        }
+
+        return Response(data=data, status=status.HTTP_200_OK)
+
+    def get_active_category_comp_tasks(self, categorys, tasks):
+        '''
+        現在有効なカテゴリーの完了タスク数を返却する
+
+        **params**
+            - categorys : 有効カテゴリー
+            - tasks : 完了タスク
+        '''
+        res = {}
+
+        for category in categorys:
+            res[category.name] = 0
+
+        for task in tasks:
+            if task.target_category.is_active:
+                category_name = task.target_category.name
+                res[category_name] += 1
+
+        return res
+
+    def get_priority_comp_tasks(self, tasks):
+        '''
+        優先度毎の完了タスク数を返却する
+
+        **params**
+            - tasks : 完了タスク
+        '''
+        res = {
+            '1': 0,
+            '2': 0,
+            '3': 0,
+            '4': 0,
+            '5': 0
+        }
+
+        for task in tasks:
+            res[task.priority] += 1
+
+        return res
+
+    @action(methods=['GET'], detail=False)
+    def get_schedule(self, request):
+        '''
+        スケジュール画面にタスクの情報を返却するアクション
+        '''
+        user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+        user_tasks = user.task_target_user.all()
+        # 未完了タスクを取得
+        incomp_tasks = user_tasks.filter(completed=False)
+
+        data = {
+            'incomp_tasks' : self.get_serializer(incomp_tasks, many=True).data,
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
+
 class SubTaskViewSet(BaseModelViewSet):
 
     permission_classes = (permissions.AllowAny,)
@@ -448,7 +559,7 @@ class KarmaViewSet(BaseModelViewSet):
     filter_class = KarmaFilter
 
     @action(methods=['GET'], detail=False)
-    def result(self, request, pk=None):
+    def get_info(self, request):
         '''
         現在のカルマ情報を返却するアクション
         '''

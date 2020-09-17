@@ -323,21 +323,6 @@ class TaskViewSet(BaseModelViewSet):
             return Response(self.get_serializer(complete_task_list, many=True).data, status=status.HTTP_200_OK)
 
     @action(methods=['POST'], detail=False)
-    def change_comment(self, request):
-        """
-        タスクのコメントを変更するアクション
-        """
-        try:
-            task = Task.objects.get(pk=request.data['task_id'])
-            task.comment = request.data['comment']
-            task.save()
-        except Task.DoesNotExist:
-            logger.error('タスクが見つかりませんでした。')
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(self.get_serializer(task).data, status=status.HTTP_200_OK)
-
-
-    @action(methods=['POST'], detail=False)
     def change_task_detail(self, request):
         """
         タスク詳細から個別にデータを更新するアクション

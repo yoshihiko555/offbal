@@ -85,12 +85,13 @@
                     console.log(e)
                 })
                 this.complete_tasks = []
+                this.closeSameTaskDetail(task)
             }, 800),
             showTaskDetail (task) {
                 this.$eventHub.$emit('showTaskDetail', task)
             },
-            closeTaskDetail () {
-                this.$eventHub.$emit('closeTaskDetail')
+            closeSameTaskDetail (task) {
+                this.$eventHub.$emit('closeSameTaskDetail', task)
             },
             restOfSubTasks (task) {
                 const subTasks = task.sub_tasks.length

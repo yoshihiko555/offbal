@@ -36,7 +36,7 @@ from .models import (
 )
 
 from django.utils import timezone
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from .filters import (
     CategoryFilter,
@@ -549,40 +549,34 @@ class KarmaViewSet(BaseModelViewSet):
         現在のカルマ情報を返却するアクション
         '''
         user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
-
-        # 1日の最大タスク量を取得
-        setting = mSetting.objects.get(target_user=user)
-        daily_task_number = setting.daily_task_number
-
-        # 今日の完了タスク数を取得
-        today_comp_task_count = user.task_target_user.filter(completed=True, completed_at__date=date.today()).count()
+        user_karma = user.karma_target_user.all()
 
         # 現在の合計カルマポイントを取得
-        total_result = Karma.objects.filter(target_user=user).aggregate(sum_of_point=Sum('point'))
+        total_result = user_karma.aggregate(sum_of_point=Sum('point'))
         # カルマポイントがない場合は0を入れる
         total = total_result['sum_of_point'] if total_result['sum_of_point'] != None else 0
         info = self.get_karma_info(total)
 
-        # 今週分の完了タスクを取得
-        week_comp_tasks = user.task_target_user.filter(
-            completed=True,
-            completed_at__date__gte=ReturnDateTime.get_monday_of_this_week(),
-            completed_at__date__lte=ReturnDateTime.get_sunday_of_this_week(),
-        )
-        week_count_list = []
-        # 月曜から完了タスク数をリストに格納していく
-        for i in range(1, 8):
-            week_count_list.append(week_comp_tasks.filter(completed_at__iso_week_day=i).count())
+        # 今週のカルマポイントを取得
+
+        # 月曜からカルマポイントをリストに格納していく
+        week_karma_point = []
+        for i in range(0, 7):
+            result = user_karma\
+                .filter(
+                    created_at__date__lt=ReturnDateTime.get_monday_of_this_week() + timedelta(days=i)
+                )\
+                .aggregate(sum_of_point=Sum('point'))
+            point = result['sum_of_point'] if result['sum_of_point'] != None else 0
+            week_karma_point.append(point)
 
         data = {
-            'today_comp_task_count': today_comp_task_count,
-            'daily_task_number': daily_task_number,
             'rank': info['rank'],
             'msg': info['msg'],
             'total_point': total,
             'next_point': info['next_point'],
             'up_to_next_point': info['up_to_next_point'],
-            'week_count_list': week_count_list,
+            'week_karma_point': week_karma_point,
         }
         return Response(data=data, status=status.HTTP_200_OK)
 

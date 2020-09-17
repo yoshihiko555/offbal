@@ -1,22 +1,16 @@
 <template>
-    <v-container fluid>
+    <v-container fluid v-if='load'>
         <v-row class="mb-2 graph_wrap">
             <v-col cols='4'>
                 <v-card>
-                    <v-card-title class="py-1">1日のタスク</v-card-title>
-                    <ReactiveDoughnut v-if='load' class='graph pa-4 mx-auto' :chart-data='todayTaskPoint'/>
-                </v-card>
-            </v-col>
-            <v-col cols='4'>
-                <v-card>
-                    <v-card-title class='pb-0'>今週のタスク</v-card-title>
-                    <ReactiveBar v-if='load' class='pa-4 mx-auto' :chart-data='weekTaskPoint' :height='height'/>
-                </v-card>
-            </v-col>
-            <v-col cols='4'>
-                <v-card>
                     <v-card-title class='py-1'>次のランク</v-card-title>
-                    <ReactiveDoughnut v-if='load' class='graph pa-4 mx-auto' :chart-data='karmaRankInfo'/>
+                    <ReactiveDoughnut class='pa-4 mx-auto' :chart-data='karmaRankInfo'/>
+                </v-card>
+            </v-col>
+            <v-col cols='8'>
+                <v-card>
+                    <v-card-title class='py-1'>カルマの傾向</v-card-title>
+                    <ReactiveLine class='pa-4 mx-auto' :chart-data='weekKarmaPoint' :height='height'/>
                 </v-card>
             </v-col>
         </v-row>
@@ -71,75 +65,51 @@
 </template>
 
 <script>
-    import ReactiveBar from '@/components/parts/ReactiveBar'
+    import ReactiveLine from '@/components/parts/ReactiveLine'
     import ReactiveDoughnut from '@/components/parts/ReactiveDoughnut'
     import _ from 'loadsh'
+    import { Const } from '@/assets/js/const'
+    const Con = new Const()
 
     export default {
         name: 'KarmaResult',
         components: {
-        	ReactiveBar,
+        	ReactiveLine,
         	ReactiveDoughnut,
         },
         data: () => ({
             info: {},
             height: 264,
             load: false,
-            todayTaskPoint: {
-                datasets: [
-                    {
-                        data: [],
-                        backgroundColor: [
-                            '#376892',
-                            '#e8e8e8',
-                        ],
-                        borderColor: 'transparent'
-                    },
-                ]
-            },
             karmaRankInfo: {
                 datasets: [
                     {
                         data: [],
-                        backgroundColor: [
-                            '#009688',
-                            '#e8e8e8',
-                        ],
+                        backgroundColor: Con.KARMA_RANK_INFO_CONFIG.BACK_GROUND_COLOR,
                         borderColor: 'transparent'
                     },
                 ]
             },
-            weekTaskPoint: {
-            	labels: ['月', '火', '水', '木', '金', '土', '日'],
+            weekKarmaPoint: {
+                labels: Con.WEEK_KARMA_POINT_CONFIG.LABELS,
                 datasets: [
                     {
-                    	label: '週間結果',
+                        label: '週間結果',
                         data: [],
-                        backgroundColor: [
-                            '#00BCD4',
-                            '#F44336',
-                            '#3F51B5',
-                            '#009688',
-                            '#FF9800',
-                            '#607D8B',
-                            '#E91E63',
-                        ],
-                    },
-                ],
+                    }
+                ]
             }
         }),
         created () {
-            this.init()
             this.$axios({
                 url: '/api/karma/get_info/',
                 method: 'GET',
             })
             .then(res => {
-                console.log(res)
+                console.log('カルマ情報', res)
                 this.info = res.data
-                this.setTodayTaskPoint(res.data.today_comp_task_count, res.data.daily_task_number)
                 this.setKarmaRankInfo(res.data.total_point, res.data.next_point)
-                this.setWeekTaskPoint(res.data.week_count_list)
+                this.setWeekKarmaPoint(res.data.week_karma_point)
                 this.load = true
             })
             .catch(e => {
@@ -149,31 +119,18 @@
     	computed: {
     	},
         methods: {
-            setTodayTaskPoint (current, total) {
-                const clone = _.cloneDeep(this.todayTaskPoint)
-                clone.datasets[0].data.push(current)
-                clone.datasets[0].data.push(total)
-                this.todayTaskPoint = clone
-            },
             setKarmaRankInfo (current, next) {
                 const clone = _.cloneDeep(this.karmaRankInfo)
                 clone.datasets[0].data.push(current)
                 clone.datasets[0].data.push(next)
                 this.karmaRankInfo = clone
             },
-            setWeekTaskPoint (list) {
-                const clone = _.cloneDeep(this.weekTaskPoint)
-                for (const i in list) {
-                    const cnt = list[i]
-                    clone.datasets[0].data.push(cnt)
+            setWeekKarmaPoint (data) {
+                const clone = _.cloneDeep(this.weekKarmaPoint)
+                for (const i of data) {
+                    clone.datasets[0].data.push(i)
                 }
-                this.weekTaskPoint = clone
-            },
-            init () {
-                this.init = {}
-                this.todayTaskPoint.datasets[0].data = []
-                this.karmaRankInfo.datasets[0].data = []
-                this.weekTaskPoint.datasets[0].data = []
+        		this.weekKarmaPoint = clone
             }
         },
     }

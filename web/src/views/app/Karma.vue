@@ -28,30 +28,30 @@
 
 <script>
     import KarmaResult from '@/components/common/KarmaResult'
-    import Graph from '@/components/common/Graph'
+    import TaskResult from '@/components/common/TaskResult'
     import Schedule from '@/components/common/Schedule'
 
     export default {
         name: 'Karma',
         components: {
             KarmaResult,
-            Graph,
+            TaskResult,
             Schedule,
         },
         data () {
             return {
-                active: 'karmaResult',
-                view: KarmaResult,
+                active: 'taskResult',
+                view: TaskResult,
                 menus: [
+                    {
+                        name: 'taskResult',
+                        title: 'タスク',
+                        component: TaskResult,
+                    },
                     {
                         name: 'karmaResult',
                         title: 'カルマ',
                         component: KarmaResult,
-                    },
-                    {
-                        name: 'graph',
-                        title: 'グラフ',
-                        component: Graph,
                     },
                     {
                         name: 'schedule',

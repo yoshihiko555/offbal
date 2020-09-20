@@ -56,7 +56,7 @@
         		method: 'GET',
         	})
         	.then(res => {
-        		console.log(res)
+        		console.log('スケジュール情報', res)
         		this.setEvents(res.data.incomp_tasks)
         	})
         	.catch(e => {

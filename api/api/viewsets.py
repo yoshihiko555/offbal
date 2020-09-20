@@ -284,21 +284,21 @@ class TaskViewSet(BaseModelViewSet):
         self.perform_destroy(instance)
         return Response(data, status=status.HTTP_200_OK)
 
-    @action(methods=['POST'], detail=False)
+    @action(methods=['PUT'], detail=False)
     def complete(self, request):
         """
         該当タスクの完了フラグを立てるアクション
             単体:
-                key: complete_task_id
-                value: 該当タスクのid
+                key: complete_task
+                value: 該当タスクの
             複数:
-                key: complete_task_id_list
-                value: 該当タスクのidのリスト
+                key: complete_task_list
+                value: 該当タスクのリスト
         """
-        if 'complete_task_id' in request.data:
-            complete_task_id = request.data['complete_task_id']
+        if 'complete_task' in request.data:
+            complete_task = request.data['complete_task']
             try:
-                task = Task.objects.get(pk=complete_task_id)
+                task = Task.objects.get(pk=complete_task['id'])
                 task.completed = True
                 task.completed_at = timezone.datetime.now()
                 task.save()
@@ -308,30 +308,32 @@ class TaskViewSet(BaseModelViewSet):
             return Response(self.get_serializer(task).data, status=status.HTTP_200_OK)
 
         else:
-            complete_task_id_list = request.data['complete_task_id_list']
-            complete_task_list = []
+            complete_task_list = request.data['complete_task_list']
+            complete_tasks = []
             try:
-                for i in complete_task_id_list:
-                    instance = Task.objects.get(pk=i)
+                for complete_task in complete_task_list:
+                    instance = Task.objects.get(pk=complete_task['id'])
                     instance.completed = True
                     instance.completed_at = timezone.datetime.now()
-                    complete_task_list.append(instance)
-                Task.objects.bulk_update(complete_task_list, ['completed', 'completed_at'])
+                    complete_tasks.append(instance)
+                Task.objects.bulk_update(complete_tasks, ['completed', 'completed_at'])
             except Task.DoesNotExist:
                 logger.error('タスクが見つかりませんでした。')
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-            return Response(self.get_serializer(complete_task_list, many=True).data, status=status.HTTP_200_OK)
+            return Response(self.get_serializer(complete_tasks, many=True).data, status=status.HTTP_200_OK)
 
-    @action(methods=['POST'], detail=False)
+    @action(methods=['PUT'], detail=False)
     def change_task_detail(self, request):
         """
         タスク詳細から個別にデータを更新するアクション
         """
         params = {
+            'content': self.changeTaskDetail,
             'comment': self.changeTaskDetail,
             'start_time': self.changeTaskDetail,
             'deadline': self.changeTaskDetail,
             'remind': self.changeTaskDetail,
+            'priority': self.changeTaskDetail,
         }
 
         for value in params:
@@ -343,10 +345,12 @@ class TaskViewSet(BaseModelViewSet):
     def changeTaskDetail(self, key, data):
         try:
             task = Task.objects.get(pk=data['task_id'])
-            if key == 'comment': task.comment = data['comment']
+            if key == 'content': task.content = data['content']
+            elif key == 'comment': task.comment = data['comment']
             elif key == 'start_time': task.start_time = datetime.strptime(data['start_time'], '%Y-%m-%d %H:%M:%S')
             elif key == 'deadline': task.deadline = datetime.strptime(data['deadline'], '%Y-%m-%d %H:%M:%S')
             elif key == 'remind': task.remind = datetime.strptime(data['remind'], '%Y-%m-%d %H:%M:%S')
+            elif key == 'priority': task.priority = data['priority']
             task.save()
         except Task.DoesNotExist:
             logger.error('タスクが見つかりませんでした。')
@@ -485,26 +489,36 @@ class SubTaskViewSet(BaseModelViewSet):
         logger.debug(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['POST'], detail=False)
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = self.get_serializer(instance).data
+        self.perform_destroy(instance)
+        return Response(data, status=status.HTTP_200_OK)
+
+    @action(methods=['PUT'], detail=False)
     def complete(self, request):
         """
         該当サブタスクの完了フラグを立てるアクション
-            完了したサブタスクIDリストを返す
+            完了したサブタスクリストを返す
             ※既に完了したものも送られてくる可能性があるため、サブタスクを一括更新
         """
         task_id = request.data['task_id']
-        compelete_sub_task_id_list = request.data['compelete_sub_task_id_list']
+        complete_sub_task_list = request.data['compelete_sub_task_list']
         sub_task_list = []
-        # complete_sub_task_list = []
+        result = []
+
         try:
             task = Task.objects.get(pk=task_id)
             subTasks = task.subtask_target_task.all().iterator()
             for subTask in subTasks:
-                if subTask.id in compelete_sub_task_id_list:
-                    subTask.completed = True
-                    if subTask.completed_at == None: subTask.completed_at = timezone.datetime.now()
-                    # complete_sub_task_list.append(subTask)
-                else:
+                isMatched = False
+                for complete_sub_task in complete_sub_task_list:
+                    if subTask.id == complete_sub_task['id']:
+                        isMatched = True
+                        subTask.completed = True
+                        if subTask.completed_at == None: subTask.completed_at = timezone.datetime.now()
+                        result.append(subTask)
+                if isMatched == False:
                     subTask.completed = False
                     subTask.completed_at = None
                 sub_task_list.append(subTask)
@@ -515,8 +529,10 @@ class SubTaskViewSet(BaseModelViewSet):
 
         return Response({
             'target_task': task_id,
-            'sub_task_list': compelete_sub_task_id_list
+            'target_section': task.target_section.id,
+            'complete_sub_tasks': self.get_serializer(result, many=True).data
         }, status=status.HTTP_200_OK)
+
 
 
 class LabelViewSet(BaseModelViewSet):

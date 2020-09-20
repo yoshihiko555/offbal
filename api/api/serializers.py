@@ -298,7 +298,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     # サブタスク全部（表示に使用)
     sub_tasks = serializers.SerializerMethodField()
 
-    # 完了したサブタスクのpkリスト（完了数カウント,チェックボックスの初期描画に使用）
+    # 完了したサブタスクリスト
     complete_sub_tasks = serializers.SerializerMethodField()
     completed_at = serializers.SerializerMethodField()
 
@@ -370,7 +370,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
 
     def get_complete_sub_tasks(self, obj):
         complete_sub_tasks = obj.subtask_target_task.all().filter(completed=True)
-        return [subtask.pk for subtask in complete_sub_tasks]
+        return SubTaskSerializer(complete_sub_tasks, many=True).data
 
     def create(self, validated_data):
 
@@ -484,6 +484,7 @@ class SubTaskSerializer(DynamicFieldsModelSerializer):
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
     completed_at = serializers.SerializerMethodField()
+    target_section = serializers.SerializerMethodField()
 
     class Meta:
         model = SubTask
@@ -495,6 +496,7 @@ class SubTaskSerializer(DynamicFieldsModelSerializer):
             'completed_at',
             'created_at',
             'updated_at',
+            'target_section',
         ]
 
     def get_created_at(self, obj):
@@ -507,6 +509,13 @@ class SubTaskSerializer(DynamicFieldsModelSerializer):
         if obj.completed_at == None:
             return ''
         return utc_to_jst(obj.completed_at)
+
+    def get_target_section(self, obj):
+        try:
+            task = Task.objects.get(pk=obj.target_task)
+            return task.target_section.id if task.target_section != None else 0
+        except Task.DoesNotExist:
+            return 0
 
     def create(self, validated_data):
         logger.debug("サブタスクを作る")

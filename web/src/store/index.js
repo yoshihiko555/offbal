@@ -123,7 +123,6 @@ export default new Vuex.Store({
 		},
 		deleteTask (state, payload) {
 			// カテゴリー詳細
-			console.log(payload)
 			if (payload.target_section === 0) {
 				const index = state.detailCategory.tasks.findIndex(task => task.id === payload.id)
 				if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
@@ -164,28 +163,59 @@ export default new Vuex.Store({
 			}
 		},
 		addSubTask (state, payload) {
-			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
-			task.sub_tasks.push(payload)
+			if (payload.target_section === 0) {
+				const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
+				task.sub_tasks.push(payload)
+			} else {
+				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
+				const task = section.tasks.find(task => task.id === payload.target_task)
+				task.sub_tasks.push(payload)
+			}
 		},
-		addCompleteSubTasks (state, payload) {
-			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
-			task.complete_sub_tasks = payload.sub_task_list
+		updateCompleteSubTasks (state, payload) {
+			if (payload.target_section === 0) {
+				const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
+				task.complete_sub_tasks.splice(0, task.complete_sub_tasks.length)
+				task.complete_sub_tasks.push(...payload.complete_sub_tasks)
+			} else {
+				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
+				const task = section.tasks.find(task => task.id === payload.target_task)
+				task.complete_sub_tasks.splice(0, task.complete_sub_tasks.length)
+				task.complete_sub_tasks.push(...payload.complete_sub_tasks)
+			}
 		},
-		updateComment (state, payload) {
-			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
-			task.comment = payload.comment
+		updateSubTask (state, payload) {
+			console.log(payload)
+			if (payload.target_section === 0) {
+				const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
+				const index = task.sub_tasks.findIndex(sub => sub.id === payload.id)
+				Vue.set(task.sub_tasks, index, payload)
+				const i = task.complete_sub_tasks.findIndex(sub => sub.id === payload.id)
+				if (i !== -1) Vue.set(task.complete_sub_tasks, i, payload)
+			} else {
+				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
+				const task = section.tasks.find(task => task.id === payload.target_task)
+				const index = task.sub_tasks.findIndex(sub => sub.id === payload.id)
+				Vue.set(task.sub_tasks, index, payload)
+				const i = task.complete_sub_tasks.findIndex(sub => sub.id === payload.id)
+				if (i !== -1) Vue.set(task.complete_sub_tasks, i, payload)
+			}
 		},
-		updateStartTime (state, payload) {
-			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
-			task.start_time = payload.start_time
-		},
-		updateDeadLine (state, payload) {
-			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
-			task.deadline = payload.deadline
-		},
-		updateRemind (state, payload) {
-			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
-			task.remind = payload.remind
+		deleteSubTask (state, payload) {
+			if (payload.target_section === 0) {
+				const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
+				const index = task.sub_tasks.findIndex(subtask => subtask.id === payload.id)
+				if (index !== -1) task.sub_tasks = task.sub_tasks.filter((_, i) => i !== index)
+				const j = task.complete_sub_tasks.findIndex(subtask => subtask.id === payload.id)
+				if (j !== -1) task.complete_sub_tasks = task.complete_sub_tasks.filter((_, i) => i !== j)
+			} else {
+				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
+				const task = section.tasks.find(task => task.id === payload.target_task)
+				const index = task.sub_tasks.findIndex(subtask => subtask.id === payload.id)
+				if (index !== -1) task.sub_tasks = task.sub_tasks.filter((_, i) => i !== index)
+				const j = task.complete_sub_tasks.findIndex(subtask => subtask.id === payload.id)
+				if (j !== -1) task.complete_sub_tasks = task.complete_sub_tasks.filter((_, i) => i !== j)
+			}
 		}
 	},
 	actions: {
@@ -283,6 +313,19 @@ export default new Vuex.Store({
 	        .then(res => {
 	            console.log(res)
 	            this.commit('deleteTask', res.data)
+	        })
+	        .catch(e => {
+	            console.log(e)
+	        })
+	    },
+		deleteSubTaskAction (ctx, id) {
+	        Vue.prototype.$axios({
+	            url: `/api/sub_task/${id}/`,
+	            method: 'DELETE',
+	        })
+	        .then(res => {
+	            console.log(res)
+	            this.commit('deleteSubTask', res.data)
 	        })
 	        .catch(e => {
 	            console.log(e)

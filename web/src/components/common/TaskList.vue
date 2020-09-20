@@ -9,8 +9,8 @@
             >
                 <vs-checkbox
                     color="primary"
-                    v-model="complete_tasks"
-                    :val="task.id"
+                    v-model="complete_task_list"
+                    :val="task"
                     @change="checkTask(task)"
                     line-through
                 >
@@ -54,7 +54,7 @@
             'tasks',
         ],
         data: () => ({
-            complete_tasks: [],
+            complete_task_list: [],
         }),
         mounted: function () {
         },
@@ -71,9 +71,9 @@
             checkTask: _.debounce(function checkTask (task) {
                 this.$axios({
                     url: '/api/task/complete/',
-                    method: 'POST',
+                    method: 'PUT',
                     data: {
-                        complete_task_id_list: this.complete_tasks,
+                        complete_task_list: this.complete_task_list,
                     }
                 })
                 .then(res => {
@@ -84,9 +84,9 @@
                 .catch(e => {
                     console.log(e)
                 })
-                this.complete_tasks = []
+                this.complete_task_list = []
                 this.closeSameTaskDetail(task)
-            }, 800),
+            }, 400),
             showTaskDetail (task) {
                 this.$eventHub.$emit('showTaskDetail', task)
             },

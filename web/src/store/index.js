@@ -163,74 +163,65 @@ export default new Vuex.Store({
 			}
 		},
 		addSubTask (state, payload) {
+			let task
 			if (payload.target_section === 0) {
-				const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
-				task.sub_tasks.push(payload)
+				task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			} else {
 				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				const task = section.tasks.find(task => task.id === payload.target_task)
-				task.sub_tasks.push(payload)
+				task = section.tasks.find(task => task.id === payload.target_task)
 			}
+			task.sub_tasks.push(payload)
 		},
 		updateCompleteSubTasks (state, payload) {
+			let task
 			if (payload.target_section === 0) {
-				const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
-				task.complete_sub_tasks.splice(0, task.complete_sub_tasks.length)
-				task.complete_sub_tasks.push(...payload.complete_sub_tasks)
+				task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			} else {
 				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				const task = section.tasks.find(task => task.id === payload.target_task)
-				task.complete_sub_tasks.splice(0, task.complete_sub_tasks.length)
-				task.complete_sub_tasks.push(...payload.complete_sub_tasks)
+				task = section.tasks.find(task => task.id === payload.target_task)
 			}
+			task.sub_tasks.splice(0, task.sub_tasks.length)
+			task.sub_tasks.push(...payload.sub_tasks)
+			task.complete_sub_tasks.splice(0, task.complete_sub_tasks.length)
+			task.complete_sub_tasks.push(...payload.complete_sub_tasks)
 		},
 		updateSubTask (state, payload) {
-			console.log(payload)
+			let task
 			if (payload.target_section === 0) {
-				const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
-				const index = task.sub_tasks.findIndex(sub => sub.id === payload.id)
-				Vue.set(task.sub_tasks, index, payload)
-				const i = task.complete_sub_tasks.findIndex(sub => sub.id === payload.id)
-				if (i !== -1) Vue.set(task.complete_sub_tasks, i, payload)
+				task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			} else {
 				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				const task = section.tasks.find(task => task.id === payload.target_task)
-				const index = task.sub_tasks.findIndex(sub => sub.id === payload.id)
-				Vue.set(task.sub_tasks, index, payload)
-				const i = task.complete_sub_tasks.findIndex(sub => sub.id === payload.id)
-				if (i !== -1) Vue.set(task.complete_sub_tasks, i, payload)
+				task = section.tasks.find(task => task.id === payload.target_task)
 			}
+			const index = task.sub_tasks.findIndex(sub => sub.id === payload.id)
+			Vue.set(task.sub_tasks, index, payload)
+			const i = task.complete_sub_tasks.findIndex(sub => sub.id === payload.id)
+			if (i !== -1) Vue.set(task.complete_sub_tasks, i, payload)
 		},
 		deleteSubTask (state, payload) {
+			let task
 			if (payload.target_section === 0) {
-				const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
-				const index = task.sub_tasks.findIndex(subtask => subtask.id === payload.id)
-				if (index !== -1) task.sub_tasks = task.sub_tasks.filter((_, i) => i !== index)
-				const j = task.complete_sub_tasks.findIndex(subtask => subtask.id === payload.id)
-				if (j !== -1) task.complete_sub_tasks = task.complete_sub_tasks.filter((_, i) => i !== j)
+				task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			} else {
 				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				const task = section.tasks.find(task => task.id === payload.target_task)
-				const index = task.sub_tasks.findIndex(subtask => subtask.id === payload.id)
-				if (index !== -1) task.sub_tasks = task.sub_tasks.filter((_, i) => i !== index)
-				const j = task.complete_sub_tasks.findIndex(subtask => subtask.id === payload.id)
-				if (j !== -1) task.complete_sub_tasks = task.complete_sub_tasks.filter((_, i) => i !== j)
+				task = section.tasks.find(task => task.id === payload.target_task)
 			}
+			const index = task.sub_tasks.findIndex(subtask => subtask.id === payload.id)
+			if (index !== -1) task.sub_tasks = task.sub_tasks.filter((_, i) => i !== index)
+			const j = task.complete_sub_tasks.findIndex(subtask => subtask.id === payload.id)
+			if (j !== -1) task.complete_sub_tasks = task.complete_sub_tasks.filter((_, i) => i !== j)
 		},
 		deleteLabels (state, payload) {
+			let task
 			if (payload.target_section === 0) {
-				const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
-				for (const i in payload.delete_labels) {
-					const index = task.label.findIndex(label => label.id === payload.delete_labels[i].id)
-					if (index !== -1) task.label = task.label.filter((_, i) => i !== index)
-				}
+				task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			} else {
 				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				const task = section.tasks.find(task => task.id === payload.target_task)
-				for (const i in payload.delete_labels) {
-					const index = task.label.findIndex(label => label.id === payload.delete_labels[i].id)
-					if (index !== -1) task.label = task.label.filter((_, i) => i !== index)
-				}
+				task = section.tasks.find(task => task.id === payload.target_task)
+			}
+			for (const i in payload.delete_labels) {
+				const index = task.label.findIndex(label => label.id === payload.delete_labels[i].id)
+				if (index !== -1) task.label = task.label.filter((_, i) => i !== index)
 			}
 		}
 	},

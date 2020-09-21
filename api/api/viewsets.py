@@ -509,8 +509,8 @@ class SubTaskViewSet(BaseModelViewSet):
 
         try:
             task = Task.objects.get(pk=task_id)
-            subTasks = task.subtask_target_task.all().iterator()
-            for subTask in subTasks:
+            subTasks = task.subtask_target_task.all()
+            for subTask in subTasks.iterator():
                 isMatched = False
                 for complete_sub_task in complete_sub_task_list:
                     if subTask.id == complete_sub_task['id']:
@@ -532,6 +532,7 @@ class SubTaskViewSet(BaseModelViewSet):
         return Response({
             'target_task': task_id,
             'target_section': section_id,
+            'sub_tasks': self.get_serializer(subTasks, many=True).data,
             'complete_sub_tasks': self.get_serializer(result, many=True).data
         }, status=status.HTTP_200_OK)
 

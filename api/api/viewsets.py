@@ -553,6 +553,33 @@ class LabelViewSet(BaseModelViewSet):
         logger.debug(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['DELETE'], detail=False)
+    def delete(self, request):
+        task_id = request.data['task_id']
+        delete_label_list = request.data['delete_label_list']
+        result = []
+
+        try:
+            task = Task.objects.get(pk=task_id)
+            labels = task.label.all().iterator()
+            for label in labels:
+                for delete_label in delete_label_list:
+                    if label.id == delete_label['id']:
+                        task.label.remove(label)
+                        result.append(label)
+                        task.save()
+        except Task.DoesNotExist:
+            logger.error('タスクが見つかりませんでした。')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        section_id = task.target_section.id if task.target_section != None else 0
+
+        return Response({
+            'target_task': task_id,
+            'target_section': section_id,
+            'delete_labels': self.get_serializer(result, many=True).data
+        }, status=status.HTTP_200_OK)
+
 
 class KarmaViewSet(BaseModelViewSet):
 

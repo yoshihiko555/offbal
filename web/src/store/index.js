@@ -216,6 +216,22 @@ export default new Vuex.Store({
 				const j = task.complete_sub_tasks.findIndex(subtask => subtask.id === payload.id)
 				if (j !== -1) task.complete_sub_tasks = task.complete_sub_tasks.filter((_, i) => i !== j)
 			}
+		},
+		deleteLabels (state, payload) {
+			if (payload.target_section === 0) {
+				const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
+				for (const i in payload.delete_labels) {
+					const index = task.label.findIndex(label => label.id === payload.delete_labels[i].id)
+					if (index !== -1) task.label = task.label.filter((_, i) => i !== index)
+				}
+			} else {
+				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
+				const task = section.tasks.find(task => task.id === payload.target_task)
+				for (const i in payload.delete_labels) {
+					const index = task.label.findIndex(label => label.id === payload.delete_labels[i].id)
+					if (index !== -1) task.label = task.label.filter((_, i) => i !== index)
+				}
+			}
 		}
 	},
 	actions: {

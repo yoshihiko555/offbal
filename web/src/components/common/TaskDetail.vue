@@ -4,15 +4,13 @@
             v-model="drawer"
             right
             fixed
-            :style="{ width: '500px', top: '80px' }"
+            :style="{ width: '500px', top: '80px', height: '650px' }"
         >
             <v-container
                 fluid
                 class="task_detail_wrap"
             >
-                <v-card
-                    outlined
-                >
+                <v-card>
                     <!-- タスク内容、サブタスク内容ここから -->
                     <!-- タスク～ -->
                     <div class="task_detail_header">
@@ -113,6 +111,42 @@
                                 </v-btn>
                             </v-card-actions>
                         </v-card-title>
+                        <v-card-text>
+                            <v-chip-group
+                                column
+                            >
+                                <v-chip
+                                    color="teal accent-3"
+                                    text-color="white"
+                                    label
+                                    small
+                                    close
+                                    v-for="(label, i) in cloneTask.label"
+                                    :key="i"
+                                    @click:close="deleteLabel(label)"
+                                >
+                                    <v-icon
+                                        left
+                                        small
+                                        color="white"
+                                    >mdi-label</v-icon>
+                                    {{ label.name }}
+                                </v-chip>
+                            </v-chip-group>
+                            <v-chip
+                                class="mt-1"
+                                color="teal accent-3"
+                                text-color="white"
+                                small
+                                @click="addLabelBtn"
+                            >
+                                <v-icon
+                                    small
+                                    color="white"
+                                >mdi-plus</v-icon>
+                                追加
+                            </v-chip>
+                        </v-card-text>
                         <v-divider></v-divider>
                     </div>
                     <!-- ～タスク -->
@@ -470,6 +504,7 @@
                     },
                     icon: 'mdi-star',
                 },
+                deleteLabelList: [],
             }
         },
         created () {
@@ -521,6 +556,7 @@
                 'updateCompleteSubTasks',
                 'updateTask',
                 'updateSubTask',
+                'deleteLabels',
             ]),
             ...mapActions([
                 'deleteTaskAction',
@@ -779,12 +815,45 @@
                 this.priority.value = priority
                 this.updateTaskDetail('priority', this.cloneTask.priority)
                 this.priority_menu = false
+            },
+            deleteLabel (label) {
+                for (const i in this.cloneTask.label) {
+                    if (this.cloneTask.label[i].id === label.id) {
+                        this.cloneTask.label.splice(i, 1)
+                        break
+                    }
+                }
+                this.deleteLabelList.push(label)
+                this.deleteLabelAction()
+            },
+            deleteLabelAction: _.debounce(function deleteLabelAction () {
+                this.$axios({
+                    url: '/api/label/delete/',
+                    method: 'DELETE',
+                    data: {
+                        task_id: this.cloneTask.id,
+                        delete_label_list: this.deleteLabelList
+                    }
+                })
+                .then(res => {
+                    console.log(res)
+                    this.deleteLabels(res.data)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+                this.deleteLabelList = []
+            }, 400),
+            addLabelBtn () {
+                console.log('addLabelBtn')
             }
         },
     }
 </script>
 <style lang="scss" scoped>
     .task_detail_wrap {
+        margin: 0;
+        padding: 0;
         .task_detail_header {
             .v-card__actions {
                 padding: 8px 0 0 0;

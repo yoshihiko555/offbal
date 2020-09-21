@@ -1,57 +1,56 @@
 <template>
-    <div id='category-list' class="detail_category_wrap" :class="{ 'is-task-drawer': drawer }">
-        <div class="detail_category_header">
-            <h1 class="category_title">{{ detailCategory.name }}</h1>
-            <!-- <DetailCategoryMenuBtn
+    <div>
+        <div id='category-list' class="detail_category_wrap" :class="{ 'is-task-drawer': drawer }">
+            <div class="detail_category_header">
+                <h1 class="category_title">{{ detailCategory.name }}</h1>
+                <!-- <DetailCategoryMenuBtn
+                    @open-create='openCreate'
+                /> -->
+                <v-spacer/>
+                <div class='operation_btn_wrap pr-2'>
+                    <FilterBtn/>
+                    <SortBtn/>
+                </div>
+            </div>
+
+            <CreateTaskField
+                :category=detailCategory
+            />
+
+            <TaskList
+                :tasks=detailCategory.tasks
+            />
+
+            <SectionList/>
+
+            <CreateSectionBtn
+                v-show="isCreateBtn"
                 @open-create='openCreate'
-            /> -->
-            <v-spacer/>
-            <div class='operation_btn_wrap pr-2'>
-                <FilterBtn/>
-                <SortBtn/>
-            </div>
+            />
+            <CreateSectionField
+                v-show="isCreateField"
+                @close-create='closeCreate'
+            />
+            <EditSectionField
+                v-show="isEditField"
+                ref='edit'
+                @close-edit='closeEdit'
+            />
+            <CompleteTaskList
+                :complete_tasks=detailCategory.complete_tasks
+            />
+            <TaskDetail/>
         </div>
-
-        <CreateTaskField
-            :category=detailCategory
-        />
-
-        <TaskList
-            :tasks=detailCategory.tasks
-        />
-
-        <SectionList/>
-
-        <CreateSectionBtn
-            v-show="isCreateBtn"
-            @open-create='openCreate'
-        />
-        <CreateSectionField
-            v-show="isCreateField"
-            @close-create='closeCreate'
-        />
-        <EditSectionField
-            v-show="isEditField"
-            ref='edit'
-            @close-edit='closeEdit'
-        />
-        <CompleteTaskList
-            :complete_tasks=detailCategory.complete_tasks
-        />
-        <v-row>
-            <v-spacer></v-spacer>
-            <div class='today_todo_count_wrap pr-2'>
-                <vs-button
-                    icon
-                    relief
-                    size="large"
-                    to='/myapp/karma/'
-                >
-                    <i class='bx bx-list-check'></i>2/5
-                </vs-button>
-            </div>
-        </v-row>
-        <TaskDetail/>
+        <div class='today_todo_count_wrap pr-2' :class="{ 'today_todo_count_wrap_clicked': drawer}">
+            <vs-button
+                icon
+                relief
+                size="large"
+                to='/myapp/karma/'
+            >
+                <i class='bx bx-list-check'></i>2/5
+            </vs-button>
+        </div>
     </div>
 </template>
 
@@ -148,9 +147,14 @@
         }
     }
     .today_todo_count_wrap::v-deep {
-        // position: absolute;
-        // right: 0;
-        // bottom: 0;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+    }
+    .today_todo_count_wrap_clicked::v-deep {
+        right: 500px;
+        transition: .2s;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     }
     .detail_category_wrap {
         max-width: calc(100% - 10px);

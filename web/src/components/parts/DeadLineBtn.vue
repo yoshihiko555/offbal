@@ -7,7 +7,7 @@
             z-index=99000
             open-delay=250
         >
-            <span>{{ deadlineDate }}</span>
+            <span>{{ deadlineDate }}まで</span>
         </v-tooltip>
         <v-tooltip
             v-else
@@ -72,8 +72,10 @@
                 value: '',
                 color: Con.NON_ACTIVE_COLOR
             },
+            startTime: '',
         }),
         created () {
+            this.$eventHub.$on('set_start_time', this.setStartTime)
             if (this.defaultDeadline !== null) this.deadline.value = this.defaultDeadline
         },
         mounted: function () {},
@@ -81,10 +83,12 @@
             'deadline.value': function (val) {
                 this.deadline.color = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
                 this.$eventHub.$emit('create_task_info', 'deadline_str', val)
+                this.$eventHub.$emit('set_deadline', val)
             }
         },
         computed: {
             start () {
+                if (this.startTime !== '') return this.startTime
                 const start = moment()
                 return start.format('YYYY-MM-DDTHH:mm:ss')
             },
@@ -95,7 +99,11 @@
                 return this.deadline.value
             },
         },
-        methods: {},
+        methods: {
+            setStartTime (startTime) {
+                this.startTime = startTime
+            }
+        },
     }
 </script>
 <style lang='scss'>

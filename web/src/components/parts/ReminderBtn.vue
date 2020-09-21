@@ -7,7 +7,7 @@
             z-index=99000
             open-delay=250
         >
-            <span>{{ remindDate }}</span>
+            <span>{{ remindDate }}に通知</span>
         </v-tooltip>
         <v-tooltip
             v-else
@@ -39,6 +39,7 @@
                 v-model="remind.value"
                 :minute-interval="15"
                 :min-date="start"
+                :max-date="end"
                 inline
                 no-keyboard
                 format="YYYY-MM-DD HH:mm:ss"
@@ -72,8 +73,10 @@
                 color: Con.NON_ACTIVE_COLOR
             },
             isSelected: false,
+            endTime: '',
         }),
         created () {
+            this.$eventHub.$on('set_deadline', this.setEndTime)
         },
         mounted: function () {
             if (this.defaultRemind !== null) this.remind.value = this.defaultRemind
@@ -95,11 +98,18 @@
                 const start = moment()
                 return start.format('YYYY-MM-DDTHH:mm:ss')
             },
+            end () {
+                return this.endTime
+            },
             remindDate () {
                 return this.remind.value
             }
         },
-        methods: {},
+        methods: {
+            setEndTime (endTime) {
+                this.endTime = endTime
+            }
+        },
     }
 </script>
 <style lang='scss'>

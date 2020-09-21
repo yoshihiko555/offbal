@@ -10,6 +10,7 @@ import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import myRules from '@/assets/js/rules'
 import { globalMixins } from '@/mixins'
 import eventHub from '@/plugins/eventHub'
+import truncate from '@/filters/truncate'
 
 // CSS
 import 'vuesax/dist/vuesax.css'

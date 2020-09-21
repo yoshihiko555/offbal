@@ -7,7 +7,7 @@
             z-index=99000
             open-delay=250
         >
-            <span>{{ startTimeDate }}</span>
+            <span>{{ startTimeDate }}から開始</span>
         </v-tooltip>
         <v-tooltip
             v-else
@@ -81,6 +81,7 @@
             'startTime.value': function (val) {
                 this.startTime.color = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
                 this.$eventHub.$emit('create_task_info', 'start_time_str', val)
+                this.$eventHub.$emit('set_start_time', val)
             }
         },
         computed: {

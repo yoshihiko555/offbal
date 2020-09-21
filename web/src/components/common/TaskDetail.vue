@@ -138,8 +138,7 @@
                                     >
                                         <v-list-item-title
                                             class="subtask_content"
-                                            v-text="subtask.content"
-                                        ></v-list-item-title>
+                                        >{{ subtask.content | truncate(18) }}</v-list-item-title>
                                     </vs-checkbox>
                                 </v-col>
                                 <v-col cols="2">

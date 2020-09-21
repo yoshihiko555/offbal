@@ -84,8 +84,12 @@
                 .catch(e => {
                     console.log(e)
                 })
+                for (const i in this.complete_task_list) {
+                    const completeTask = JSON.stringify(this.complete_task_list[i])
+                    const targetTask = JSON.stringify(task)
+                    if (completeTask === targetTask) this.closeSameTaskDetail(task)
+                }
                 this.complete_task_list = []
-                this.closeSameTaskDetail(task)
             }, 400),
             showTaskDetail (task) {
                 this.$eventHub.$emit('showTaskDetail', task)

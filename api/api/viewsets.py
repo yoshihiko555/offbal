@@ -527,9 +527,11 @@ class SubTaskViewSet(BaseModelViewSet):
             logger.error('タスクが見つかりませんでした。')
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+        section_id = task.target_section.id if task.target_section != None else 0
+
         return Response({
             'target_task': task_id,
-            'target_section': task.target_section.id,
+            'target_section': section_id,
             'complete_sub_tasks': self.get_serializer(result, many=True).data
         }, status=status.HTTP_200_OK)
 

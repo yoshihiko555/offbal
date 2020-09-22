@@ -138,12 +138,14 @@
                                     {{ label.name }}
                                 </v-chip>
                             </v-chip-group>
+                            <!-- ラベル追加ボタンここから -->
                             <v-chip
+                                v-if="!isCreateLabel"
                                 class="mt-1"
                                 color="teal accent-3"
                                 text-color="white"
                                 small
-                                @click="addLabelBtn"
+                                @click="addLabelContent"
                             >
                                 <v-icon
                                     small
@@ -151,6 +153,66 @@
                                 >mdi-plus</v-icon>
                                 ラベル追加
                             </v-chip>
+                            <!-- ラベル追加ボタンここまで -->
+                            <!-- ラベル追加ボタン押下後ここから -->
+                            <div
+                                v-else
+                                class="create_label_area_wrap mt-5"
+                            >
+                                <div class="create_label_input_area_wrap">
+                                    <vs-input
+                                        v-model="createLabelValue"
+                                        @keypress.prevent.enter.exact="changeCreateLabelSubmitValue"
+                                        @keyup.prevent.enter.exact="setCreateLabelName"
+                                    >
+                                        <template #icon>
+                                            <i class='bx bx-label'></i>
+                                        </template>
+                                    </vs-input>
+                                    <v-btn
+                                        class="create_label_add_btn"
+                                        icon
+                                        color="primary"
+                                        @click="createLabelBtn"
+                                    >
+                                        <i class='bx bx-check'></i>
+                                    </v-btn>
+                                    <v-btn
+                                        class="create_label_cancel_btn"
+                                        icon
+                                        @click="isCreateLabel = false"
+                                    >
+                                        <i class='bx bx-x'></i>
+                                    </v-btn>
+                                </div>
+                                <div class="create_label_select_area_wrap mt-3">
+                                    <vs-select
+                                        placeholder='Select Label'
+                                        v-model="selectLabelList"
+                                        multiple
+                                        filter
+                                        chips
+                                    >
+                                        <vs-option
+                                            v-for='(label, i) in labels'
+                                            :key='i'
+                                            :label='label.name'
+                                            :value='label.id'
+                                            filter
+                                        >{{ label.name }}
+                                        </vs-option>
+                                    </vs-select>
+                                    <v-btn
+                                        class="create_label_submit_btn ml-2"
+                                        icon
+                                        color="primary"
+                                        @click="addLabelBtn"
+                                    >
+                                        <i class="bx bxs-paper-plane"></i>
+                                    </v-btn>
+                                </div>
+                            </div>
+                            <!-- ラベル追加ボタン押下後ここまで -->
                         </v-card-text>
                         <v-divider></v-divider>
                         <!-- ラベルここまで -->
@@ -162,7 +224,7 @@
                             v-for="(subtask, i) in cloneTask.sub_tasks"
                             :key="subtask.id"
                         >
-                            <v-container>
+                            <v-container class="ma-0 pa-0">
                                 <v-row
                                     v-if="!isEditSubTask(subtask)"
                                     class="sub_task_area_wrap"
@@ -433,7 +495,7 @@
 </template>
 <script>
     import { Const } from '@/assets/js/const'
-    import { mapActions, mapMutations } from 'vuex'
+    import { mapGetters, mapActions, mapMutations } from 'vuex'
     import _ from 'lodash'
     import moment from 'moment'
     import Datetime from 'vue-ctk-date-time-picker'
@@ -463,6 +525,9 @@
                 isHover: false,
                 subTaskSubmitValue: false,
                 isEdit: false,
+                isCreateLabel: false,
+                createLabelSubmitValue: false,
+                createLabelValue: '',
                 editTaskSubmitValue: false,
                 editSubTaskSubmitValue: false,
                 mouseOverSubTaskData: {},
@@ -513,6 +578,7 @@
                     icon: 'mdi-star',
                 },
                 deleteLabelList: [],
+                selectLabelList: [],
             }
         },
         created () {
@@ -544,6 +610,9 @@
             }, 500),
         },
         computed: {
+            ...mapGetters([
+                'labels',
+            ]),
             start () {
                 const start = moment()
                 return start.format('YYYY-MM-DDTHH:mm:ss')
@@ -603,6 +672,9 @@
                 this.complete_sub_task_list = _.cloneDeep(task.complete_sub_tasks)
                 this.task = task
                 this.cloneTask = _.cloneDeep(task)
+                this.endEditTaskContent()
+                this.endEditSubTaskContent()
+                this.endCreateLabel()
             },
             checkSubTask: _.debounce(function checkSubTask (subtask) {
                 // サブタスクのチェックボックス押下後発火
@@ -684,6 +756,9 @@
                     target_task: 0,
                     content: '',
                 }
+                this.endEditTaskContent()
+                this.endEditSubTaskContent()
+                this.endCreateLabel()
             },
             updateTaskDetail (key, value) {
                 // タスク詳細を個別に更新
@@ -722,14 +797,22 @@
                 })
             },
             editTaskContent () {
-                // タスク編集モードにする。サブタスク編集モードは終了
+                // タスク編集モードにする。
                 this.isEdit = true
                 this.endEditSubTaskContent()
+                this.endCreateLabel()
             },
             editSubTaskContent (subtask) {
-                // サブタスク編集モードにする。タスク編集モードは終了
+                // サブタスク編集モードにする。
                 this.editSubTaskData = subtask
                 this.endEditTaskContent()
+                this.endCreateLabel()
+            },
+            addLabelContent () {
+                // ラベル作成モードにする。
+                this.isCreateLabel = true
+                this.endEditTaskContent()
+                this.endEditSubTaskContent()
             },
             mouseOverSubTask (subtask) {
                 // サブタスクにホバー時にサブタスク情報を保持
@@ -751,6 +834,10 @@
             changeEditSubTaskSubmitValue () {
                 // サブタスク編集の日本語変換でのsubmitを防ぐ
                 this.editSubTaskSubmitValue = true
+            },
+            changeCreateLabelSubmitValue () {
+                // ラベル作成の日本語変換でのsubmitを防ぐ
+                this.createLabelSubmitValue = true
             },
             setEditTaskContent () {
                 // タスク編集の入力エリアでenterが押されたら更新
@@ -774,6 +861,21 @@
                 }
                 this.endEditSubTaskContent()
             },
+            setCreateLabelName () {
+                // ラベル作成エリアでenterが押されたら更新
+                const length = this.createLabelValue.length
+                if (length === 0 || !this.createLabelSubmitValue) return
+                this.endCreateLabel()
+            },
+            createLabelBtn () {
+                // ラベル作成の送信ボタンが押されたらラベル作成
+                this.endCreateLabel()
+            },
+            addLabelBtn () {
+                // ラベルを選択した後送信
+                console.log('addLabelBtn')
+                this.endCreateLabel()
+            },
             endEditTaskContent () {
                 // タスク編集モードを終了
                 this.isEdit = false
@@ -784,6 +886,12 @@
                 this.editSubTaskData = {}
                 this.editSubTaskSubmitValue = false
                 this.mouseOverSubTaskData = {}
+            },
+            endCreateLabel () {
+                // ラベル作成モードを終了
+                this.isCreateLabel = false
+                this.createLabelSubmitValue = false
+                this.createLabelValue = ''
             },
             editTaskContentBtn () {
                 // タスク編集時にsubmitボタン押下で更新
@@ -852,13 +960,16 @@
                 })
                 this.deleteLabelList = []
             }, 400),
-            addLabelBtn () {
-                console.log('addLabelBtn')
-            }
         },
     }
 </script>
 <style lang="scss" scoped>
+    .vs-input-parent::v-deep {
+        width: 100%;
+        .vs-input {
+            width: 100%;
+        }
+    }
     .task_detail_wrap {
         margin: 0;
         padding: 0;
@@ -885,11 +996,25 @@
         .sub_task_area_wrap {
             height: 65px;
         }
-    }
-    .vs-input-parent::v-deep {
-        width: 100%;
-        .vs-input {
+        .create_label_input_area_wrap {
+            display: flex;
             width: 100%;
+            .vs-input-parent::v-deep {
+                width: 55%;
+                .vs-input {
+                    width: 100%;
+                }
+            }
+        }
+        .create_label_select_area_wrap {
+            display: flex;
+            width: 100%;
+            .vs-select-content::v-deep {
+                max-width: 63%;
+                .vs-select__input {
+                    width: 100%;
+                }
+            }
         }
     }
     .task_delete_confirm_btn {

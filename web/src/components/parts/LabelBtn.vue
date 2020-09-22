@@ -87,7 +87,7 @@
                                         :label='label.name'
                                         :value='label.id'
                                         filter
-                                    >{{ label.name }} {{ label.id }} {{ i }}
+                                    >{{ label.name }}
                                     </vs-option>
                                 </vs-select>
                             </v-card-actions>

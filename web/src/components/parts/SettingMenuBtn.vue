@@ -43,6 +43,11 @@
             return {
                 menus: [
                     {
+                        name: 'Setting',
+                        icon: 'mdi-cog',
+                        call: this.toSetting,
+                    },
+                    {
                         name: 'Signout',
                         icon: 'mdi-account-arrow-right-outline',
                         call: this.signout,
@@ -54,6 +59,9 @@
         	signout () {
                 auth.logout()
             },
+            toSetting () {
+                this.$router.push('/setting')
+            }
         },
     }
 </script>

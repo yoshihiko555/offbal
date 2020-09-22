@@ -140,12 +140,6 @@
                 clone.datasets[0].data.push(total)
                 this.todayTaskPoint = clone
             },
-            setKarmaRankInfo (current, next) {
-                const clone = _.cloneDeep(this.karmaRankInfo)
-                clone.datasets[0].data.push(current)
-                clone.datasets[0].data.push(next)
-                this.karmaRankInfo = clone
-            },
             setWeekTaskPoint (list) {
                 const clone = _.cloneDeep(this.weekTaskPoint)
                 for (const i of list) {

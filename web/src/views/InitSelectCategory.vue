@@ -1,3 +1,4 @@
+<!-- カテゴリー初期選択画面 -->
 <template>
     <vs-dialog
         v-model="isShow"

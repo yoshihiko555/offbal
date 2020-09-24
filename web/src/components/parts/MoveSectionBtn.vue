@@ -1,3 +1,4 @@
+<!-- セクションメニューのカテゴリー移動ボタン -->
 <template>
     <v-menu
         bottom
@@ -46,7 +47,7 @@
     const Con = new Const()
 
     export default {
-        name: 'CategoryBtn',
+        name: 'MoveSectionBtn',
         data: () => ({
             category: {
                 name: '',

@@ -1,4 +1,5 @@
 <script>
+    // リアクティブな円グラフ
     import { Doughnut, mixins } from 'vue-chartjs'
     import Chart from 'chart.js'
     const { reactiveProp } = mixins

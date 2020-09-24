@@ -1,3 +1,4 @@
+<!-- アプリサイドバー -->
 <template>
     <div id="sidebar">
 		<v-navigation-drawer
@@ -52,10 +53,6 @@
 		</v-navigation-drawer>
 
         <!-- モーダル読み込み -->
-        <!-- <CreateCategoryDialog
-            ref='category'
-        /> -->
-
         <CreateLabelDialog
             ref='label'
         />
@@ -67,10 +64,7 @@
 </template>
 
 <script>
-	import CreateCategoryDialog from '@/components/common/CreateCategoryDialog'
-    import SidebarCategoryMenuBtn from '@/components/parts/SidebarCategoryMenuBtn'
     import CreateLabelDialog from '@/components/common/CreateLabelDialog'
-    import SidebarArchiveMenuBtn from '@/components/parts/SidebarArchiveMenuBtn'
     import draggable from 'vuedraggable'
     import ChangeCategoryDialog from '@/components/common/ChangeCategoryDialog'
 
@@ -82,10 +76,7 @@
     export default {
         name: 'Sidebar',
         components: {
-        	CreateCategoryDialog,
-            SidebarCategoryMenuBtn,
             CreateLabelDialog,
-            SidebarArchiveMenuBtn,
             draggable,
             ChangeCategoryDialog
         },
@@ -110,8 +101,6 @@
     	computed: {
     		...mapGetters([
                 'categorys',
-                'favoriteCategorys',
-                'archivedCategorys',
                 'labels',
             ]),
             localCategorys: {
@@ -141,9 +130,6 @@
             		}
             	})
                 this.$eventHub.$emit('closeTaskDetail')
-            },
-            createCategory () {
-            	this.$refs.category.open()
             },
             createLabel () {
                 this.$refs.label.open()

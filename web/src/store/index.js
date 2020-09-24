@@ -9,17 +9,13 @@ export default new Vuex.Store({
 	strict: true,
 	state: {
 	    categorys: [],
-	    favoriteCategorys: [],
 		labels: [],
 	    detailCategory: {},
-	    archivedCategorys: [],
 	},
 	getters: {
 	    categorys: state => state.categorys,
-	    favoriteCategorys: state => state.favoriteCategorys,
 		labels: state => state.labels,
 		detailCategory: state => state.detailCategory,
-		archivedCategorys: state => state.archivedCategorys,
 	},
 	mutations: {
 		setCategorys (state, payload) {
@@ -27,9 +23,6 @@ export default new Vuex.Store({
 		},
 		setLabels (state, payload) {
             state.labels = payload
-		},
-		addCategory (state, payload) {
-            state.categorys.push(payload)
 		},
 		addLabel (state, payload) {
             state.labels.push(payload)
@@ -42,27 +35,9 @@ export default new Vuex.Store({
 	        const index = state.categorys.findIndex(category => category.id === payload.id)
 	        Vue.set(state.categorys, index, payload)
     	},
-		deleteCategory (state, payload) {
-	        const index = state.categorys.findIndex(category => category.id === payload.id)
-	        state.categorys = state.categorys.filter((_, i) => i !== index)
-        },
         updateCategoryIndex (state, payload) {
             state.categorys = payload
         },
-  		setFavoriteCategorys (state, payload) {
-	        const favopro = []
-	        for (const category of payload) {
-	            if (category.favorite) favopro.push(category)
-	        }
-	      	state.favoriteCategorys = favopro
-  		},
-	  	addFavoriteCategorys (state, payload) {
-			state.favoriteCategorys.push(payload)
-	  	},
-		deleteFavoriteCategorys (state, payload) {
-	        const index = state.favoriteCategorys.findIndex(category => category.id === payload.id)
-	        if (index !== -1) state.favoriteCategorys = state.favoriteCategorys.filter((_, i) => i !== index)
-    	},
 	    setDetailCategory (state, payload) {
 	        state.detailCategory = payload
 	    },
@@ -93,20 +68,6 @@ export default new Vuex.Store({
 	        const category = state.categorys.find(category => category.id === state.detailCategory.id)
 	        const j = category.sections.findIndex(section => section.id === payload)
 	        if (j !== -1) category.sections = category.sections.filter((_, i) => i !== j)
-	    },
-	    setArchivedCategorys (state, payload) {
-	        const archives = []
-	        for (const category of payload) {
-	            if (category.archived) archives.push(category)
-	        }
-	      	state.archivedCategorys = archives
-	    },
-	    addArchivedCategorys (state, payload) {
-	        state.archivedCategorys.push(payload)
-	    },
-	    deleteArchivedCategorys (state, payload) {
-	        const index = state.archivedCategorys.findIndex(category => category.id === payload.id)
-	        if (index !== -1) state.archivedCategorys = state.archivedCategorys.filter((_, i) => i !== index)
 	    },
 		addTask (state, payload) {
 			// 違うカテゴリーだったら追加しない
@@ -236,8 +197,6 @@ export default new Vuex.Store({
 	        	.then(res => {
 	        		console.log('アプリ初期描画', res)
 					this.commit('setCategorys', res.data.categorys)
-					this.commit('setFavoriteCategorys', res.data.categorys)
-					this.commit('setArchivedCategorys', res.data.categorys)
 					this.commit('setLabels', res.data.labels)
 					resolve(res)
 	        	})
@@ -247,39 +206,12 @@ export default new Vuex.Store({
 	        	})
 			})
 		},
-    	// 作成したカテゴリーを一覧に追加
-		addCategorysAction (ctx, kwargs) {
-			this.commit('addCategory', kwargs)
-    	},
 		addLabelsAction (ctx, kwargs) {
 			this.commit('addLabel', kwargs)
 		},
 	    // カテゴリーの更新
 	    updateCategoryAction (ctx, kwargs) {
 	        this.commit('updateCategory', kwargs)
-	    },
-	    // カテゴリーの削除
-        deleteCategoryAction (ctx, kwargs) {
-            Vue.prototype.$axios({
-                url: `/api/category/${kwargs.id}/`,
-                method: 'DELETE',
-            })
-            .then(res => {
-                console.log(res)
-                this.commit('deleteCategory', kwargs)
-                this.commit('deleteArchivedCategorys', kwargs)
-            })
-            .catch(e => {
-                console.log(e)
-            })
-	    },
-	    // お気に入りカテゴリーを追加
-		addFavoriteCategorysAction (ctx, kwargs) {
-			this.commit('addFavoriteCategorys', kwargs)
-    	},
-	    // お気に入りカテゴリーを削除
-	    deleteFavoriteCategorysAction (ctx, kwargs) {
-	        this.commit('deleteFavoriteCategorys', kwargs)
 	    },
     	// カテゴリー詳細取得
 	    getDetailCategoryAction (ctx, id) {

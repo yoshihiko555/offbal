@@ -1,11 +1,9 @@
+<!-- アプリカテゴリー詳細画面 -->
 <template>
     <div>
         <div id='category-list' class="detail_category_wrap" :class="{ 'is-task-drawer': drawer }">
             <div class="detail_category_header">
                 <h1 class="category_title">{{ detailCategory.name }}</h1>
-                <!-- <DetailCategoryMenuBtn
-                    @open-create='openCreate'
-                /> -->
                 <v-spacer/>
                 <div class='operation_btn_wrap pr-2'>
                     <FilterBtn/>
@@ -41,15 +39,11 @@
             />
             <TaskDetail/>
         </div>
-        <div class='today_todo_count_wrap pr-2' :class="{ 'today_todo_count_wrap_clicked': drawer}">
-            <vs-button
-                icon
-                relief
-                size="large"
-                to='/myapp/karma/'
-            >
-                <i class='bx bx-list-check'></i>2/5
-            </vs-button>
+        <div
+            class='today_todo_count_wrap pr-2'
+            :class="{ 'today_todo_count_wrap_clicked': drawer}"
+        >
+            <TodayTaskCountBtn/>
         </div>
     </div>
 </template>
@@ -60,12 +54,12 @@
     import CreateSectionBtn from '@/components/parts/CreateSectionBtn'
     import CreateSectionField from '@/components/parts/CreateSectionField'
     import EditSectionField from '@/components/parts/EditSectionField'
-    import DetailCategoryMenuBtn from '@/components/parts/DetailCategoryMenuBtn'
     import TaskList from '@/components/common/TaskList'
     import SectionList from '@/components/common/SectionList'
     import CreateTaskField from '@/components/parts/CreateTaskField'
     import CompleteTaskList from '@/components/common/CompleteTaskList'
     import TaskDetail from '@/components/common/TaskDetail'
+    import TodayTaskCountBtn from '@/components/parts/TodayTaskCountBtn'
 
     import { mapGetters, mapActions } from 'vuex'
 
@@ -77,12 +71,12 @@
             CreateSectionBtn,
             CreateSectionField,
             EditSectionField,
-            DetailCategoryMenuBtn,
             TaskList,
             SectionList,
             CreateTaskField,
             CompleteTaskList,
             TaskDetail,
+            TodayTaskCountBtn,
         },
         data: () => ({
             isCreateBtn: true,        // セクション追加ボタン

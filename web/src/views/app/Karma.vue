@@ -1,3 +1,4 @@
+<!-- カルマベース画面 -->
 <template>
     <div id='karma'>
         <vs-navbar

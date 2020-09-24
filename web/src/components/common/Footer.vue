@@ -1,3 +1,4 @@
+<!-- サイトフッター -->
 <template>
     <v-footer
         color='white'

@@ -1,3 +1,4 @@
+<!-- カテゴリーの変更モーダル -->
 <template>
     <vs-dialog
         v-model="isShow"
@@ -51,7 +52,7 @@
     const Con = new Const()
 
     export default {
-        name: 'InitSelectCategory',
+        name: 'ChangeCategoryDialog',
         data: () => ({
             isShow: false,
             id: null,
@@ -99,6 +100,8 @@
                 })
             },
             changeCategorys () {
+                // TODO : ここもVuexのActionに任せちゃうようにする
+                // 極力store管理しているものでaxiosが絡んでいるものはVuexのActionを通したい
                 console.log('選択カテゴリー', this.selectCategorys)
                 this.$axios({
                     url: '/api/category/change_categorys/',

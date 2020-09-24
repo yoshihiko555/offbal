@@ -1,4 +1,5 @@
 <script>
+    // リアクティブな棒グラフ
     import { Bar, mixins } from 'vue-chartjs'
     const { reactiveProp } = mixins
 

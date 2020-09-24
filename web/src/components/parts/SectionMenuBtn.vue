@@ -1,3 +1,4 @@
+<!-- セクションメニューボタン -->
 <template>
     <div>
         <v-menu
@@ -50,7 +51,7 @@
                 </v-list-item>
             </v-list>
         </v-menu>
-        <SelectCategoryBtn
+        <MoveSectionBtn
             @move-section='moveSection'
             ref='categoryBtn'
         />
@@ -58,14 +59,14 @@
 </template>
 
 <script>
-    import SelectCategoryBtn from '@/components/parts/SelectCategoryBtn'
+    import MoveSectionBtn from '@/components/parts/MoveSectionBtn'
 	import { mapActions, mapMutations } from 'vuex'
 	import _ from 'lodash'
 
     export default {
         name: 'SectionMenuBtn',
         components: {
-            SelectCategoryBtn,
+            MoveSectionBtn,
         },
         props: {
         	section: {

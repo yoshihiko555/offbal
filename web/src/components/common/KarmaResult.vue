@@ -1,3 +1,4 @@
+<!-- カルマの結果を表示する -->
 <template>
     <v-container fluid v-if='load'>
         <v-row class="mb-2 graph_wrap">

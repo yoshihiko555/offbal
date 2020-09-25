@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexPersistedstate from 'vuex-persistedstate'
 import { setTitle } from '@/mixins'
+import setting from './setting'
 
 Vue.use(Vuex)
 
@@ -198,6 +199,7 @@ export default new Vuex.Store({
 	        		console.log('アプリ初期描画', res)
 					this.commit('setCategorys', res.data.categorys)
 					this.commit('setLabels', res.data.labels)
+					this.commit('setting/setSetting', res.data.setting)
 					resolve(res)
 	        	})
 	        	.catch(e => {
@@ -276,6 +278,7 @@ export default new Vuex.Store({
 		},
 	},
 	modules: {
+		setting,
 	},
     plugins: [
         VuexPersistedstate({

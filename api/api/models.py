@@ -161,7 +161,7 @@ class mSetting(models.Model):
         DEFAULT = 'default', _('Default')
         DARK = 'dark', _('Dark')
 
-    target_user = models.ForeignKey(
+    target_user = models.OneToOneField(
         mUser,
         on_delete=models.CASCADE,
         related_name='setting_target_user'

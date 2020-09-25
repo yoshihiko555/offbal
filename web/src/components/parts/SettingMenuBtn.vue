@@ -19,7 +19,7 @@
                 <v-list-item
                     v-for='(menu, i) in menus'
                     :key='i'
-                    @click="menu.call"
+                    @click="menu.call(menu.url)"
                 >
                     <v-list-item-icon class="mr-0">
                         <v-icon small v-text='menu.icon'/>
@@ -45,11 +45,19 @@
                     {
                         name: 'Setting',
                         icon: 'mdi-cog',
-                        call: this.toSetting,
+                        url: '/setting',
+                        call: this.toPage,
+                    },
+                    {
+                    	name: 'Theme',
+                    	icon: 'mdi-palette',
+                    	url: '/setting/theme',
+                    	call: this.toPage,
                     },
                     {
                         name: 'Signout',
                         icon: 'mdi-account-arrow-right-outline',
+                        url: '',
                         call: this.signout,
                     },
                 ],
@@ -59,8 +67,8 @@
         	signout () {
                 auth.logout()
             },
-            toSetting () {
-                this.$router.push('/setting')
+            toPage (url) {
+            	this.$router.push(url)
             }
         },
     }

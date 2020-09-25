@@ -16,12 +16,6 @@ class Const {
     NON_ACTIVE_COLOR = 'grey lighten-1'
 
     SIDEBAR_MENU = [
-        // {
-        //     title: 'Inbox',
-        //     icon: 'mdi-inbox',
-        //     isNest: false,
-        //     route: 'Inbox',
-        // },
         {
             title: 'Today',
             icon: 'mdi-calendar-today',
@@ -34,30 +28,33 @@ class Const {
             isNest: false,
             route: 'FutureScheduled',
         },
-        // {
-        //     title: 'Favorite',
-        //     icon: 'mdi-star',
-        //     isNest: false,
-        //     route: 'DetailCategory',
-        // },
-        // {
-        //     title: 'Category',
-        //     icon: 'mdi-format-list-checkbox',
-        //     isNest: true,
-        //     route: 'DetailCategory',
-        // },
-        // {
-        //     title: 'Label',
-        //     icon: 'mdi-label-multiple-outline',
-        //     isNest: true,
-        //     route: 'Labels',
-        // },
-        // {
-        //     title: 'Activity',
-        //     icon: 'mdi-bell-ring',
-        //     isNest: false,
-        //     route: 'Activitys',
-        // },
+    ]
+
+    SETTING_SIDEBAR_MENU = [
+        {
+            id: 'general',
+            name: '一般',
+            icon: 'bx-cog',
+            url: '/setting',
+        },
+        {
+            id: 'theme',
+            name: 'テーマ',
+            icon: 'bx-palette',
+            url: '/setting/theme/',
+        },
+        {
+            id: 'acount',
+            name: 'アカウント',
+            icon: 'bx-user',
+            url: '/setting/acount/',
+        },
+        {
+            id: 'karma',
+            name: 'カルマ',
+            icon: 'bx-droplet',
+            url: '/setting/karma/',
+        },
     ]
 
     VUETIFY_COLORS = {

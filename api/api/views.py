@@ -79,11 +79,14 @@ class AppInitView(generics.ListAPIView, GetLoginUserMixin):
             label_serializer = LabelSerializer(labels, many=True, context={ 'view' : self })
             karmas = Karma.objects.filter(target_user=user)
             karma_serializer = KarmaSerializer(karmas, many=True, context={ 'view' : self })
+            setting = user.setting_target_user
+            setting_serializer = SettingSerializer(setting)
             return Response(
                 {
                     'categorys': category_serializer.data,
                     'labels': label_serializer.data,
                     'karma': karma_serializer.data,
+                    'setting': setting_serializer.data,
                     'result': True,
                 },
                 status=status.HTTP_200_OK

@@ -701,3 +701,10 @@ class KarmaViewSet(BaseModelViewSet):
             return { 'rank': '上級者', 'msg': 'あなたは上級者だ。頑張れ', 'next_point': 300, 'up_to_next_point': up_to_next_point}
         else:
             return { 'rank': 'マスター', 'msg': 'あなたはマスターしてる。さらに頑張れ', 'next_point': 0, 'up_to_next_point': 0}
+
+
+class SettingViewSet(BaseModelViewSet):
+    permission_classes = (permissions.AllowAny,)
+    queryset = mSetting.objects.all()
+    serializer_class = SettingSerializer
+

@@ -10,6 +10,7 @@ router.register('task', viewsets.TaskViewSet)
 router.register('sub_task', viewsets.SubTaskViewSet)
 router.register('label', viewsets.LabelViewSet)
 router.register('karma', viewsets.KarmaViewSet)
+router.register('setting', viewsets.SettingViewSet)
 
 
 app_name = 'api'

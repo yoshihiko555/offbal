@@ -57,7 +57,7 @@
             <v-col cols='4'>
                 <v-card flat class="karma_info_link_wrap pa-0">
                     <router-link to="/myapp/karma/">カルマについて</router-link>
-                    <router-link to="/myapp/karma/">ゴールの設定</router-link>
+                    <router-link to="/setting/karma/">ゴールの設定</router-link>
                     <router-link to="/myapp/karma/">完了したすべてのタスクを見る</router-link>
                 </v-card>
             </v-col>

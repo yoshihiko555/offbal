@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 export default {
     namespaced: true,
     state: {
@@ -12,5 +14,23 @@ export default {
     	},
     },
     actions: {
+        updateSettingAction (ctx, kwargs) {
+            return new Promise((resolve, reject) => {
+                Vue.prototype.$axios({
+                    url: `/api/setting/${kwargs.id}/`,
+                    method: 'PUT',
+                    data: kwargs,
+                })
+                .then(res => {
+                    console.log(res)
+                    this.commit('setting/setSetting', res.data)
+                    resolve(res)
+                })
+                .catch(e => {
+                    console.log(e)
+                    reject(e)
+                })
+            })
+        }
     }
 }

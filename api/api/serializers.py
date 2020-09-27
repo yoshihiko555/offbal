@@ -77,6 +77,7 @@ class SettingSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = mSetting
         fields = [
+            'id',
             'target_user',
             'language',
             'time_zone',
@@ -88,6 +89,11 @@ class SettingSerializer(DynamicFieldsModelSerializer):
             'holiday',
             'karma',
             'vacation_mode',
+            'start_page',
+            'time_format',
+            'mail_today_result',
+            'mail_news',
+            'mail_hint',
         ]
 
 class CategorySerializer(DynamicFieldsModelSerializer):

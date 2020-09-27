@@ -8,9 +8,14 @@
                     <p>言語</p>
                 </v-col>
                 <v-col cols='9'>
-                    <vs-select v-model="language">
-                        <vs-option label='日本語' value='japanese'>
-                            日本語
+                    <vs-select v-model="cloneSetting.language">
+                        <vs-option
+                            v-for="option in languageOptions"
+                            :key='option.label'
+                            :label='option.label'
+                            :value='option.value'
+                        >
+                            {{ option.label}}
                         </vs-option>
                     </vs-select>
                 </v-col>
@@ -22,9 +27,14 @@
                     <p>スタートページ</p>
                 </v-col>
                 <v-col cols='9'>
-                    <vs-select v-model="startPage">
-                        <vs-option label='今日' value='0'>
-                            今日
+                    <vs-select v-model="cloneSetting.start_page">
+                        <vs-option
+                            v-for="option in startPageOptions"
+                            :key='option.label'
+                            :label='option.label'
+                            :value='option.value'
+                        >
+                            {{ option.label}}
                         </vs-option>
                     </vs-select>
                 </v-col>
@@ -39,9 +49,14 @@
                     <p>タイムゾーン</p>
                 </v-col>
                 <v-col cols='9'>
-                    <vs-select v-model="timezone">
-                        <vs-option label='日本' value='0'>
-                            日本
+                    <vs-select v-model="cloneSetting.time_zone">
+                        <vs-option
+                            v-for="option in timezoneOptions"
+                            :key='option.label'
+                            :label='option.label'
+                            :value='option.value'
+                        >
+                            {{ option.label}}
                         </vs-option>
                     </vs-select>
                 </v-col>
@@ -53,8 +68,14 @@
                     <p>時刻の書式</p>
                 </v-col>
                 <v-col cols='9'>
-                    <vs-radio v-model="timeFormat" val='0'>13:00</vs-radio>
-                    <vs-radio v-model="timeFormat" val='1'>1:00pm</vs-radio>
+                    <vs-radio
+                        v-for="option in timeFormatOptions"
+                        :key="option.label"
+                        v-model="cloneSetting.time_format"
+                        :val='option.value'
+                    >
+                        {{ option.label}}
+                    </vs-radio>
                 </v-col>
             </v-row>
 
@@ -64,9 +85,14 @@
                     <p>週の始まり</p>
                 </v-col>
                 <v-col cols='9'>
-                    <vs-select v-model="weeklyBeginning">
-                        <vs-option label='月曜' value='0'>
-                            月曜
+                    <vs-select v-model="cloneSetting.weekly_beginning">
+                        <vs-option
+                            v-for="option in weekOptions"
+                            :key='option.label'
+                            :label='option.label'
+                            :value='option.value'
+                        >
+                            {{ option.label}}
                         </vs-option>
                     </vs-select>
                 </v-col>
@@ -77,9 +103,14 @@
                     <p>来週</p>
                 </v-col>
                 <v-col cols='9'>
-                    <vs-select v-model="nextWeekInterpretation">
-                        <vs-option label='月曜' value='0'>
-                            月曜
+                    <vs-select v-model="cloneSetting.next_week_interpretation">
+                        <vs-option
+                            v-for="option in weekOptions"
+                            :key='option.label'
+                            :label='option.label'
+                            :value='option.value'
+                        >
+                            {{ option.label}}
                         </vs-option>
                     </vs-select>
                 </v-col>
@@ -90,9 +121,14 @@
                     <p>週末</p>
                 </v-col>
                 <v-col cols='9'>
-                    <vs-select v-model="weekendInterpretation">
-                        <vs-option label='土曜' value='0'>
-                            土曜
+                    <vs-select v-model="cloneSetting.weekend_interpretation">
+                        <vs-option
+                            v-for="option in weekOptions"
+                            :key='option.label'
+                            :label='option.label'
+                            :value='option.value'
+                        >
+                            {{ option.label}}
                         </vs-option>
                     </vs-select>
                 </v-col>
@@ -107,7 +143,7 @@
                     <p>今日の結果</p>
                 </v-col>
                 <v-col cols='9'>
-                    <vs-switch v-model="todayResult" />
+                    <vs-switch v-model="cloneSetting.mail_today_result" />
                 </v-col>
             </v-row>
             <!-- お知らせ -->
@@ -116,7 +152,7 @@
                     <p>お知らせ</p>
                 </v-col>
                 <v-col cols='9'>
-                    <vs-switch v-model="news" />
+                    <vs-switch v-model="cloneSetting.mail_news" />
                 </v-col>
             </v-row>
             <!-- ヒントとコツ -->
@@ -125,14 +161,19 @@
                     <p>ヒントとコツ</p>
                 </v-col>
                 <v-col cols='9'>
-                    <vs-switch v-model="hint" />
+                    <vs-switch v-model="cloneSetting.mail_hint" />
                 </v-col>
             </v-row>
 
             <v-divider/>
             <v-row>
                 <v-col cols='12'>
-                    <vs-button>保存</vs-button>
+                    <vs-button
+                        :disabled='disabled'
+                        @click='update'
+                    >
+                        保存
+                    </vs-button>
                 </v-col>
             </v-row>
         </v-container>
@@ -140,27 +181,51 @@
 </template>
 
 <script>
+    import _ from 'lodash'
+    import { mapActions } from 'vuex'
+    import { Const } from '@/assets/js/const'
+    const Con = new Const()
+
     export default {
         name: 'GeneralSetting',
         components: {
         },
+        props: {
+            setting: {
+                requied: true,
+            }
+        },
         data: () => ({
-            language: 'japanese',
-            startPage: '0',
-            timezone: '0',
-            timeFormat: '0',
-            weeklyBeginning: '0',
-            nextWeekInterpretation: '0',
-            weekendInterpretation: '0',
-            todayResult: false,
-            news: false,
-            hint: false,
+            cloneSetting: {},
+            disabled: true,
+            languageOptions: Con.LANGUAGE_OPTIONS,
+            startPageOptions: Con.START_PAGE_OPTIONS,
+            timezoneOptions: Con.TIMEZONE_OPTIONS,
+            timeFormatOptions: Con.TIME_FORMAT_OPTIONS,
+            weekOptions: Con.WEEK_OPTIONS,
         }),
         created () {
+            this.cloneSetting = _.cloneDeep(this.setting)
         },
-        computed: {
+        watch: {
+            cloneSetting: {
+                handler (val) {
+                    this.disabled = _.isEqual(val, this.setting)
+                    this.$emit('update-is-change', this.disabled)
+                },
+                deep: true,
+            }
         },
         methods: {
+            ...mapActions('setting', [
+                'updateSettingAction',
+            ]),
+            update () {
+                this.updateSettingAction(this.cloneSetting)
+                .then(res => {
+                    this.disabled = true
+                })
+            }
         },
     }
 </script>

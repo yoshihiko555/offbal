@@ -34,7 +34,7 @@ const routes = {
 		},
 		{
 			path: 'karma',
-			name: 'Karma',
+			name: 'SettingKarma',
 			component: KarmaSetting,
 		    meta: {
 		    	title: 'カルマ設定',

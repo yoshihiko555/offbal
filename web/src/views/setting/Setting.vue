@@ -5,7 +5,7 @@
                 <h3>設定</h3>
             </template>
             <template #right>
-                <vs-button to='/myapp'>
+                <vs-button @click='toApp'>
                     閉じる<i class='bx bx-x'/>
                 </vs-button>
             </template>
@@ -37,15 +37,23 @@
 
                 <!-- メインコンテンツ -->
                 <v-col cols='9'>
-                    <router-view/>
-                    <button @click='get'>get</button>
+                    <router-view
+                        :setting='setting'
+                        @update-is-change='updateIsChange'
+                    />
                 </v-col>
             </v-row>
         </v-container>
+
+        <!-- モーダル読み込み -->
+        <SettingConfirmDialog
+            ref='confirm'
+        />
     </div>
 </template>
 
 <script>
+    import SettingConfirmDialog from '@/components/common/SettingConfirmDialog'
     import { Const } from '@/assets/js/const'
     import { createNamespacedHelpers  } from 'vuex'
 
@@ -55,32 +63,25 @@
     export default {
         name: 'Setting',
         components: {
+            SettingConfirmDialog,
         },
         data: () => ({
             active: 'general',
             menus: Con.SETTING_SIDEBAR_MENU,
+            isChange: true,
         }),
         created () {
-        	switch (this.$route.name) {
-        	case 'General':
-        		this.active = 'general'
-        		break
-
-        	case 'Theme':
-        		this.active = 'theme'
-        		break
-
-        	case 'Acount':
-        		this.active = 'acount'
-        		break
-
-        	case 'Karma':
-        		this.active = 'karma'
-        		break
-
-    		default:
-    		    break
-        	}
+            this.$eventHub.$on('confirm-apply-setting', this.applySetting)
+            this.$eventHub.$on('confirm-cancel-setting', this.cancelSetting)
+            this.changeActiveSidebar()
+        },
+        beforeRouteUpdate (to, from, next) {
+            if (this.isChange) {
+                // 変更なし
+                next()
+            } else {
+                this.$refs.confirm.open(to.path, next)
+            }
         },
         computed: {
         	...mapGetters([
@@ -88,11 +89,49 @@
         	]),
         },
         methods: {
-        	get () {
-        		console.log(this.setting)
-        		console.log(this.categorys)
-        		console.log(this.$store.getters)
-        	}
+            toApp () {
+                if (this.isChange) {
+                    this.$router.push('/myapp')
+                } else {
+                    this.$refs.confirm.open('/myapp')
+                }
+            },
+            updateIsChange (flg) {
+                this.isChange = flg
+            },
+            applySetting (path, next) {
+                this.isChange = true
+                if (next) {
+                    next()
+                } else {
+                    this.$router.push(path)
+                }
+            },
+            cancelSetting () {
+                this.changeActiveSidebar()
+            },
+            changeActiveSidebar () {
+                switch (this.$route.name) {
+                case 'General':
+                    this.active = 'general'
+                    break
+
+                case 'Theme':
+                    this.active = 'theme'
+                    break
+
+                case 'Acount':
+                    this.active = 'acount'
+                    break
+
+                case 'Karma':
+                    this.active = 'karma'
+                    break
+
+                default:
+                    break
+                }
+            }
         },
     }
 </script>

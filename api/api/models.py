@@ -154,12 +154,16 @@ class mSetting(models.Model):
         GERMAN = 'german', _('German')
 
     class Timezone(models.TextChoices):
-        AMERICA_LOS_ANGELES = '(UTF-08:00) 太平洋標準時(米国およびカナダ)', _('America Los Angeles')
-        ASIA_TOKYO = '(UTF+09:00) 大阪、札幌、東京', _('Asia Tokyo')
+        AMERICA_LOS_ANGELES = '(UTC-08:00) Los Angeles', _('America Los Angeles')
+        ASIA_TOKYO = '(UTC+09:00) Tokyo', _('Asia Tokyo')
 
     class Theme(models.TextChoices):
         DEFAULT = 'default', _('Default')
         DARK = 'dark', _('Dark')
+
+    class TimeFormat(models.IntegerChoices):
+        NORMAL = 0, _('Normal')
+        AM_PM = 1, _('AM or PM')
 
     target_user = models.OneToOneField(
         mUser,
@@ -173,10 +177,20 @@ class mSetting(models.Model):
         default=Language.JAPANESE
     )
 
+    start_page = models.CharField(
+        max_length=50,
+        default='today',
+    )
+
     time_zone = models.CharField(
         max_length=50,
         choices=Timezone.choices,
         default=Timezone.ASIA_TOKYO
+    )
+
+    time_format = models.IntegerField(
+        choices=TimeFormat.choices,
+        default=TimeFormat.NORMAL,
     )
 
     weekly_beginning = models.CharField(
@@ -212,6 +226,10 @@ class mSetting(models.Model):
 
     karma = models.BooleanField(_('Karma'), default=True)
     vacation_mode = models.BooleanField(_('Vacation Mode'), default=False)
+
+    mail_today_result = models.BooleanField(_('Mail Today Result'), default=True)
+    mail_news = models.BooleanField(_('Mail News'), default=True)
+    mail_hint = models.BooleanField(_('Mail Hint'), default=True)
 
     def __str__(self):
         name = self.target_user.auth0_name if self.target_user.auth0_name != '' else self.target_user.username

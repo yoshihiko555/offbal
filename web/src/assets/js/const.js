@@ -134,6 +134,92 @@ class Const {
     WEEK_KARMA_POINT_CONFIG = {
         LABELS: this.WEEK,
     }
+
+    /**
+     * 設定オプション
+     */
+    LANGUAGE_OPTIONS = [
+        {
+            label: 'English',
+            value: 'english',
+        },
+        {
+            label: 'French',
+            value: 'french',
+        },
+        {
+            label: 'German',
+            value: 'german',
+        },
+        {
+            label: '日本語',
+            value: 'japanese',
+        },
+    ]
+
+    START_PAGE_OPTIONS = [
+        {
+            label: '今日',
+            value: 'today',
+        },
+        {
+            label: '近日中',
+            value: 'future-scheduled',
+        },
+    ]
+
+    TIMEZONE_OPTIONS = [
+        {
+            label: '(UTC-08:00) Los Angeles',
+            value: '(UTC-08:00) Los Angeles',
+        },
+        {
+            label: '(UTC+09:00) Tokyo',
+            value: '(UTC+09:00) Tokyo',
+        },
+    ]
+
+    TIME_FORMAT_OPTIONS = [
+        {
+            label: '13:00',
+            value: 0,
+        },
+        {
+            label: '1:00 PM',
+            value: 1,
+        },
+    ]
+
+    WEEK_OPTIONS = [
+        {
+            label: '月曜日',
+            value: 'Mon.',
+        },
+        {
+            label: '火曜日',
+            value: 'Tue.',
+        },
+        {
+            label: '水曜日',
+            value: 'Wed.',
+        },
+        {
+            label: '木曜日',
+            value: 'Thu.',
+        },
+        {
+            label: '金曜日',
+            value: 'Fri.',
+        },
+        {
+            label: '土曜日',
+            value: 'Sta.',
+        },
+        {
+            label: '日曜日',
+            value: 'Sun.',
+        },
+    ]
 }
 
 export { Const }

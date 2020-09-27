@@ -118,6 +118,7 @@
                         <!-- ラベルここから -->
                         <v-card-text>
                             <v-chip-group
+                                v-if="!isCreateLabel"
                                 column
                             >
                                 <v-chip
@@ -150,8 +151,8 @@
                                 <v-icon
                                     small
                                     color="white"
-                                >mdi-plus</v-icon>
-                                ラベル追加
+                                >mdi-pencil</v-icon>
+                                ラベルを変更する
                             </v-chip>
                             <!-- ラベル追加ボタンここまで -->
                             <!-- ラベル追加ボタン押下後ここから -->
@@ -159,57 +160,91 @@
                                 v-else
                                 class="create_label_area_wrap mt-5"
                             >
-                                <div class="create_label_input_area_wrap">
-                                    <vs-input
-                                        v-model="createLabelValue"
-                                        @keypress.prevent.enter.exact="changeCreateLabelSubmitValue"
-                                        @keyup.prevent.enter.exact="setCreateLabelName"
-                                    >
-                                        <template #icon>
-                                            <i class='bx bx-label'></i>
-                                        </template>
-                                    </vs-input>
-                                    <v-btn
-                                        class="create_label_add_btn"
-                                        icon
-                                        color="primary"
-                                        @click="createLabelBtn"
-                                    >
-                                        <i class='bx bx-check'></i>
-                                    </v-btn>
-                                    <v-btn
-                                        class="create_label_cancel_btn"
-                                        icon
-                                        @click="isCreateLabel = false"
-                                    >
-                                        <i class='bx bx-x'></i>
-                                    </v-btn>
-                                </div>
                                 <div class="create_label_select_area_wrap mt-3">
-                                    <vs-select
-                                        placeholder='Select Label'
-                                        v-model="selectLabelList"
-                                        multiple
-                                        filter
-                                        chips
-                                    >
-                                        <vs-option
-                                            v-for='(label, i) in labels'
-                                            :key='i'
-                                            :label='label.name'
-                                            :value='label.id'
+                                    <div v-if="!isCreateNewLabel">
+                                        <vs-select
+                                            id="label_vs_select"
+                                            placeholder='ラベルを選択してください'
+                                            v-model="selectedLabelList"
+                                            multiple
                                             filter
-                                        >{{ label.name }}
-                                        </vs-option>
-                                    </vs-select>
-                                    <v-btn
-                                        class="create_label_submit_btn ml-2"
-                                        icon
-                                        color="primary"
-                                        @click="addLabelBtn"
+                                            ref="vsSelect"
+                                        >
+                                            <vs-option
+                                                ref="vsOption"
+                                                id="label_vs_option"
+                                                v-for='(label, i) in labels'
+                                                :key='i'
+                                                :label='label.name'
+                                                :value='label.id'
+                                                filter
+                                            >{{ label.name }}
+                                            </vs-option>
+                                        </vs-select>
+                                        <div
+                                            class="change_label_btn_wrap mt-1"
+                                        >
+                                            <vs-button
+                                                dark
+                                                @click="endCreateLabel"
+                                            >
+                                                キャンセル
+                                            </vs-button>
+                                            <vs-button
+                                                class="create_label_submit_btn ml-2"
+                                                color="primary"
+                                                @click="addLabelBtn"
+                                            >
+                                                変更
+                                                <template #animate>
+                                                    <i class="bx bxs-paper-plane"></i> 送信
+                                                </template>
+                                            </vs-button>
+                                            <v-spacer></v-spacer>
+                                            <vs-button
+                                                v-if="!isCreateNewLabel"
+                                                flat
+                                                @click="createLabelContent"
+                                            >
+                                                ラベルを作成
+                                            </vs-button>
+                                        </div>
+                                    </div>
+                                    <div
+                                        v-else
+                                        class="create_label_input_area_wrap mt-2"
                                     >
-                                        <i class="bx bxs-paper-plane"></i>
-                                    </v-btn>
+                                        <vs-input
+                                            placeholder="ラベルを新規作成する"
+                                            v-model="createLabelValue"
+                                            @keypress.prevent.enter.exact="changeCreateLabelSubmitValue"
+                                            @keyup.prevent.enter.exact="setCreateLabelName"
+                                        >
+                                            <template #icon>
+                                                <i class='bx bx-label'></i>
+                                            </template>
+                                        </vs-input>
+                                        <div
+                                            class="change_label_btn_wrap mt-1"
+                                        >
+                                            <vs-button
+                                                dark
+                                                @click="isCreateNewLabel = false"
+                                            >
+                                                キャンセル
+                                            </vs-button>
+                                            <vs-button
+                                                class="create_label_submit_btn ml-2"
+                                                color="success"
+                                                @click="createLabelBtn"
+                                            >
+                                                作成
+                                                <template #animate>
+                                                    <i class="bx bxs-paper-plane"></i> 送信
+                                                </template>
+                                            </vs-button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <!-- ラベル追加ボタン押下後ここまで -->
@@ -517,23 +552,38 @@
                     completed: false,
                 },
                 drawer: false,
+                // 終了したタスクの一括更新用リスト
                 complete_sub_task_list: [],
+                // 作成するサブタスクの情報
                 subTask: {
                     target_task: 0,
                     content: '',
                 },
+                // タスクにホバーしているか
                 isHover: false,
+                // サブタスクの作成フィールドの日本語変換時のsubmit防ぐため
                 subTaskSubmitValue: false,
+                // タスク編集中
                 isEdit: false,
+                // ラベル作成中
                 isCreateLabel: false,
+                // ラベル作成フィールドの日本語変換時のsubmit防ぐため
                 createLabelSubmitValue: false,
+                // ラベルのフィールドのデータ
                 createLabelValue: '',
+                // タスクの編集フィールドの日本語変換時のsubmit防ぐため
                 editTaskSubmitValue: false,
+                // サブタスクの編集フィールドの日本語変換時のsubmit防ぐため
                 editSubTaskSubmitValue: false,
+                // ホバーしたサブタスクのデータ
                 mouseOverSubTaskData: {},
+                // 編集するサブタスクのデータ
                 editSubTaskData: {},
+                // タスク削除モーダルのv-model
                 taskDeleteConfirm: false,
+                // 優先度のメニューのv-model
                 priority_menu: false,
+                // 優先度表示用
                 priority_items: [
                     {
                         text: '優先度5',
@@ -566,6 +616,7 @@
                         value: '1',
                     },
                 ],
+                // 選択した優先度のデータ
                 priority: {
                     value: '1',
                     color: {
@@ -577,8 +628,14 @@
                     },
                     icon: 'mdi-star',
                 },
+                // 削除するラベルリストを一時的に保存
                 deleteLabelList: [],
-                selectLabelList: [],
+                // 選択したラベルIDリスト
+                selectedLabelList: [],
+                // label更新中フラグ
+                isLoadingUpdateLabel: false,
+                // label新規作成フィールドのv-model
+                isCreateNewLabel: false,
             }
         },
         created () {
@@ -586,6 +643,8 @@
             this.$eventHub.$on('closeTaskDetail', this.closeTaskDetail)
             this.$eventHub.$on('closeSameTaskDetail', this.closeSameTaskDetail)
             this.priority.value = this.cloneTask.priority
+        },
+        mounted: function () {
         },
         watch: {
             'cloneTask.comment': _.debounce(function (val) {
@@ -627,6 +686,7 @@
         },
         methods: {
             ...mapMutations([
+                'addLabel',
                 'addSubTask',
                 'deleteTask',
                 'addCompleteTask',
@@ -636,6 +696,7 @@
                 'deleteLabels',
             ]),
             ...mapActions([
+                'addLabelsAction',
                 'deleteTaskAction',
                 'deleteSubTaskAction',
             ]),
@@ -672,9 +733,17 @@
                 this.complete_sub_task_list = _.cloneDeep(task.complete_sub_tasks)
                 this.task = task
                 this.cloneTask = _.cloneDeep(task)
+                this.setSelectedLabelList()
                 this.endEditTaskContent()
                 this.endEditSubTaskContent()
                 this.endCreateLabel()
+            },
+            setSelectedLabelList () {
+                this.selectedLabelList = []
+                // 選択されているラベルをセット
+                for (const i in this.cloneTask.label) {
+                    this.selectedLabelList.push(this.cloneTask.label[i].id)
+                }
             },
             checkSubTask: _.debounce(function checkSubTask (subtask) {
                 // サブタスクのチェックボックス押下後発火
@@ -814,6 +883,9 @@
                 this.endEditTaskContent()
                 this.endEditSubTaskContent()
             },
+            createLabelContent () {
+                this.isCreateNewLabel = true
+            },
             mouseOverSubTask (subtask) {
                 // サブタスクにホバー時にサブタスク情報を保持
                 this.mouseOverSubTaskData = _.cloneDeep(subtask)
@@ -865,16 +937,52 @@
                 // ラベル作成エリアでenterが押されたら更新
                 const length = this.createLabelValue.length
                 if (length === 0 || !this.createLabelSubmitValue) return
-                this.endCreateLabel()
+                this.createLabelBtn()
             },
             createLabelBtn () {
                 // ラベル作成の送信ボタンが押されたらラベル作成
-                this.endCreateLabel()
+                if (this.createLabelValue.length === 0) return
+                this.isLoadingUpdateLabel = true
+                this.$axios({
+                    url: '/api/label/',
+                    method: 'POST',
+                    data: {
+                        name: this.createLabelValue,
+                    }
+                })
+                .then(res => {
+                    this.isLoadingUpdateLabel = false
+                    this.selectedLabelList.push(res.data.id)
+                    this.addLabelsAction(res.data)
+                    this.isCreateNewLabel = false
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+                this.createLabelValue = ''
             },
             addLabelBtn () {
                 // ラベルを選択した後送信
                 console.log('addLabelBtn')
-                this.endCreateLabel()
+                this.isLoadingUpdateLabel = true
+                this.$axios({
+                    url: '/api/task/change_label_list/',
+                    method: 'PUT',
+                    data: {
+                        task_id: this.cloneTask.id,
+                        label_id_list: this.selectedLabelList
+                    }
+                })
+                .then(res => {
+                    console.log(res)
+                    this.cloneTask.label = res.data
+                    this.setSelectedLabelList()
+                    this.isLoadingUpdateLabel = false
+                    this.endCreateLabel()
+                })
+                .catch(e => {
+                    console.log(e)
+                })
             },
             endEditTaskContent () {
                 // タスク編集モードを終了
@@ -892,6 +1000,7 @@
                 this.isCreateLabel = false
                 this.createLabelSubmitValue = false
                 this.createLabelValue = ''
+                this.setSelectedLabelList()
             },
             editTaskContentBtn () {
                 // タスク編集時にsubmitボタン押下で更新
@@ -939,6 +1048,8 @@
                         break
                     }
                 }
+                const index = this.selectedLabelList.indexOf(label.id)
+                if (index !== -1) this.selectedLabelList.splice(index, 1)
                 this.deleteLabelList.push(label)
                 this.deleteLabelAction()
             },
@@ -996,21 +1107,24 @@
         .sub_task_area_wrap {
             height: 65px;
         }
-        .create_label_input_area_wrap {
+        .change_label_btn_wrap {
             display: flex;
+        }
+        .create_label_input_area_wrap {
             width: 100%;
             .vs-input-parent::v-deep {
-                width: 55%;
+                width: 100%;
                 .vs-input {
                     width: 100%;
                 }
             }
         }
         .create_label_select_area_wrap {
-            display: flex;
+            // display: flex;
             width: 100%;
             .vs-select-content::v-deep {
-                max-width: 63%;
+                max-width: 100%;
+                // max-width: 63%;
                 .vs-select__input {
                     width: 100%;
                 }

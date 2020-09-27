@@ -470,6 +470,33 @@ class TaskViewSet(BaseModelViewSet):
         }
         return Response(data=data, status=status.HTTP_200_OK)
 
+    @action(methods=['PUT'], detail=False)
+    def change_label_list(self, request):
+        """
+        タスクのラベルを一括変更するアクション
+        　追加するラベル一覧情報を返す
+        """
+        task_id = request.data['task_id']
+        label_id_list = request.data['label_id_list']
+        result = []
+        try:
+            task = Task.objects.get(pk=task_id)
+            task.label.remove()
+            for label_id in label_id_list:
+                l = Label.objects.get(pk=label_id)
+                task.label.add(l)
+                result.append(l)
+            task.save()
+        except Task.DoesNotExist:
+            logger.error('タスクが見つかりませんでした。')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except Label.DoesNotExist:
+            logger.error('ラベルが見つかりませんでした。')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(LabelSerializer(result, many=True).data, status=status.HTTP_200_OK)
+
+
 class SubTaskViewSet(BaseModelViewSet):
 
     permission_classes = (permissions.AllowAny,)
@@ -580,6 +607,34 @@ class LabelViewSet(BaseModelViewSet):
             'target_section': section_id,
             'delete_labels': self.get_serializer(result, many=True).data
         }, status=status.HTTP_200_OK)
+
+    @action(methods=['POST'], detail=False)
+    def add_label(self, request):
+        # TODO validate
+
+        logger.debug(request.data)
+        task_id = request.data['task_id']
+        name = request.data['name']
+        auth0_id = request.data['auth0_id']
+
+        try:
+            task = Task.objects.get(pk=task_id)
+            author = mUser.objects.get(auth0_id=auth0_id)
+        except Task.DoesNotExist:
+            logger.error('タスクが見つかりませんでした。')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except mUser.DoesNotExist:
+            logger.error('ユーザーが見つかりませんでした。')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        label = Label.objects.create(
+            name=name,
+            author=author
+        )
+
+        task.label.add(label)
+        task.save()
+        return Response(self.get_serializer(label).data, status=status.HTTP_200_OK)
 
 
 class KarmaViewSet(BaseModelViewSet):

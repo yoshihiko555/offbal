@@ -26,7 +26,9 @@ export default new Vuex.Store({
             state.labels = payload
 		},
 		addLabel (state, payload) {
+			console.log('addLabel before')
             state.labels.push(payload)
+			console.log('addLabel after')
 		},
 		updateCategory (state, payload) {
 	        // カテゴリー詳細の更新

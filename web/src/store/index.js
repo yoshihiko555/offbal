@@ -26,9 +26,20 @@ export default new Vuex.Store({
             state.labels = payload
 		},
 		addLabel (state, payload) {
-			console.log('addLabel before')
             state.labels.push(payload)
-			console.log('addLabel after')
+		},
+		updateLabelToTask (state, payload) {
+			let task
+			if (payload.target_section === 0) {
+				task = state.detailCategory.tasks.find(task => task.id === payload.id)
+			} else {
+				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
+				task = section.tasks.find(task => task.id === payload.id)
+			}
+			task.label = []
+			for (const i in payload.label) {
+				task.label.push(payload.label[i])
+			}
 		},
 		updateCategory (state, payload) {
 	        // カテゴリー詳細の更新
@@ -277,6 +288,23 @@ export default new Vuex.Store({
 		// タスク更新
 		updateTaskAction (ctx, kwargs) {
 			this.commit('updateTask', kwargs)
+		},
+		deleteLabelAction (ctx, kwargs) {
+			Vue.prototype.$axios({
+				url: '/api/label/delete/',
+				method: 'DELETE',
+				data: {
+					task_id: kwargs.task_id,
+					delete_label_list: kwargs.delete_label_list
+				}
+			})
+			.then(res => {
+				console.log(res)
+				this.commit('deleteLabels', res.data)
+			})
+			.catch(e => {
+				console.log(e)
+			})
 		},
 	},
 	modules: {

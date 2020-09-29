@@ -38,11 +38,12 @@
                 </div>
             </template>
             <v-card>
-                <v-card-title>
+                <v-subheader class="description">優先度を設定</v-subheader>
+                <!-- <v-card-title>
                     <h5>
                         優先度設定
                     </h5>
-                </v-card-title>
+                </v-card-title> -->
                 <v-list
                     dense
                 >
@@ -153,5 +154,9 @@
 <style lang='scss' scoped>
     .v-card__title {
         height: 50px;
+    }
+    .description {
+        position: relative;
+        top: 10px;
     }
 </style>

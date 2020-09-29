@@ -21,8 +21,8 @@
         <v-menu
             :close-on-content-click="false"
             offset-x
-            min-width="350px"
-            max-height="380px"
+            min-width="300px"
+            max-height="420px"
             transition="scroll-y-transition"
             v-model="menu"
         >
@@ -40,23 +40,25 @@
                 </div>
             </template>
             <v-card>
-                <v-card-title>
+                <v-subheader class="description">カテゴリを選択</v-subheader>
+                <!-- <v-card-title>
                     <h5>
                         カテゴリー設定
                     </h5>
-                </v-card-title>
+                </v-card-title> -->
+                <!-- <v-divider></v-divider> -->
                 <v-list
                     dense
                 >
-                    <vs-input
+                    <!-- <vs-input
                         class="px-5 mt-3 mb-2"
                         size="small"
                         placeholder="カテゴリー名を検索"
                         v-model="filterValue"
-                    ></vs-input>
+                    ></vs-input> -->
                     <v-list-item-group>
                         <!-- フィルター絞る前 -->
-                        <div v-if="filterValue.length === 0">
+                        <!-- <div v-if="filterValue.length === 0"> -->
                             <div
                                 v-for="(category, i) in categorys"
                                 :key="i"
@@ -66,13 +68,13 @@
                                     @click="selectCategory(category)"
                                 >
                                     <v-icon
-                                        class="mr-2"
+                                        class="ml-3 mr-4"
                                         :color="category.color"
                                     >mdi-circle-medium</v-icon>
                                     {{ category.name }}
                                 </v-list-item>
                                 <v-list-item
-                                    class="pl-8"
+                                    class="pl-14"
                                     v-for="(section, i) in category.sections"
                                     :key="i"
                                     @click="selectCategory(section)"
@@ -84,10 +86,10 @@
                                     {{ section.name }}
                                 </v-list-item>
                             </div>
-                        </div>
+                        <!-- </div> -->
                         <!-- フィルター絞る前ここまで -->
                         <!-- フィルター絞る -->
-                        <div v-else>
+                        <!-- <div v-else>
                             <div v-if="filteredItems.length === 0">
                                 <v-list-item
                                     class="no_data_available"
@@ -124,7 +126,7 @@
                                     </v-list-item>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- フィルター絞るここまで -->
                     </v-list-item-group>
                 </v-list>
@@ -259,13 +261,16 @@
     }
 </script>
 <style lang='scss' scoped>
+    .description {
+        position: relative;
+        top: 10px;
+    }
     .vs-input-parent::v-deep {
         .vs-input {
             width: 100%;
         }
     }
     .category_name {
-        padding-top: 15px;
         height: 48px;
     }
     .v-card__title {

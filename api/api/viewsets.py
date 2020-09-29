@@ -494,7 +494,13 @@ class TaskViewSet(BaseModelViewSet):
             logger.error('ラベルが見つかりませんでした。')
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(LabelSerializer(result, many=True).data, status=status.HTTP_200_OK)
+        target_section = task.target_section.id if task.target_section != None else 0
+        data = {
+            'id': task_id,
+            'target_section': target_section,
+            'label': LabelSerializer(result, many=True).data
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 class SubTaskViewSet(BaseModelViewSet):
@@ -608,33 +614,26 @@ class LabelViewSet(BaseModelViewSet):
             'delete_labels': self.get_serializer(result, many=True).data
         }, status=status.HTTP_200_OK)
 
-    @action(methods=['POST'], detail=False)
-    def add_label(self, request):
-        # TODO validate
+    @action(methods=['GET'], detail=False)
+    def checkDuplication(self, request):
+        """
+        ラベル名の重複チェック
+        """
+        logger.info(request.query_params)
+        logger.info(request.query_params['name'])
 
-        logger.debug(request.data)
-        task_id = request.data['task_id']
-        name = request.data['name']
-        auth0_id = request.data['auth0_id']
-
+        auth0_id = request.query_params['auth0_id']
+        name = request.query_params['name']
         try:
-            task = Task.objects.get(pk=task_id)
             author = mUser.objects.get(auth0_id=auth0_id)
-        except Task.DoesNotExist:
-            logger.error('タスクが見つかりませんでした。')
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        except mUser.DoesNotExist:
-            logger.error('ユーザーが見つかりませんでした。')
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        label = Label.objects.create(
-            name=name,
-            author=author
-        )
-
-        task.label.add(label)
-        task.save()
-        return Response(self.get_serializer(label).data, status=status.HTTP_200_OK)
+            Label.objects.get(name=name, author=author)
+        except Label.DoesNotExist:
+            return Response({'status': 'success', 'result': True}, status=status.HTTP_200_OK)
+        except Label.MultipleObjectsReturned:
+            # TODO 重複チェックして登録させないつもりだが・・・
+            return Response({'status': 'success', 'result': False}, status=status.HTTP_200_OK)
+        else:
+            return Response({'status': 'success', 'result': False}, status=status.HTTP_200_OK)
 
 
 class KarmaViewSet(BaseModelViewSet):
@@ -707,4 +706,3 @@ class SettingViewSet(BaseModelViewSet):
     permission_classes = (permissions.AllowAny,)
     queryset = mSetting.objects.all()
     serializer_class = SettingSerializer
-

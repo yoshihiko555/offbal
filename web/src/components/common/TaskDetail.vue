@@ -17,54 +17,9 @@
                         <v-card-actions>
                             <v-card-subtitle>タスク詳細</v-card-subtitle>
                             <v-spacer></v-spacer>
-                            <v-menu
-                                :close-on-content-click="false"
-                                offset-y
-                                bottom
-                                transition="scroll-y-transition"
-                                min-width="180px"
-                                v-model="priority_menu"
-                            >
-                                <template v-slot:activator="{ on, attrs }">
-                                    <div id="priority_btn" class="mr-3">
-                                        <v-btn
-                                            text
-                                            v-bind="attrs"
-                                            v-on="on"
-                                        ><v-icon
-                                            :color="priority.color[cloneTask.priority]"
-                                        >{{ priority.icon }}</v-icon>
-                                        <span>優先度{{ cloneTask.priority }}</span>
-                                        </v-btn>
-                                    </div>
-                                </template>
-                                <v-card>
-                                    <v-card-title>
-                                        <h5>
-                                            優先度設定
-                                        </h5>
-                                    </v-card-title>
-                                    <v-list
-                                        dense
-                                    >
-                                        <v-list-item
-                                            v-for="(item, i) in priority_items"
-                                            :key="i"
-                                            @click="selectPriority(item.value)"
-                                        >
-                                            <v-icon
-                                                class="mr-1 ml-2"
-                                                :color="item.color"
-                                            >{{ item.icon }}</v-icon>
-                                            <v-list-item-title
-                                                class="ml-5"
-                                            >
-                                                {{ item.text }}
-                                            </v-list-item-title>
-                                        </v-list-item>
-                                    </v-list>
-                                </v-card>
-                            </v-menu>
+                            <TaskDetailUpdatePriority
+                                :cloneTask=cloneTask
+                            />
                         </v-card-actions>
                         <!-- タスク表示モードここから -->
                         <v-card-title v-if="!isEdit"
@@ -161,6 +116,7 @@
                                 class="create_label_area_wrap mt-5"
                             >
                                 <div class="create_label_select_area_wrap mt-3">
+                                    <!-- ラベル選択モード -->
                                     <div v-if="!isCreateNewLabel">
                                         <vs-select
                                             id="label_vs_select"
@@ -168,10 +124,8 @@
                                             v-model="selectedLabelList"
                                             multiple
                                             filter
-                                            ref="vsSelect"
                                         >
                                             <vs-option
-                                                ref="vsOption"
                                                 id="label_vs_option"
                                                 v-for='(label, i) in labels'
                                                 :key='i'
@@ -204,24 +158,28 @@
                                             <vs-button
                                                 v-if="!isCreateNewLabel"
                                                 flat
-                                                @click="createLabelContent"
+                                                @click="isCreateNewLabel = true"
                                             >
                                                 ラベルを作成
                                             </vs-button>
                                         </div>
                                     </div>
+                                    <!-- ラベル作成モード -->
                                     <div
                                         v-else
                                         class="create_label_input_area_wrap mt-2"
                                     >
                                         <vs-input
-                                            placeholder="ラベルを新規作成する"
+                                            label-placeholder="ラベルを新規作成する"
                                             v-model="createLabelValue"
                                             @keypress.prevent.enter.exact="changeCreateLabelSubmitValue"
                                             @keyup.prevent.enter.exact="setCreateLabelName"
                                         >
                                             <template #icon>
                                                 <i class='bx bx-label'></i>
+                                            </template>
+                                            <template v-if="createLabelDuplicate" #message-danger>
+                                                既にこのラベルは作成されています。
                                             </template>
                                         </vs-input>
                                         <div
@@ -237,6 +195,7 @@
                                                 class="create_label_submit_btn ml-2"
                                                 color="success"
                                                 @click="createLabelBtn"
+                                                :disabled="createLabelDisabled"
                                             >
                                                 作成
                                                 <template #animate>
@@ -345,187 +304,17 @@
                     <v-divider></v-divider>
                     <!-- ～サブタスク -->
                     <!-- タスク内容、サブタスク内容ここまで -->
-                    <!-- 開始時刻、期限、リマインドここから -->
-                    <v-list>
-                        <v-tooltip
-                            top
-                            activator="#start_time_btn"
-                            z-index=99000
-                        >
-                            <span>タスク開始時刻を変更する</span>
-                        </v-tooltip>
-                        <v-tooltip
-                            top
-                            activator="#deadline_btn"
-                            z-index=99000
-                        >
-                            <span>期限を変更する</span>
-                        </v-tooltip>
-                        <v-tooltip
-                            top
-                            activator="#remind_btn"
-                            z-index=99000
-                        >
-                            <span>リマインダーを変更する</span>
-                        </v-tooltip>
-                        <v-list-item>
-                            <v-list-item-icon id="start_time_btn" class="mr-5">
-                                <v-menu
-                                    offset-x
-                                    min-width="400px"
-                                    transition="scroll-y-transition"
-                                    :close-on-content-click="false"
-                                >
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-btn
-                                            icon
-                                            v-bind="attrs"
-                                            v-on="on"
-                                        >
-                                            <v-icon>mdi-clock-start</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <Datetime
-                                        v-model="cloneTask.start_time"
-                                        :minute-interval="30"
-                                        :min-date="start"
-                                        inline
-                                        no-keyboard
-                                        format="YYYY-MM-DD HH:mm:ss"
-                                    />
-                                </v-menu>
-                            </v-list-item-icon>
-                            <v-list-item-content>
-                                <v-list-item-title>{{ cloneTask.start_time }} に開始</v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                        <v-divider></v-divider>
-                        <v-list-item>
-                            <v-list-item-icon id="deadline_btn" class="mr-5">
-                                <v-menu
-                                    offset-x
-                                    min-width="400px"
-                                    transition="scroll-y-transition"
-                                    :close-on-content-click="false"
-                                >
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-btn
-                                            icon
-                                            v-bind="attrs"
-                                            v-on="on"
-                                        >
-                                            <v-icon>mdi-calendar-clock</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <Datetime
-                                        v-model="cloneTask.deadline"
-                                        :minute-interval="30"
-                                        :min-date="start"
-                                        inline
-                                        no-keyboard
-                                        format="YYYY-MM-DD HH:mm:ss"
-                                    />
-                                </v-menu>
-                            </v-list-item-icon>
-                            <v-list-item-content>
-                                <v-list-item-title v-if="cloneTask.deadline !== ''">{{ cloneTask.deadline }} まで</v-list-item-title>
-                                <v-list-item-subtitle v-else>期限を設定する</v-list-item-subtitle>
-                            </v-list-item-content>
-                        </v-list-item>
-                        <v-divider></v-divider>
-                        <v-list-item>
-                            <v-list-item-icon id="remind_btn" class="mr-5">
-                                <v-menu
-                                    offset-x
-                                    min-width="400px"
-                                    transition="scroll-y-transition"
-                                    :close-on-content-click="false"
-                                >
-                                    <template activator="#ttt" v-slot:activator="{ on, attrs }">
-                                        <v-btn
-                                            icon
-                                            v-bind="attrs"
-                                            v-on="on"
-                                        >
-                                            <v-icon>mdi-alarm</v-icon>
-                                        </v-btn>
-                                    </template>
-                                    <Datetime
-                                        v-model="cloneTask.remind"
-                                        :minute-interval="30"
-                                        :min-date="start"
-                                        inline
-                                        no-keyboard
-                                        format="YYYY-MM-DD HH:mm:ss"
-                                    />
-                                </v-menu>
-                            </v-list-item-icon>
-                            <v-list-item-content>
-                                <v-list-item-title v-if="cloneTask.remind !== ''">{{ cloneTask.remind }} に通知</v-list-item-title>
-                                <v-list-item-subtitle v-else>リマインダーを設定する</v-list-item-subtitle>
-                            </v-list-item-content>
-                        </v-list-item>
-                        <v-divider></v-divider>
-                        <v-list-item>
-                            <v-list-item-content>
-                                <v-text-field
-                                    v-model="cloneTask.comment"
-                                    placeholder="コメントを追加"
-                                ></v-text-field>
-                            </v-list-item-content>
-                        </v-list-item>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-card-subtitle>{{ cloneTask.created_at }}に作成</v-card-subtitle>
-                            <v-spacer></v-spacer>
-                            <v-btn
-                                icon
-                                @click="taskDeleteConfirm = true"
-                            >
-                                <v-icon>mdi-delete</v-icon>
-                            </v-btn>
-                        </v-card-actions>
-                        <!-- 開始時刻、期限、リマインド、ここまで -->
-                    </v-list>
+                    <TaskDetailUpdateDate
+                        :cloneTask=cloneTask
+                    />
                 </v-card>
             </v-container>
         </v-navigation-drawer>
 
-        <vs-dialog
-            v-model="taskDeleteConfirm"
-        >
-            <v-container
-                fluid
-                class="ma-0 pa-0"
-            >
-                <h5
-                    class="task_dialog_header mb-3"
-                    align="center"
-                >
-                    タスクを削除しますか？
-                </h5>
-                <v-row>
-                    <v-col cols="6">
-                        <vs-button
-                            class="task_delete_confirm_btn"
-                            size="l"
-                            @click="deleteTaskConfirm"
-                        >
-                            <i class='bx bx-trash'></i> はい
-                        </vs-button>
-                    </v-col>
-                    <v-col cols="6">
-                        <vs-button
-                            class="task_delete_confirm_btn"
-                            size="l"
-                            @click="taskDeleteConfirm = false"
-                        >
-                            いいえ
-                        </vs-button>
-                    </v-col>
-                </v-row>
-            </v-container>
-        </vs-dialog>
+        <TaskDetailDeleteTaskDialog
+            @update="taskDeleteConfirm = $event"
+            :taskDeleteConfirm="taskDeleteConfirm"
+        />
     </div>
 </template>
 <script>
@@ -535,114 +324,76 @@
     import moment from 'moment'
     import Datetime from 'vue-ctk-date-time-picker'
     import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css'
+    import { globalValidateMixins } from '@/mixins/validate'
+    import TaskDetailDeleteTaskDialog from '@/components/parts/TaskDetailDeleteTaskDialog'
+    import TaskDetailUpdatePriority from '@/components/parts/TaskDetailUpdatePriority'
+    import TaskDetailUpdateDate from '@/components/parts/TaskDetailUpdateDate'
 
     const Con = new Const()
 
     export default {
         name: 'TaskDetail',
         components: {
-            Datetime
+            Datetime,
+            TaskDetailDeleteTaskDialog,
+            TaskDetailUpdatePriority,
+            TaskDetailUpdateDate,
         },
-        data () {
-            return {
-                task: {},
-                cloneTask: {
-                    content: '',
-                    comment: '',
-                    completed: false,
-                },
-                drawer: false,
-                // 終了したタスクの一括更新用リスト
-                complete_sub_task_list: [],
-                // 作成するサブタスクの情報
-                subTask: {
-                    target_task: 0,
-                    content: '',
-                },
-                // タスクにホバーしているか
-                isHover: false,
-                // サブタスクの作成フィールドの日本語変換時のsubmit防ぐため
-                subTaskSubmitValue: false,
-                // タスク編集中
-                isEdit: false,
-                // ラベル作成中
-                isCreateLabel: false,
-                // ラベル作成フィールドの日本語変換時のsubmit防ぐため
-                createLabelSubmitValue: false,
-                // ラベルのフィールドのデータ
-                createLabelValue: '',
-                // タスクの編集フィールドの日本語変換時のsubmit防ぐため
-                editTaskSubmitValue: false,
-                // サブタスクの編集フィールドの日本語変換時のsubmit防ぐため
-                editSubTaskSubmitValue: false,
-                // ホバーしたサブタスクのデータ
-                mouseOverSubTaskData: {},
-                // 編集するサブタスクのデータ
-                editSubTaskData: {},
-                // タスク削除モーダルのv-model
-                taskDeleteConfirm: false,
-                // 優先度のメニューのv-model
-                priority_menu: false,
-                // 優先度表示用
-                priority_items: [
-                    {
-                        text: '優先度5',
-                        icon: 'mdi-star',
-                        color: 'red accent-4',
-                        value: '5',
-                    },
-                    {
-                        text: '優先度4',
-                        icon: 'mdi-star',
-                        color: 'red accent-3',
-                        value: '4',
-                    },
-                    {
-                        text: '優先度3',
-                        icon: 'mdi-star',
-                        color: 'red accent-2',
-                        value: '3',
-                    },
-                    {
-                        text: '優先度2',
-                        icon: 'mdi-star',
-                        color: 'red accent-1',
-                        value: '2',
-                    },
-                    {
-                        text: '優先度1',
-                        icon: 'mdi-star-outline',
-                        color: 'grey lighten-1',
-                        value: '1',
-                    },
-                ],
-                // 選択した優先度のデータ
-                priority: {
-                    value: '1',
-                    color: {
-                        1: 'grey lighten-1',
-                        2: 'red accent-1',
-                        3: 'red accent-2',
-                        4: 'red accent-3',
-                        5: 'red accent-4',
-                    },
-                    icon: 'mdi-star',
-                },
-                // 削除するラベルリストを一時的に保存
-                deleteLabelList: [],
-                // 選択したラベルIDリスト
-                selectedLabelList: [],
-                // label更新中フラグ
-                isLoadingUpdateLabel: false,
-                // label新規作成フィールドのv-model
-                isCreateNewLabel: false,
-            }
-        },
+        data: () => ({
+            task: {},
+            cloneTask: {
+                content: '',
+                comment: '',
+                completed: false,
+            },
+            drawer: false,
+            // 終了したタスクの一括更新用リスト
+            complete_sub_task_list: [],
+            // 作成するサブタスクの情報
+            subTask: {
+                target_task: 0,
+                content: '',
+            },
+            // タスクにホバーしているか
+            isHover: false,
+            // サブタスクの作成フィールドの日本語変換時のsubmit防ぐため
+            subTaskSubmitValue: false,
+            // タスク編集中
+            isEdit: false,
+            // ラベル作成中
+            isCreateLabel: false,
+            // ラベル作成フィールドの日本語変換時のsubmit防ぐため
+            createLabelSubmitValue: false,
+            // ラベルのフィールドのデータ
+            createLabelValue: '',
+            // タスクの編集フィールドの日本語変換時のsubmit防ぐため
+            editTaskSubmitValue: false,
+            // サブタスクの編集フィールドの日本語変換時のsubmit防ぐため
+            editSubTaskSubmitValue: false,
+            // ホバーしたサブタスクのデータ
+            mouseOverSubTaskData: {},
+            // 編集するサブタスクのデータ
+            editSubTaskData: {},
+            // タスク削除モーダルのv-model
+            taskDeleteConfirm: false,
+            // 削除するラベルリストを一時的に保存
+            deleteLabelList: [],
+            // 選択したラベルIDリスト
+            selectedLabelList: [],
+            // label更新中フラグ
+            isLoadingUpdateLabel: false,
+            // label新規作成フィールドのv-model
+            isCreateNewLabel: false,
+            createLabelDuplicationCheck: false,
+            createLabelDuplicate: false,
+        }),
         created () {
             this.$eventHub.$on('showTaskDetail', this.showTaskDetail)
             this.$eventHub.$on('closeTaskDetail', this.closeTaskDetail)
             this.$eventHub.$on('closeSameTaskDetail', this.closeSameTaskDetail)
-            this.priority.value = this.cloneTask.priority
+            this.$eventHub.$on('deleteTaskConfirm', this.deleteTaskConfirm)
+            this.$eventHub.$on('selectPriority', this.selectPriority)
+            this.$eventHub.$on('showTaskDeleteConfirm', this.showTaskDeleteConfirm)
         },
         mounted: function () {
         },
@@ -667,21 +418,27 @@
                     this.updateTaskDetail('remind', val)
                 }
             }, 500),
+            createLabelValue: _.debounce(function (val) {
+                this.createLabelDuplicationCheck = false
+                if (this.createLabelValue.length === 0) this.createLabelDuplicate = false
+                if (this.createLabelValue.length > 0) this.checkLabelNameDuplication()
+            }, 200),
         },
         computed: {
             ...mapGetters([
                 'labels',
             ]),
-            start () {
-                const start = moment()
-                return start.format('YYYY-MM-DDTHH:mm:ss')
-            },
             isDisabledEditTaskSubmitBtn () {
                 if (this.cloneTask.content.length > 0) return false
                 return true
             },
             priorityValue () {
                 return this.priority.text
+            },
+            createLabelDisabled () {
+                if (this.createLabelValue.length > 0 &&
+                    this.createLabelDuplicationCheck) return false
+                return true
             }
         },
         methods: {
@@ -693,13 +450,41 @@
                 'updateCompleteSubTasks',
                 'updateTask',
                 'updateSubTask',
-                'deleteLabels',
+                'updateLabelToTask',
             ]),
             ...mapActions([
                 'addLabelsAction',
                 'deleteTaskAction',
                 'deleteSubTaskAction',
+                'deleteLabelAction',
             ]),
+            showTaskDeleteConfirm () {
+                this.taskDeleteConfirm = true
+            },
+            checkLabelNameDuplication () {
+                this.$axios({
+                    url: '/api/label/checkDuplication/',
+                    method: 'GET',
+                    params: {
+                        name: this.createLabelValue
+                    }
+                })
+                .then(res => {
+                    console.log(res.data)
+                    if (res.data.result) {
+                        this.createLabelDuplicate = false
+                        this.createLabelDuplicationCheck = true
+                    } else {
+                        this.createLabelDuplicate = true
+                    }
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            },
+            createLabelValidate () {
+                // ラベル作成のバリデーション
+            },
             closeTaskDetail () {
                 // タスク詳細を閉じる
                 this.drawer = false
@@ -883,9 +668,6 @@
                 this.endEditTaskContent()
                 this.endEditSubTaskContent()
             },
-            createLabelContent () {
-                this.isCreateNewLabel = true
-            },
             mouseOverSubTask (subtask) {
                 // サブタスクにホバー時にサブタスク情報を保持
                 this.mouseOverSubTaskData = _.cloneDeep(subtask)
@@ -936,7 +718,7 @@
             setCreateLabelName () {
                 // ラベル作成エリアでenterが押されたら更新
                 const length = this.createLabelValue.length
-                if (length === 0 || !this.createLabelSubmitValue) return
+                if (length === 0 || !this.createLabelSubmitValue || this.createLabelDisabled) return
                 this.createLabelBtn()
             },
             createLabelBtn () {
@@ -963,7 +745,6 @@
             },
             addLabelBtn () {
                 // ラベルを選択した後送信
-                console.log('addLabelBtn')
                 this.isLoadingUpdateLabel = true
                 this.$axios({
                     url: '/api/task/change_label_list/',
@@ -975,10 +756,11 @@
                 })
                 .then(res => {
                     console.log(res)
-                    this.cloneTask.label = res.data
+                    this.cloneTask.label = res.data.label
                     this.setSelectedLabelList()
-                    this.isLoadingUpdateLabel = false
                     this.endCreateLabel()
+                    this.updateLabelToTask(res.data)
+                    this.isLoadingUpdateLabel = false
                 })
                 .catch(e => {
                     console.log(e)
@@ -1037,9 +819,7 @@
             },
             selectPriority (priority) {
                 this.cloneTask.priority = priority
-                this.priority.value = priority
                 this.updateTaskDetail('priority', this.cloneTask.priority)
-                this.priority_menu = false
             },
             deleteLabel (label) {
                 for (const i in this.cloneTask.label) {
@@ -1051,27 +831,17 @@
                 const index = this.selectedLabelList.indexOf(label.id)
                 if (index !== -1) this.selectedLabelList.splice(index, 1)
                 this.deleteLabelList.push(label)
-                this.deleteLabelAction()
+                this.deleteLabelToAction()
             },
-            deleteLabelAction: _.debounce(function deleteLabelAction () {
-                this.$axios({
-                    url: '/api/label/delete/',
-                    method: 'DELETE',
-                    data: {
-                        task_id: this.cloneTask.id,
-                        delete_label_list: this.deleteLabelList
-                    }
-                })
-                .then(res => {
-                    console.log(res)
-                    this.deleteLabels(res.data)
-                })
-                .catch(e => {
-                    console.log(e)
+            deleteLabelToAction: _.debounce(function deleteLabelToAction () {
+                this.deleteLabelAction({
+                    task_id: this.cloneTask.id,
+                    delete_label_list: this.deleteLabelList
                 })
                 this.deleteLabelList = []
             }, 400),
         },
+        mixins: [globalValidateMixins],
     }
 </script>
 <style lang="scss" scoped>
@@ -1130,8 +900,5 @@
                 }
             }
         }
-    }
-    .task_delete_confirm_btn {
-        margin: 0 auto;
     }
 </style>

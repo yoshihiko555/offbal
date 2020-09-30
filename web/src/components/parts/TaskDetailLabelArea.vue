@@ -49,7 +49,7 @@
                     <vs-select
                         id="label_vs_select"
                         placeholder='ラベルを選択してください'
-                        v-model="selectedLabelList"
+                        v-model="localSelectedLabelList"
                         multiple
                         filter
                     >
@@ -134,6 +134,223 @@
                 </div>
             </div>
         </div>
-        <!-- ラベル追加ボタン押下後ここまで -->
     </v-card-text>
 </template>
+<script>
+    import { mapGetters, mapActions, mapMutations } from 'vuex'
+    import { globalValidateMixins } from '@/mixins/validate'
+    import _ from 'lodash'
+
+    export default {
+        name: 'TaskDetailLabelArea',
+        components: {
+        },
+        props: {
+            cloneTask: {
+                type: Object,
+                required: true,
+            },
+            selectedLabelList: {
+                type: Array,
+                required: true,
+            }
+        },
+        data: () => ({
+            isCreateNewLabel: false,
+            isCreateLabel: false,
+            deleteLabelList: [],
+            createLabelSubmitValue: false,
+            createLabelValue: '',
+            isLoadingUpdateLabel: false,
+            createLabelDuplicationCheck: false,
+            createLabelDuplicate: false,
+        }),
+        created () {
+            this.$eventHub.$on('endCreateLabel', this.endCreateLabel)
+        },
+        mounted: function () {
+        },
+        watch: {
+            createLabelValue: _.debounce(function (val) {
+                this.createLabelDuplicationCheck = false
+                if (this.createLabelValue.length === 0) this.createLabelDuplicate = false
+                if (this.createLabelValue.length > 0) this.checkLabelNameDuplication()
+            }, 200),
+        },
+        computed: {
+            ...mapGetters([
+                'labels'
+            ]),
+            createLabelDisabled () {
+                if (this.createLabelValue.length > 0 &&
+                    this.createLabelDuplicationCheck) return false
+                return true
+            },
+            localSelectedLabelList: {
+                get: function () {
+                    return this.selectedLabelList
+                },
+                set: function (value) {
+                    this.$emit('update', value)
+                },
+            },
+        },
+        methods: {
+            ...mapMutations([
+                'addLabel',
+                'updateLabelToTask',
+            ]),
+            ...mapActions([
+                'addLabelsAction',
+                'deleteLabelAction',
+            ]),
+            addLabelContent () {
+                // ラベル作成モードにする。
+                this.isCreateLabel = true
+                this.$eventHub.$emit('endEditTaskContent')
+                this.$eventHub.$emit('endEditSubTaskContent')
+            },
+            deleteLabel (label) {
+                for (const i in this.cloneTask.label) {
+                    if (this.cloneTask.label[i].id === label.id) {
+                        this.cloneTask.label.splice(i, 1)
+                        break
+                    }
+                }
+                const index = this.localSelectedLabelList.indexOf(label.id)
+                if (index !== -1) this.localSelectedLabelList.splice(index, 1)
+                this.deleteLabelList.push(label)
+                this.deleteLabelToAction()
+            },
+            deleteLabelToAction: _.debounce(function deleteLabelToAction () {
+                this.deleteLabelAction({
+                    task_id: this.cloneTask.id,
+                    delete_label_list: this.deleteLabelList
+                })
+                this.deleteLabelList = []
+            }, 400),
+            endCreateLabel () {
+                // ラベル作成モードを終了
+                this.isCreateLabel = false
+                this.createLabelSubmitValue = false
+                this.createLabelValue = ''
+                // this.setSelectedLabelList()
+            },
+            setSelectedLabelList () {
+                this.localSelectedLabelList = []
+                // 選択されているラベルをセット
+                for (const i in this.cloneTask.label) {
+                    this.localSelectedLabelList.push(this.cloneTask.label[i].id)
+                }
+            },
+            addLabelBtn () {
+                // ラベルを選択した後送信
+                this.isLoadingUpdateLabel = true
+                this.$axios({
+                    url: '/api/task/change_label_list/',
+                    method: 'PUT',
+                    data: {
+                        task_id: this.cloneTask.id,
+                        label_id_list: this.localSelectedLabelList
+                    }
+                })
+                .then(res => {
+                    console.log(res)
+                    this.cloneTask.label = res.data.label
+                    // this.setSelectedLabelList()
+                    this.endCreateLabel()
+                    this.updateLabelToTask(res.data)
+                    this.isLoadingUpdateLabel = false
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            },
+            createLabelBtn () {
+                // ラベル作成の送信ボタンが押されたらラベル作成
+                if (this.createLabelValue.length === 0) return
+                this.isLoadingUpdateLabel = true
+                this.$axios({
+                    url: '/api/label/',
+                    method: 'POST',
+                    data: {
+                        name: this.createLabelValue,
+                    }
+                })
+                .then(res => {
+                    this.isLoadingUpdateLabel = false
+                    this.localSelectedLabelList.push(res.data.id)
+                    this.addLabelsAction(res.data)
+                    this.isCreateNewLabel = false
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+                this.createLabelValue = ''
+            },
+            checkLabelNameDuplication () {
+                this.$axios({
+                    url: '/api/label/checkDuplication/',
+                    method: 'GET',
+                    params: {
+                        name: this.createLabelValue
+                    }
+                })
+                .then(res => {
+                    console.log(res.data)
+                    if (res.data.result) {
+                        this.createLabelDuplicate = false
+                        this.createLabelDuplicationCheck = true
+                    } else {
+                        this.createLabelDuplicate = true
+                    }
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            },
+            changeCreateLabelSubmitValue () {
+                // ラベル作成の日本語変換でのsubmitを防ぐ
+                this.createLabelSubmitValue = true
+            },
+            setCreateLabelName () {
+                // ラベル作成エリアでenterが押されたら更新
+                const length = this.createLabelValue.length
+                if (length === 0 || !this.createLabelSubmitValue || this.createLabelDisabled) return
+                this.createLabelBtn()
+            },
+        },
+        mixins: [globalValidateMixins],
+    }
+</script>
+<style lang="scss" scoped>
+    .vs-input-parent::v-deep {
+        width: 100%;
+        .vs-input {
+            width: 100%;
+        }
+    }
+    .create_label_input_area_wrap {
+        width: 100%;
+        .vs-input-parent::v-deep {
+            width: 100%;
+            .vs-input {
+                width: 100%;
+            }
+        }
+    }
+    .create_label_select_area_wrap {
+        // display: flex;
+        width: 100%;
+        .vs-select-content::v-deep {
+            max-width: 100%;
+            // max-width: 63%;
+            .vs-select__input {
+                width: 100%;
+            }
+        }
+    }
+    .change_label_btn_wrap {
+        display: flex;
+    }
+</style>

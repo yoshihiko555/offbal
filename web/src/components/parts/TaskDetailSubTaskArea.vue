@@ -14,7 +14,7 @@
                     <v-col cols="10">
                         <vs-checkbox
                             color="success"
-                            v-model="complete_sub_task_list"
+                            v-model="completeSubTaskList"
                             :val="subtask"
                             @change="checkSubTask(subtask)"
                             line-through
@@ -89,24 +89,190 @@
     </v-list>
 </template>
 <script>
+    import { mapActions, mapMutations } from 'vuex'
+    import _ from 'lodash'
+
     export default {
         name: 'TaskDetailSubTaskArea',
         components: {},
         props: {
+            task: {
+                type: Object,
+                required: true,
+            },
             cloneTask: {
                 type: Object,
+                required: true,
+            },
+            completeSubTaskList: {
+                type: Array,
                 required: true,
             }
         },
         data: () => ({
+            mouseOverSubTaskData: {},
+            subTaskSubmitValue: false,
+            subTask: {
+                target_task: 0,
+                content: '',
+            },
+            editSubTaskSubmitValue: false,
+            editSubTaskData: {},
         }),
         created () {
+            this.$eventHub.$on('endEditSubTaskContent', this.endEditSubTaskContent)
         },
         watch: {
         },
         computed: {
         },
         methods: {
+            ...mapMutations([
+                'addSubTask',
+                'updateCompleteSubTasks',
+                'updateSubTask',
+            ]),
+            ...mapActions([
+                'deleteSubTaskAction',
+            ]),
+            isEditSubTask (subtask) {
+                // 編集中のサブタスクかを判定するメソッド
+                if (subtask.id === this.editSubTaskData.id) return true
+                return false
+            },
+            setCreateSubTask () {
+                // サブタスク簡易追加フィールドの日本語変換でsubmitを防ぐ
+                this.subTaskSubmitValue = true
+            },
+            mouseOverSubTask (subtask) {
+                // サブタスクにホバー時にサブタスク情報を保持
+                this.mouseOverSubTaskData = _.cloneDeep(subtask)
+            },
+            mouseLeaveSubTask (subtask) {
+                // サブタスクのホバーが終わったら初期化
+                this.mouseOverSubTaskData = {}
+            },
+            checkSubTask: _.debounce(function checkSubTask (subtask) {
+                // サブタスクのチェックボックス押下後発火
+                this.$axios({
+                    url: '/api/sub_task/complete/',
+                    method: 'PUT',
+                    data: {
+                        task_id: this.cloneTask.id,
+                        compelete_sub_task_list: this.completeSubTaskList
+                    }
+                })
+                .then(res => {
+                    console.log(res)
+                    this.updateCompleteSubTasks(res.data)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            }, 400),
+            isMouseOverSubTask (subtask) {
+                // サブタスクのホバーしている要素のみ表示させる判定メソッド
+                if (subtask.id === this.mouseOverSubTaskData.id) return true
+                return false
+            },
+            editSubTaskContent (subtask) {
+                // サブタスク編集モードにする。
+                this.editSubTaskData = subtask
+                this.$eventHub.$emit('endEditTaskContent')
+                this.$eventHub.$emit('endCreateLabel')
+            },
+            changeEditSubTaskSubmitValue () {
+                // サブタスク編集の日本語変換でのsubmitを防ぐ
+                this.editSubTaskSubmitValue = true
+            },
+            setEditSubTaskContent (subtask, i) {
+                // サブタスク編集の入力エリアでenterが押されたら更新
+                const length = subtask.content.length
+                if (!this.editSubTaskSubmitValue) return
+                if (length === 0) {
+                    this.cloneTask.sub_tasks.splice(i, 1)
+                    this.deleteSubTaskAction(subtask.id)
+                }
+                if (length !== 0 && this.mouseOverSubTaskData.content !== subtask.content) {
+                    this.updateSubTaskDetail(subtask)
+                }
+                this.endEditSubTaskContent()
+            },
+            editSubTaskContentBtn (subtask, i) {
+                // サブタスク編集時にsubmitボタン押下で更新
+                const length = subtask.content.length
+                if (length === 0) {
+                    this.cloneTask.sub_tasks.splice(i, 1)
+                    this.deleteSubTaskAction(subtask.id)
+                }
+                if (this.mouseOverSubTaskData.content !== subtask.content) {
+                    this.updateSubTaskDetail(subtask)
+                }
+                this.endEditSubTaskContent()
+            },
+            deleteSubTask (subtask, i) {
+                this.cloneTask.sub_tasks.splice(i, 1)
+                this.deleteSubTaskAction(subtask.id)
+            },
+            endEditSubTaskContent () {
+                // サブタスク編集モードを終了
+                this.editSubTaskData = {}
+                this.editSubTaskSubmitValue = false
+                this.mouseOverSubTaskData = {}
+            },
+            updateSubTaskDetail (subtask) {
+                // サブタスクの内容を更新
+                this.$axios({
+                    url: `/api/sub_task/${subtask.id}/`,
+                    method: 'PUT',
+                    data: {
+                        target_task: subtask.target_task,
+                        content: subtask.content,
+                    }
+                })
+                .then(res => {
+                    console.log(res)
+                    this.updateSubTask(res.data)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            },
+            createSubTask () {
+                // サブタスクを作成する
+                const length = this.subTask.content.length
+                if (length === 0 || !this.subTaskSubmitValue) return
+                this.subTask.target_task = this.task.id
+                this.$axios({
+                    url: '/api/sub_task/',
+                    method: 'POST',
+                    data: this.subTask
+                })
+                .then(res => {
+                    console.log(res)
+                    this.addSubTask(res.data)
+                    this.cloneTask.sub_tasks.push(res.data)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+                this.subTask = {
+                    target_task: 0,
+                    content: '',
+                }
+                this.subTaskSubmitValue = false
+            },
         }
     }
 </script>
+<style lang="scss" scoped>
+    .vs-input-parent::v-deep {
+        width: 100%;
+        .vs-input {
+            width: 100%;
+        }
+    }
+    .sub_task_area_wrap {
+        height: 65px;
+    }
+</style>

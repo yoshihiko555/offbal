@@ -146,17 +146,17 @@
             defaultCategoryId: {
                 type: Number,
                 required: false,
-                default: 0
+                default: () => (0)
             },
             defaultCategory: {
                 type: String,
                 required: false,
-                default: ''
+                default: () => ('')
             },
             defaultSection: {
                 type: String,
                 required: false,
-                default: ''
+                default: () => ('')
             },
         },
         data: () => ({

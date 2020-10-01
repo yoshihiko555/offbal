@@ -123,9 +123,6 @@
         }),
         created () {
             this.$eventHub.$on('endEditSubTaskContent', this.endEditSubTaskContent)
-            this.localCloneTask = _.cloneDeep(this.cloneTask)
-            console.log('localCloneTask')
-            console.log(this.localCloneTask)
         },
         mounted: function () {
         },

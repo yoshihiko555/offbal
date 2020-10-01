@@ -182,7 +182,7 @@
 
 <script>
     import _ from 'lodash'
-    import { mapActions } from 'vuex'
+    import { mapGetters, mapActions } from 'vuex'
     import { Const } from '@/assets/js/const'
     const Con = new Const()
 
@@ -206,6 +206,7 @@
         }),
         created () {
             this.cloneSetting = _.cloneDeep(this.setting)
+            this.addStartPageOptions()
         },
         watch: {
             cloneSetting: {
@@ -216,6 +217,11 @@
                 deep: true,
             }
         },
+        computed: {
+        	...mapGetters([
+        		'categorys',
+        	]),
+        },
         methods: {
             ...mapActions('setting', [
                 'updateSettingAction',
@@ -225,6 +231,16 @@
                 .then(res => {
                     this.disabled = true
                 })
+            },
+            addStartPageOptions () {
+            	const options = []
+            	for (const category of this.categorys) {
+            		options.push({
+            			label: category.name.toUpperCase(),
+            			value: category.name
+            		})
+            	}
+            	this.startPageOptions = this.startPageOptions.concat(options)
             }
         },
     }

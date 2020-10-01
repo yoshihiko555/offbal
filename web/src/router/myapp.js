@@ -1,10 +1,4 @@
-import MyApp from '@/views/app/MyApp'
-import StartApp from '@/views/app/StartApp'
-import Activitys from '@/views/app/Activitys'
-import DetailCategory from '@/views/app/DetailCategory'
-import TodayScheduled from '@/views/app/TodayScheduled'
-import FutureScheduled from '@/views/app/FutureScheduled'
-import Karma from '@/views/app/Karma'
+import { MyApp, StartApp, Activitys, DetailCategory, TodayScheduled, FutureScheduled, Karma } from '@/views/index'
 
 const routes = {
 	path: '/myapp',
@@ -27,7 +21,7 @@ const routes = {
 		    },
 		},
 		{
-			path: 'category/:id',
+			path: 'category/:name',
 			name: 'DetailCategory',
 			component: DetailCategory,
 		},

@@ -85,12 +85,12 @@
             drawer: false,
         }),
         created () {
-            this.getDetailCategoryAction(this.$route.params.id)
+            this.getDetailCategoryAction(this.$route.params.name)
             this.$eventHub.$on('open-edit', this.openEdit)
             this.$eventHub.$on('change-toggle-drawer', this.changeToggleDrawer)
         },
         beforeRouteUpdate (to, from, next) {
-            if (to.params.id !== from.params.id) this.getDetailCategoryAction(to.params.id)
+            if (to.params.name !== from.params.name) this.getDetailCategoryAction(to.params.name)
             next()
         },
     	computed: {

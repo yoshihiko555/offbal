@@ -119,6 +119,19 @@ class CategoryViewSet(BaseModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def retrieve(self, request, pk=None):
+        self.auth0_id = request.query_params['auth0_id']
+        user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+        try:
+            detail_category = user.category_creator_user.get(name=pk)
+            serializer = self.get_serializer(detail_category)
+        except Category.DoesNotExist:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
     @action(methods=['GET'], detail=False)
     def checkCategoryDuplication(self, request):
         '''

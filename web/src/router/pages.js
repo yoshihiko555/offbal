@@ -1,5 +1,4 @@
-import Home from '@/views/Home'
-import InitSelectCategory from '@/views/InitSelectCategory'
+import { Home, InitSelectCategory } from '@/views/index'
 
 const routes = [
     {

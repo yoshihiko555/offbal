@@ -1,8 +1,4 @@
-import Setting from '@/views/setting/Setting'
-import GeneralSetting from '@/views/setting/GeneralSetting'
-import ThemeSetting from '@/views/setting/ThemeSetting'
-import AcountSetting from '@/views/setting/AcountSetting'
-import KarmaSetting from '@/views/setting/KarmaSetting'
+import { Setting, GeneralSetting, ThemeSetting, AcountSetting, KarmaSetting } from '@/views/index'
 
 const routes = {
 	path: '/setting',

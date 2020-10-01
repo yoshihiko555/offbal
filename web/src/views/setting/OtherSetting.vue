@@ -1,0 +1,57 @@
+<!-- その他設定画面 -->
+<template>
+    <div>
+        <v-container>
+            <h3>その他設定</h3>
+
+            <v-row>
+                <v-col cols='3'>
+                    <p>カテゴリー</p>
+                </v-col>
+                <v-col cols='9'>
+                    <vs-button @click="changeCategory">カテゴリーを入れ替える</vs-button>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols='3'>
+                    <p>ラベル</p>
+                </v-col>
+                <v-col cols='9'>
+                    <vs-button @click="changeLabel">ラベル編集</vs-button>
+                </v-col>
+            </v-row>
+        </v-container>
+        <!-- モーダル読み込み -->
+        <ChangeCategoryDialog
+            ref='category'
+        />
+    </div>
+</template>
+
+<script>
+    import ChangeCategoryDialog from '@/components/common/ChangeCategoryDialog'
+
+    export default {
+        name: 'OtherSetting',
+        components: {
+            ChangeCategoryDialog,
+        },
+        data: () => ({
+        }),
+        created () {
+        },
+        watch: {
+        },
+        methods: {
+            changeCategory () {
+                this.$refs.category.open()
+            },
+            changeLabel () {
+                console.log('ラベル編集')
+            }
+        },
+    }
+</script>
+
+<style lang="scss" scoped>
+</style>

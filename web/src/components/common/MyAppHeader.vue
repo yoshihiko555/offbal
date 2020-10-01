@@ -4,7 +4,6 @@
             app
             flat
             dense
-            color='white'
         >
         	<v-row align='center'>
 	        	<SearchField/>
@@ -51,5 +50,8 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+    .theme--light.v-app-bar.v-toolbar.v-sheet {
+        background-color: #fff;
+    }
 </style>

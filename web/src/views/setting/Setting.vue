@@ -75,6 +75,9 @@
             this.$eventHub.$on('confirm-cancel-setting', this.cancelSetting)
             this.changeActiveSidebar()
         },
+        mounted () {
+            // this.$vs.setColor('background', '#000')
+        },
         beforeRouteUpdate (to, from, next) {
             if (this.isChange) {
                 // 変更なし
@@ -124,8 +127,12 @@
                     this.active = 'acount'
                     break
 
-                case 'Karma':
+                case 'SettingKarma':
                     this.active = 'karma'
+                    break
+
+                case 'Other':
+                    this.active = 'other'
                     break
 
                 default:

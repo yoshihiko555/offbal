@@ -1,4 +1,4 @@
-import { Setting, GeneralSetting, ThemeSetting, AcountSetting, KarmaSetting } from '@/views/index'
+import { Setting, GeneralSetting, ThemeSetting, AcountSetting, KarmaSetting, OtherSetting } from '@/views/index'
 
 const routes = {
 	path: '/setting',
@@ -34,6 +34,14 @@ const routes = {
 			component: KarmaSetting,
 		    meta: {
 		    	title: 'カルマ設定',
+		    },
+		},
+		{
+			path: 'other',
+			name: 'Other',
+			component: OtherSetting,
+		    meta: {
+		    	title: 'その他設定',
 		    },
 		},
 	]

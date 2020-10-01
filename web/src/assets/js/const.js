@@ -1,7 +1,6 @@
 class Const {
     CATEGORY_COLOR = [
         { color: 'grey',    code: '#607D8B' },
-        { color: 'grey',    code: '#607D8B' },
         { color: 'red',     code: '#F44336' },
         { color: 'blue',    code: '#2196F3' },
         { color: 'green',   code: '#009688' },
@@ -54,6 +53,12 @@ class Const {
             name: 'カルマ',
             icon: 'bx-droplet',
             url: '/setting/karma/',
+        },
+        {
+            id: 'other',
+            name: 'その他',
+            icon: 'bx-label',
+            url: '/setting/other/',
         },
     ]
 

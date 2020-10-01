@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-container>
-            <h4>一般</h4>
+            <h3>一般</h3>
             <!-- 言語 -->
             <v-row>
                 <v-col cols='3'>
@@ -49,7 +49,7 @@
                     <p>タイムゾーン</p>
                 </v-col>
                 <v-col cols='9'>
-                    <vs-select v-model="cloneSetting.time_zone">
+                    <vs-select v-model="cloneSetting.time_zone" class="select_timezone">
                         <vs-option
                             v-for="option in timezoneOptions"
                             :key='option.label'
@@ -167,9 +167,10 @@
 
             <v-divider/>
             <v-row>
-                <v-col cols='12'>
+                <v-col cols='12' class="text-right">
                     <vs-button
                         :disabled='disabled'
+                        class="d-inline-block"
                         @click='update'
                     >
                         保存
@@ -192,6 +193,7 @@
         },
         props: {
             setting: {
+                type: Object,
                 requied: true,
             }
         },
@@ -230,6 +232,12 @@
                 this.updateSettingAction(this.cloneSetting)
                 .then(res => {
                     this.disabled = true
+                    this.$emit('update-is-change', this.disabled)
+                    this.$vs.notification({
+                        color: 'primary',
+                        classNotification: 'category_sort',
+                    	text: '設定を変更しました。'
+                    })
                 })
             },
             addStartPageOptions () {
@@ -249,5 +257,11 @@
 <style lang="scss" scoped>
     .vs-radio-content {
         justify-content: start;
+    }
+    .select_timezone {
+        max-width: 300px;
+    }
+    .vs-switch {
+        max-width: 60px;
     }
 </style>

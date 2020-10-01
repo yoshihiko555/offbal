@@ -18,7 +18,7 @@
     import MyAppHeader from '@/components/common/MyAppHeader'
     import Sidebar from '@/components/common/Sidebar'
 
-    import { mapActions } from 'vuex'
+    import { mapGetters, mapActions } from 'vuex'
 
     export default {
         name: 'MyApp',
@@ -33,19 +33,26 @@
         	this.appInitAction()
         	.then(res => {
                 // 何もしない
+                this.setTheme()
         	})
         	.catch(e => {
                 console.log(e.response)
                 // 初期データが作成されてないので、作成画面へ
         		if (!e.response.data.result) this.$router.push('/init-select-category')
-        	})
+            })
         },
         computed: {
+            ...mapGetters('setting', [
+                'setting',
+            ])
         },
         methods: {
             ...mapActions([
             	'appInitAction',
             ]),
+            setTheme () {
+                this.$vuetify.theme.isDark = (this.setting.theme === 'dark')
+            }
         },
     }
 </script>

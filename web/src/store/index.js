@@ -229,9 +229,9 @@ export default new Vuex.Store({
 	        this.commit('updateCategory', kwargs)
 	    },
     	// カテゴリー詳細取得
-	    getDetailCategoryAction (ctx, id) {
+	    getDetailCategoryAction (ctx, name) {
 	        Vue.prototype.$axios({
-	            url: `/api/category/${id}/`,
+	            url: `/api/category/${name}/`,
 	            method: 'GET'
 	        })
 	        .then(res => {

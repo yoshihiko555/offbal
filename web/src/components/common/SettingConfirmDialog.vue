@@ -7,12 +7,12 @@
         <v-container>
             <v-row>
                 <v-col cols='6'>
-                    <vs-button class="mx-auto" @click="toPage">
+                    <vs-button class="mx-auto" @click.stop="toPage">
                         はい
                     </vs-button>
                 </v-col>
                 <v-col cols='6'>
-                    <vs-button class="mx-auto" @click='close'>
+                    <vs-button class="mx-auto" @click.stop='close'>
                         いいえ
                     </vs-button>
                 </v-col>

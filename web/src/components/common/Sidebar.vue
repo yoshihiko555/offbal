@@ -126,7 +126,7 @@
             	this.$router.push({
             		name: route,
             		params: {
-            			id: params.id,
+            			name: params.name,
             		}
             	})
                 this.$eventHub.$emit('closeTaskDetail')

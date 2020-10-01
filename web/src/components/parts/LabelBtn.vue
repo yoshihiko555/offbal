@@ -38,45 +38,15 @@
                     </v-btn>
                 </div>
             </template>
-                <v-card>
+                <v-card class="label_btn_wrap">
                     <v-subheader
                         class="description"
                     >ラベルを設定</v-subheader>
-                    <!-- <v-card-title
-                        class="mb-3"
-                    >
-                        <h5>ラベル設定</h5>
-                    </v-card-title> -->
-                    <!-- <v-divider></v-divider> -->
-                    <!-- <v-row>
-                        <v-spacer></v-spacer>
-                        <v-col cols="7" class="top-left">
-                            <vs-input
-                                v-model="labelData.name"
-                                placeholder="ラベルを追加"
-                                class="add_label_input_area"
-                            >
-                            </vs-input>
-                        </v-col>
-                        <v-col cols="4" class="top-right">
-                            <vs-button
-                                relief
-                                class="addLabelBtn"
-                                :disabled="isDisabled"
-                                @click="create"
-                            >
-                                作成
-                                <template #animate>
-                                    <i class="bx bxs-paper-plane"></i> 送信
-                                </template>
-                            </vs-button>
-                        </v-col>
-                    </v-row> -->
                 <!-- ラベル選択モード -->
-                <div v-if="!isCreateNewLabel">
-                    <v-row>
+                <div v-if="!isCreateNewLabel && !nonLabel">
+                    <v-row class="label_input_area">
                         <v-spacer></v-spacer>
-                        <v-col cols="10" class="middle">
+                        <v-col cols="10" class="pa-0">
                             <v-card-actions
                                 class="label_select_area_wrap"
                             >
@@ -102,7 +72,7 @@
                     </v-row>
                     <v-row>
                         <v-spacer></v-spacer>
-                        <v-col cols="10" class="bottom">
+                        <v-col cols="10" class="pa-0">
                             <v-card-actions>
                                 <vs-button
                                     dark
@@ -124,9 +94,9 @@
                 </div>
                 <!-- ラベル作成モード -->
                 <div v-else>
-                    <v-row>
+                    <v-row class="label_input_area">
                         <v-spacer></v-spacer>
-                        <v-col cols="10">
+                        <v-col cols="10" class="pa-0">
                             <vs-input
                                 placeholder="ラベルを新規作成する"
                                 v-model="labelData.name"
@@ -145,9 +115,8 @@
                     </v-row>
                     <v-row>
                         <v-spacer></v-spacer>
-                        <v-col cols="10" class="bottom">
+                        <v-col cols="10" class="pa-0">
                             <v-card-actions>
-                                <v-spacer></v-spacer>
                                 <vs-button
                                     dark
                                     @click="endCreateNewLabel"
@@ -157,7 +126,6 @@
                                     @click="createLabelBtn"
                                     :disabled="createLabelDisabled"
                                 >作成</vs-button>
-                                <v-spacer></v-spacer>
                             </v-card-actions>
                         </v-col>
                         <v-spacer></v-spacer>
@@ -165,17 +133,25 @@
                 </div>
             </v-card>
         </v-menu>
+        <!-- <CreateLabelDialog
+            @update="createLabelConfirm = $event"
+            :createLabelConfirm="createLabelConfirm"
+            :labelContent="labelData.name"
+        /> -->
     </div>
 </template>
 <script>
     import { mapGetters, mapActions } from 'vuex'
     import { Const } from '@/assets/js/const'
     import _ from 'lodash'
+    import CreateLabelDialog from '@/components/parts/CreateLabelDialog'
     const Con = new Const()
 
     export default {
         name: 'LabelBtn',
-        components: {},
+        components: {
+            CreateLabelDialog,
+        },
         props: {
             defaultLabelList: {
                 type: Array,
@@ -195,13 +171,16 @@
             createLabelDuplicationCheck: false,
             createLabelDuplicate: false,
             createLabelSubmitValue: false,
+            createLabelConfirm: false,
         }),
         created () {
             for (const i in this.defaultLabelList) {
                 this.selectedLabelList.push(this.defaultLabelList[i].id)
             }
+            this.$eventHub.$on('confirmCreateLabelContent', this.confirmCreateLabelContent)
         },
-        mounted: function () {},
+        mounted: function () {
+        },
         watch: {
             selectedLabelList: function (val) {
                 this.labelColor = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
@@ -212,6 +191,9 @@
                 if (this.labelData.name.length === 0) this.createLabelDuplicate = false
                 if (this.labelData.name.length > 0) this.checkLabelNameDuplication()
             }, 200),
+            menu: function (val) {
+                if (!val) setTimeout(this.init, 150)
+            }
         },
         computed: {
             ...mapGetters([
@@ -236,12 +218,23 @@
                 if (this.labelData.name.length > 0 &&
                     this.createLabelDuplicationCheck) return false
                 return true
-            }
+            },
+            nonLabel () {
+                if (this.labels.length === 0) return true
+                return false
+            },
         },
         methods: {
             ...mapActions([
                 'addLabelsAction',
             ]),
+            confirmCreateLabelContent () {
+                this.createLabelBtn()
+                this.createLabelConfirm = false
+            },
+            showConfirmCreateLabelDialog () {
+                this.createLabelConfirm = true
+            },
             close () {
                 this.menu = false
                 this.selectedLabelList = []
@@ -264,10 +257,15 @@
             },
             init () {
                 this.labelData.name = ''
+                this.isCreateNewLabel = false
             },
             endCreateNewLabel () {
+                if (this.nonLabel) {
+                    this.menu = false
+                } else {
+                    this.isCreateNewLabel = false
+                }
                 this.init()
-                this.isCreateNewLabel = false
             },
             createLabelBtn () {
                 // ラベル作成の送信ボタンが押されたらラベル作成
@@ -281,15 +279,15 @@
                     }
                 })
                 .then(res => {
-                    this.isLoadingUpdateLabel = false
                     this.selectedLabelList.push(res.data.id)
                     this.addLabelsAction(res.data)
                     this.isCreateNewLabel = false
+                    this.isLoadingUpdateLabel = false
+                    this.init()
                 })
                 .catch(e => {
                     console.log(e)
                 })
-                this.init()
             },
             changeCreateLabelSubmitValue () {
                 this.createLabelSubmitValue = true
@@ -298,6 +296,7 @@
                 const length = this.labelData.name.length
                 if (length === 0 || !this.createLabelSubmitValue || this.createLabelDisabled) return
                 this.createLabelBtn()
+                // this.showConfirmCreateLabelDialog()
             },
             checkLabelNameDuplication () {
                 this.$axios({
@@ -340,23 +339,18 @@
     }
     .vs-input-parent::v-deep {
         width: 100%;
+        height: 100%;
         .vs-input {
             width: 100%;
         }
     }
-    .top-left {
-    }
-    .top-right {
-        position: relative;
-        top: -4px;
-    }
-    .middle {
-        padding: 0;
-    }
-    .bottom {
-        padding: 0;
-    }
-    .v-card__title {
-        height: 50px;
+    .label_btn_wrap {
+        height: 180px;
+        .label_input_area {
+            height: 55px;
+        }
+        .v-card__title {
+            height: 50px;
+        }
     }
 </style>

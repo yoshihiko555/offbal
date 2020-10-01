@@ -1,6 +1,7 @@
 <template>
     <vs-dialog
-        v-model="localTaskDialog"
+        v-model='localCreateLabelConfirm'
+        overflow-hidden
     >
         <v-container
             fluid
@@ -10,14 +11,21 @@
                 class="task_dialog_header mb-3"
                 align="center"
             >
-                タスクを削除しますか？
+                ラベルを作成しますか？
             </h5>
+            <v-row>
+                <v-col cols="12">
+                    <h4 class="label_content">
+                        {{ labelContent }}
+                    </h4>
+                </v-col>
+            </v-row>
             <v-row>
                 <v-col cols="6">
                     <vs-button
-                        class="task_delete_confirm_btn"
+                        class="create_label_confirm_btn"
                         size="l"
-                        @click="deleteTaskConfirm"
+                        @click="createLabel"
                     >
                         <!-- <i class='bx bx-trash'></i> -->
                         はい
@@ -26,9 +34,9 @@
                 <v-col cols="6">
                     <vs-button
                         dark
-                        class="task_delete_confirm_btn"
+                        class="create_label_confirm_btn"
                         size="l"
-                        @click="localTaskDialog = false"
+                        @click="localCreateLabelConfirm = false"
                     >
                         いいえ
                     </vs-button>
@@ -39,18 +47,22 @@
 </template>
 <script>
     export default {
-        name: 'TaskDetailDeleteTaskDialog',
+        name: 'CreateLabelDialog',
         components: {},
         props: {
-            taskDeleteConfirm: {
+            createLabelConfirm: {
                 type: Boolean,
-                required: true
+                required: true,
+            },
+            labelContent: {
+                type: String,
+                required: true,
             }
         },
         computed: {
-            localTaskDialog: {
+            localCreateLabelConfirm: {
                 get: function () {
-                    return this.taskDeleteConfirm
+                    return this.createLabelConfirm
                 },
                 set: function (value) {
                     this.$emit('update', value)
@@ -58,14 +70,18 @@
             },
         },
         methods: {
-            deleteTaskConfirm () {
-                this.$eventHub.$emit('deleteTaskConfirm')
+            createLabel () {
+                this.$eventHub.$emit('confirmCreateLabelContent')
             }
         },
     }
 </script>
 <style lang="scss" scoped>
-    .task_delete_confirm_btn {
+    .create_label_confirm_btn {
         margin: 0 auto;
+    }
+    .label_content {
+        text-align: center;
+        word-break: break-all;
     }
 </style>

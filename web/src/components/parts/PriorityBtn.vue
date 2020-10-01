@@ -78,7 +78,7 @@
             defaultPriority: {
                 type: String,
                 required: false,
-                default: '1'
+                default: () => ('1')
             }
         },
         data: () => ({

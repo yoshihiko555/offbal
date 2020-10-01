@@ -306,6 +306,57 @@ export default new Vuex.Store({
 				console.log(e)
 			})
 		},
+		updateCompleteSubTasksAction (ctx, kwargs) {
+			Vue.prototype.$axios({
+				url: '/api/sub_task/complete/',
+				method: 'PUT',
+				data: {
+					task_id: kwargs.task_id,
+					compelete_sub_task_list: kwargs.compelete_sub_task_list
+				}
+			})
+			.then(res => {
+				console.log(res)
+				this.commit('updateCompleteSubTasks', res.data)
+			})
+			.catch(e => {
+				console.log(e)
+			})
+		},
+		updateCompleteTaskAction (ctx, kwargs) {
+			Vue.prototype.$axios({
+				url: '/api/task/complete/',
+				method: 'PUT',
+				data: {
+					complete_task: kwargs.complete_task,
+				}
+			})
+			.then(res => {
+				console.log(res)
+				this.commit('deleteTask', res.data)
+				this.commit('addCompleteTask', res.data)
+			})
+			.catch(e => {
+				console.log(e)
+			})
+		},
+		updateTaskDetailAction (ctx, kwargs) {
+			Vue.prototype.$axios({
+				url: '/api/task/change_task_detail/',
+				method: 'PUT',
+				data: {
+					task_id: kwargs.task_id,
+					[kwargs.key]: kwargs.value
+				}
+			})
+			.then(res => {
+				console.log(res)
+				this.commit('updateTask', res.data)
+			})
+			.catch(e => {
+				console.log(e)
+			})
+		}
 	},
 	modules: {
 		setting,

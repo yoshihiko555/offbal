@@ -44,7 +44,7 @@
 </template>
 <script>
     import { Const } from '@/assets/js/const'
-    import { mapGetters, mapActions, mapMutations } from 'vuex'
+    import { mapActions } from 'vuex'
     import _ from 'lodash'
     import moment from 'moment'
     import Datetime from 'vue-ctk-date-time-picker'
@@ -90,6 +90,7 @@
             this.$eventHub.$on('deleteTaskConfirm', this.deleteTaskConfirm)
             this.$eventHub.$on('selectPriority', this.selectPriority)
             this.$eventHub.$on('showTaskDeleteConfirm', this.showTaskDeleteConfirm)
+            this.$eventHub.$on('cloneTaskAfterUpdateSubTask', this.cloneTaskAfterUpdateSubTask)
         },
         mounted: function () {
         },
@@ -116,20 +117,14 @@
             }, 500),
         },
         computed: {
-            ...mapGetters([
-                'labels',
-            ]),
             priorityValue () {
                 return this.priority.text
             },
         },
         methods: {
-            ...mapMutations([
-                'updateCompleteSubTasks',
-                'updateTask',
-            ]),
             ...mapActions([
                 'deleteTaskAction',
+                'updateTaskDetailAction',
             ]),
             showTaskDeleteConfirm () {
                 this.taskDeleteConfirm = true
@@ -169,6 +164,11 @@
                 this.cloneTask = _.cloneDeep(task)
                 this.setSelectedLabelList()
             },
+            cloneTaskAfterUpdateSubTask () {
+                // タスクの詳細の情報をセット
+                this.cloneTask = _.cloneDeep(this.task)
+                this.completeSubTaskList = _.cloneDeep(this.task.complete_sub_tasks)
+            },
             setSelectedLabelList () {
                 this.selectedLabelList = []
                 // 選択されているラベルをセット
@@ -188,20 +188,10 @@
             },
             updateTaskDetail (key, value) {
                 // タスク詳細を個別に更新
-                this.$axios({
-                    url: '/api/task/change_task_detail/',
-                    method: 'PUT',
-                    data: {
-                        task_id: this.cloneTask.id,
-                        [key]: value
-                    }
-                })
-                .then(res => {
-                    console.log(res)
-                    this.updateTask(res.data)
-                })
-                .catch(e => {
-                    console.log(e)
+                this.updateTaskDetailAction({
+                    task_id: this.cloneTask.id,
+                    key: key,
+                    value: value,
                 })
             },
             deleteTaskConfirm () {

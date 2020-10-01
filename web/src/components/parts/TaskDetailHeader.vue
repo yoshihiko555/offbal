@@ -58,7 +58,7 @@
     </div>
 </template>
 <script>
-    import { mapMutations, mapActions } from 'vuex'
+    import { mapActions } from 'vuex'
     import TaskDetailUpdatePriority from '@/components/parts/TaskDetailUpdatePriority'
     import _ from 'lodash'
 
@@ -94,32 +94,17 @@
             },
         },
         methods: {
-            ...mapMutations([
-                'deleteTask',
-                'addCompleteTask',
-                'updateTask'
-            ]),
             ...mapActions([
-                'deleteTaskAction'
+                'deleteTaskAction',
+                'updateCompleteTaskAction',
+                'updateTaskDetailAction',
             ]),
             checkTask: _.debounce(function checkTask () {
-                this.$axios({
-                    url: '/api/task/complete/',
-                    method: 'PUT',
-                    data: {
-                        complete_task: this.cloneTask,
-                    }
+                this.updateCompleteTaskAction({
+                    complete_task: this.cloneTask
                 })
-                .then(res => {
-                    console.log(res)
-                    this.deleteTask(res.data)
-                    this.addCompleteTask(res.data)
-                })
-                .catch(e => {
-                    console.log(e)
-                })
-                this.$eventHub.$emit('cloneTaskDetail')
-            }),
+                this.$eventHub.$emit('closeTaskDetail')
+            }, 600),
             editTaskContent () {
                 // タスク編集モードにする。
                 this.isEdit = true
@@ -153,20 +138,10 @@
             },
             updateTaskDetail (key, value) {
                 // タスク詳細を個別に更新
-                this.$axios({
-                    url: '/api/task/change_task_detail/',
-                    method: 'PUT',
-                    data: {
-                        task_id: this.cloneTask.id,
-                        [key]: value
-                    }
-                })
-                .then(res => {
-                    console.log(res)
-                    this.updateTask(res.data)
-                })
-                .catch(e => {
-                    console.log(e)
+                this.updateTaskDetailAction({
+                    task_id: this.cloneTask.id,
+                    key: key,
+                    value: value,
                 })
             },
         }

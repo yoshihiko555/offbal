@@ -71,33 +71,6 @@ export default {
     	signin () {
     		auth.login()
     	},
-        // handleAuthentication () {
-  	    // 	auth.handleAuthentication()
-   	    // },
-   	    // initUserData (id, name) {
-   	    // 	this.$axios({
-   	    // 		url: '/api/signup/',
-   	    // 		method: 'POST',
-   	    // 		data: {
-   	    // 			auth0_id: id,
-   	    // 			auth0_name: name
-   	    // 		}
-   	    // 	})
-   	    // 	.then(res => {
-        //         console.log(res)
-        //         // if (!this.isAuth) this.$router.push('/')
-        //         // else this.$router.push('/myapp')
-   	    // 	})
-   	    // 	.catch(e => {
-   	    // 		console.log(e)
-   	    // 	})
-        // },
-        // openSelectCategory () {
-           // this.$refs.selectCategory.open()
-        // },
-        updateUsermetadata () {
-            auth.updateUsermetadata()
-        }
     }
 }
 </script>

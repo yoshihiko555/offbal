@@ -1,6 +1,7 @@
 <!-- スタートページ切り替えのルートコンポーネント -->
 <template>
     <div id='start-app'>
+        START PAGE
     </div>
 </template>
 
@@ -16,7 +17,7 @@
         data: () => ({
         }),
         created () {
-        	// auth.testCheckSession()
+            // this.getToken()
         	const prefix = (this.isCategory()) ? '/myapp/category' : '/myapp'
         	this.$router.push(`${prefix}/${this.setting.start_page}`)
         },
@@ -35,6 +36,10 @@
         			// カテゴリー
         			return true
         		}
+        	},
+        	async getToken () {
+            	const res = await AuthService.getManageAPIToken()
+            	console.log(res)
         	}
         },
     }

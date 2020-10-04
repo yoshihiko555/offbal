@@ -14,6 +14,7 @@ export default class AuthService {
         this.logout = this.logout.bind(this)
         this.isAuthenticated = this.isAuthenticated.bind(this)
         this.handleAuthentication = this.handleAuthentication.bind(this)
+        this.updateUserProfile = this.updateUserProfile.bind(this)
     }
 
     // auth0.WebAuth のインスタンスをAPI および Client
@@ -91,6 +92,45 @@ export default class AuthService {
         else return null
     }
 
+    // 管理APIを操作するインスタンスの作成
+    async initAuthManage () {
+        const res = await AuthService.getManageAPIToken().catch(e => e)
+        console.log(res)
+        if (res.data) {
+            const token = res.data.access_token
+            const auth0Manage = new auth0.Management({
+                domain: process.env.VUE_APP_AUTH_DOMAIN,
+                token: token,
+            })
+            return auth0Manage
+        } else {
+            throw new Error('トークンの取得に失敗しました')
+        }
+    }
+
+    // 管理APIからユーザー情報を取得
+    async getManageUserProfile (cb) {
+        try {
+            const auth0Manage = await this.initAuthManage()
+            const authId = AuthService.getAuth0Id()
+            return auth0Manage.getUser(authId, cb)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    // 管理APIによるユーザー情報の更新
+    async updateUserProfile (data, cb) {
+        console.log(data)
+        try {
+            const auth0Manage = await this.initAuthManage()
+            const authId = AuthService.getAuth0Id()
+            auth0Manage.patchUserAttributes(authId, data, cb)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
     /*********************************
      * 静的メソッド
      ********************************/
@@ -111,28 +151,22 @@ export default class AuthService {
     }
 
     // 管理APIへのアクセストークンを取得する静的メソッド
-    static async getManageAPIToken () {
-    	const url = `https://${process.env.VUE_APP_AUTH_DOMAIN}/oauth/token`
-		const data = {
+    static getManageAPIToken () {
+        const url = `https://${process.env.VUE_APP_AUTH_DOMAIN}/oauth/token`
+        const data = {
 	    	grant_type: 'client_credentials',
 	    	client_id: process.env.VUE_APP_MANAGE_CLIENT_ID,
 	    	client_secret: process.env.VUE_APP_MANAGE_CLIENT_SECRET,
 	    	audience: `https://${process.env.VUE_APP_AUTH_DOMAIN}/api/v2/`,
-		}
+        }
     	const options = {
     			url: url,
     			method: 'POST',
 	    		headers: {
 	    			 'content-type': 'application/x-www-form-urlencoded',
-	    		},
-//	    		data: data,
+                },
 	    		data: qs.stringify(data),
     	}
-    	try {
-    		const res = await axios(options)
-    		return res.data.access_token
-    	} catch (e) {
-    		console.log(e)
-    	}
+        return axios(options)
     }
 }

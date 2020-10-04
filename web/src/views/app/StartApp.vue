@@ -17,7 +17,6 @@
         data: () => ({
         }),
         created () {
-            // this.getToken()
         	const prefix = (this.isCategory()) ? '/myapp/category' : '/myapp'
         	this.$router.push(`${prefix}/${this.setting.start_page}`)
         },
@@ -37,10 +36,6 @@
         			return true
         		}
         	},
-        	async getToken () {
-            	const res = await AuthService.getManageAPIToken()
-            	console.log(res)
-        	}
         },
     }
 </script>

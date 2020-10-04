@@ -8,7 +8,7 @@
             </v-col>
             <v-col cols='9'>
                 <vs-input
-                    v-model="userProfile.nickname"
+                    v-model="cloneUserProfile.nickname"
                 ></vs-input>
             </v-col>
         </v-row>
@@ -19,7 +19,7 @@
             </v-col>
             <v-col cols='9'>
                 <vs-input
-                    v-model="userProfile.email"
+                    v-model="cloneUserProfile.email"
                 ></vs-input>
             </v-col>
         </v-row>
@@ -37,6 +37,7 @@
 </template>
 
 <script>
+    import _ from 'lodash'
     import AuthService from '@/auth/AuthService'
     const auth = new AuthService()
 
@@ -46,31 +47,57 @@
         },
         data: () => ({
             userProfile: {},
+            cloneUserProfile: {},
             disabled: true,
         }),
         created () {
-            // auth.getUser((err, res) => {
-            //     if (err) {
-            //         console.log(err)
-            //     } else {
-            //         console.log(res)
-            //     }
-            // })
-            // auth.getUserProfile((err, res) => {
-            //     if (err) {
-            //         console.log(err)
-            //     } else {
-            //         console.log(res)
-            //         this.userProfile = res
-            //     }
-            // })
+            auth.getManageUserProfile((err, res) => {
+                if (err) {
+                    console.log(err)
+                } else {
+                    console.log(res)
+                    this.userProfile = res
+                    this.cloneUserProfile = _.cloneDeep(this.userProfile)
+                }
+            })
+        },
+        watch: {
+            cloneUserProfile: {
+                handler (val) {
+                    this.disabled = _.isEqual(val, this.userProfile)
+                    this.$emit('update-is-change', this.disabled)
+                },
+                deep: true,
+            }
         },
         computed: {
         },
         methods: {
             update () {
-                console.log('user update')
+                const sendData = this.conversionData(this.cloneUserProfile)
+                auth.updateUserProfile(sendData, (err, res) => {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        console.log(res)
+                        this.disabled = true
+                        this.userProfile = res
+                        this.cloneUserProfile = _.cloneDeep(this.userProfile)
+                    }
+                })
+            },
+            // 送信データで不必要なプロパティを削除して返却
+            conversionData (data) {
+                delete data.user_id
+                delete data.logins_count
+                delete data.last_login
+                delete data.last_ip
+                delete data.updated_at
+                delete data.created_at
+                delete data.identities
+                return data
             }
+
         },
     }
 </script>

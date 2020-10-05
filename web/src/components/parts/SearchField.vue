@@ -16,6 +16,11 @@ export default {
     }),
 	created () {
 	},
+    watch: {
+        text: function (val) {
+            if (val.length > 0) this.$eventHub.$emit('search-task', val)
+        }
+    },
     methods: {
     }
 }

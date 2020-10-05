@@ -49,6 +49,7 @@
 </template>
 
 <script>
+    import _ from 'lodash'
     import FilterBtn from '@/components/parts/FilterBtn'
     import SortBtn from '@/components/parts/SortBtn'
     import CreateSectionBtn from '@/components/parts/CreateSectionBtn'
@@ -95,6 +96,7 @@
             })
             this.$eventHub.$on('open-edit', this.openEdit)
             this.$eventHub.$on('change-toggle-drawer', this.changeToggleDrawer)
+            this.$eventHub.$on('search-task', this.search)
         },
         mounted: function () {
         },
@@ -139,6 +141,30 @@
             },
             changeToggleDrawer (value) {
                 this.drawer = value
+            },
+            search: _.debounce(function search (searchText) {
+                console.log('isSearch')
+                const trimedText = this.trim(searchText)
+                const trimedTextList = [...new Set(trimedText.split(/\s+/))]
+                const searchWord = trimedTextList.join(',')
+                console.log('検索文字列 : ' + searchWord)
+                this.$axios({
+                    url: '/api/search/',
+                    method: 'GET',
+                    params: {
+                        searchText: searchText
+                    }
+                })
+                .then(res => {
+                    console.log(res)
+                    // TODO ここで検索結果反映
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            }, 200),
+            trim (word) {
+                return String(word).replace(/^\s+|\s+$/g, '')
             }
         },
     }

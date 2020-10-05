@@ -191,17 +191,14 @@
                 this.beforeCompleteTasks = _.cloneDeep(this.localCompleteTasks)
             }, 400),
             cloneCompleteTasks (tasks) {
-                console.log('cloneCompleteTasks')
                 this.beforeCompleteTasks = _.cloneDeep(tasks)
                 this.localCompleteTasks = _.cloneDeep(tasks)
             },
             addCloneCompleteTasks (tasks) {
-                console.log('addCloneCompleteTasks')
                 for (const i in tasks) {
                     this.beforeCompleteTasks.push(tasks[i])
                     this.localCompleteTasks.push(tasks[i])
                 }
-                console.log(this.localCompleteTasks)
             },
             restOfSubTasks (task) {
                 const subTasks = task.sub_tasks.length

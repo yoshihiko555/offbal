@@ -198,6 +198,23 @@ export default new Vuex.Store({
 				const index = task.label.findIndex(label => label.id === payload.delete_labels[i].id)
 				if (index !== -1) task.label = task.label.filter((_, i) => i !== index)
 			}
+		},
+		// タスクを複数追加。TODO id順にする？？
+		addTasks (state, payload) {
+			for (const i in payload) {
+				if (payload[i].target_section === 0) {
+					state.detailCategory.tasks.push(payload[i])
+				} else {
+					const section = state.detailCategory.sections.find(section => section.id === payload[i].target_section)
+					section.tasks.push(payload[i])
+				}
+			}
+		},
+		deleteCompleteTasks (state, payload) {
+			for (const i in payload) {
+				const index = state.detailCategory.complete_tasks.findIndex(task => task.id === payload[i].id)
+				if (index !== -1) state.detailCategory.complete_tasks = state.detailCategory.complete_tasks.filter((_, i) => i !== index)
+			}
 		}
 	},
 	actions: {
@@ -230,19 +247,23 @@ export default new Vuex.Store({
 	    },
     	// カテゴリー詳細取得
 	    getDetailCategoryAction (ctx, name) {
-	        Vue.prototype.$axios({
-	            url: `/api/category/${name}/`,
-	            method: 'GET'
-	        })
-	        .then(res => {
-	            console.log('カテゴリー詳細', res)
-	            // Ttile設定
-	            setTitle(res.data.name)
-	            this.commit('setDetailCategory', res.data)
-	        })
-	        .catch(e => {
-	            console.log(e)
-	        })
+			return new Promise((resolve, reject) => {
+				Vue.prototype.$axios({
+		            url: `/api/category/${name}/`,
+		            method: 'GET'
+		        })
+		        .then(res => {
+		            console.log('カテゴリー詳細', res)
+		            // Ttile設定
+		            setTitle(res.data.name)
+		            this.commit('setDetailCategory', res.data)
+					resolve(res)
+		        })
+		        .catch(e => {
+		            console.log(e)
+					reject(e)
+		        })
+			})
 	    },
 	    // セクション削除
 	    deleteSectionAction (ctx, id) {
@@ -323,6 +344,7 @@ export default new Vuex.Store({
 				console.log(e)
 			})
 		},
+		// タスク単体の完了状態を更新
 		updateCompleteTaskAction (ctx, kwargs) {
 			Vue.prototype.$axios({
 				url: '/api/task/complete/',
@@ -356,7 +378,37 @@ export default new Vuex.Store({
 			.catch(e => {
 				console.log(e)
 			})
-		}
+		},
+		// 複数タスクの完了状態更新
+		updateCompleteTasksAction (ctx, kwargs) {
+			return new Promise((resolve, reject) => {
+				const CompleteTaskList = kwargs.complete_task_list
+				const completed = kwargs.completed
+				Vue.prototype.$axios({
+					url: '/api/task/complete/',
+					method: 'PUT',
+					data: {
+						complete_task_list: CompleteTaskList,
+						completed: completed,
+					}
+				})
+				.then(res => {
+					console.log(res)
+					if (completed) {
+						this.commit('deleteTasks', res.data)
+						this.commit('addCompleteTasks', res.data)
+					} else {
+						this.commit('deleteCompleteTasks', res.data)
+						this.commit('addTasks', res.data)
+					}
+					resolve(res)
+				})
+				.catch(e => {
+					console.log(e)
+					reject(e)
+				})
+			})
+		},
 	},
 	modules: {
 		setting,

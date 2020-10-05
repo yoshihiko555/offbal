@@ -413,7 +413,7 @@ class Section(TimeStampModel):
         related_name='section_target_category'
     )
 
-    name = models.CharField(max_length=60)
+    name = models.CharField(max_length=20)
     deleted = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
 
@@ -482,7 +482,7 @@ class SubTask(TimeStampModel,
 
 class Label(TimeStampModel):
 
-    name = models.CharField(max_length=60)
+    name = models.CharField(max_length=20)
 
     author = models.ForeignKey(
         'api.mUser',

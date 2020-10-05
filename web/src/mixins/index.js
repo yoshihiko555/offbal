@@ -18,9 +18,30 @@ export const setDescription = pathMeta => {
 		.setAttribute('content', description)
 }
 
+/**
+ * Object配列のソート
+ */
+ export const objectArraySort = (data, key, order) => {
+	 let numA = -1
+	 let numB = 1
+	 if (order === 'asc') {
+		 numA = 1
+		 numB = -1
+	 }
+	 data = data.sort(function (a, b) {
+		 const x = a[key]
+		 const y = b[key]
+		 if (x > y) return numA
+		 if (x < y) return numB
+		 return 0
+	 })
+	 return data
+ }
+
 export const globalMixins = {
 		methods: {
 			setTitle,
             setDescription,
+			objectArraySort,
 		}
 }

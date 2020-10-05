@@ -86,11 +86,29 @@
         }),
         created () {
             this.getDetailCategoryAction(this.$route.params.name)
+            .then(res => {
+                console.log(res)
+                this.$eventHub.$emit('cloneCompleteTasks', res.data.complete_tasks)
+            })
+            .catch(e => {
+                console.log(e)
+            })
             this.$eventHub.$on('open-edit', this.openEdit)
             this.$eventHub.$on('change-toggle-drawer', this.changeToggleDrawer)
         },
+        mounted: function () {
+        },
         beforeRouteUpdate (to, from, next) {
-            if (to.params.name !== from.params.name) this.getDetailCategoryAction(to.params.name)
+            if (to.params.name !== from.params.name) {
+                this.getDetailCategoryAction(to.params.name)
+                .then(res => {
+                    console.log(res)
+                    this.$eventHub.$emit('cloneCompleteTasks', res.data.complete_tasks)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
+            }
             next()
         },
     	computed: {

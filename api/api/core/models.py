@@ -14,7 +14,7 @@ class TimeStampModel(models.Model):
 
 class TaskModel(models.Model):
 
-    content = models.TextField(_('Content'))
+    content = models.CharField(_('Content'), max_length=256)
     completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(null=True, blank=True)
     deleted = models.BooleanField(default=False)

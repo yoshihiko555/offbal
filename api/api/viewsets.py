@@ -322,12 +322,13 @@ class TaskViewSet(BaseModelViewSet):
 
         else:
             complete_task_list = request.data['complete_task_list']
+            completed = request.data['completed']
             complete_tasks = []
             try:
                 for complete_task in complete_task_list:
                     instance = Task.objects.get(pk=complete_task['id'])
-                    instance.completed = True
-                    instance.completed_at = timezone.datetime.now()
+                    instance.completed = True if bool(completed) else False
+                    instance.completed_at = timezone.datetime.now() if bool(completed) else None
                     complete_tasks.append(instance)
                 Task.objects.bulk_update(complete_tasks, ['completed', 'completed_at'])
             except Task.DoesNotExist:

@@ -4,7 +4,9 @@
             v-model="drawer"
             right
             fixed
-            :style="{ width: '500px', top: '80px'}"
+            hide-overlay
+            mobile-breakpoint=700
+            :style="{ width: '500px', top: '60px', height: 'calc(100% - 60px)'}"
         >
             <v-container
                 fluid

@@ -120,6 +120,10 @@
                     })
                     this.isShow = false
                     await this.toAppPage(this)
+                    // 一旦サインアップ時は、リロード処理を入れるように修正
+                    this.$router.go({
+                        path: this.$router.currentRoute.path, force: true
+                    })
                 } catch (e) {
                 	console.error(e)
                 }

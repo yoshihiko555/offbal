@@ -94,6 +94,7 @@ class SettingSerializer(DynamicFieldsModelSerializer):
             'mail_today_result',
             'mail_news',
             'mail_hint',
+            'is_multiple_filter',
         ]
 
 class CategorySerializer(DynamicFieldsModelSerializer):

@@ -231,6 +231,9 @@ class mSetting(models.Model):
     mail_news = models.BooleanField(_('Mail News'), default=True)
     mail_hint = models.BooleanField(_('Mail Hint'), default=True)
 
+    is_multiple_filter = models.BooleanField(_('Is Multiple Filter'), default=False)
+
+
     def __str__(self):
         name = self.target_user.auth0_name if self.target_user.auth0_name != '' else self.target_user.username
         return name + 'のmSetting'

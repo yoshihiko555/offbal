@@ -133,6 +133,7 @@ export default class AuthService {
         }
     }
 
+    // 管理APIによるユーザーメタデータの更新
     async updateUserMetadata (data, cb) {
     	console.log('更新ユーザーメタデータ', data)
     	try {

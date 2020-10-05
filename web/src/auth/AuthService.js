@@ -72,9 +72,9 @@ export default class AuthService {
         localStorage.removeItem('username')
         this.authNotifier.emit('authChange', false)
         // ホームルートに移動する
-         if (router.currentRoute.fullPath !== '/') {
-             router.replace('/')
-         }
+		if (router.currentRoute.fullPath !== '/') {
+			router.replace('/')
+		}
     }
 
     // そのユーザーが認証されているか確認する
@@ -95,7 +95,7 @@ export default class AuthService {
     // 管理APIを操作するインスタンスの作成
     async initAuthManage () {
         const res = await AuthService.getManageAPIToken().catch(e => e)
-        console.log(res)
+        console.log('管理APIトークン情報:', res)
         if (res.data) {
             const token = res.data.access_token
             const auth0Manage = new auth0.Management({
@@ -116,19 +116,33 @@ export default class AuthService {
             return auth0Manage.getUser(authId, cb)
         } catch (e) {
             console.error(e)
+            throw new Error('ユーザー情報の取得に失敗しました。')
         }
     }
 
     // 管理APIによるユーザー情報の更新
     async updateUserProfile (data, cb) {
-        console.log(data)
+        console.log('更新ユーザープロフィール', data)
         try {
             const auth0Manage = await this.initAuthManage()
             const authId = AuthService.getAuth0Id()
             auth0Manage.patchUserAttributes(authId, data, cb)
         } catch (e) {
             console.error(e)
+            throw new Error('ユーザー情報の更新に失敗しました。')
         }
+    }
+
+    async updateUserMetadata (data, cb) {
+    	console.log('更新ユーザーメタデータ', data)
+    	try {
+    		const auth0Manage = await this.initAuthManage()
+    		const authId = AuthService.getAuth0Id()
+    		auth0Manage.patchUserMetadata(authId, data, cb)
+    	} catch (e) {
+    		console.error(e)
+    		throw new Error('ユーザーメタデータの更新に失敗しました。')
+    	}
     }
 
     /*********************************

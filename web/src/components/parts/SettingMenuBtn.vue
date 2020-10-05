@@ -32,6 +32,7 @@
 </template>
 
 <script>
+    import { mapMutations } from 'vuex'
     import AuthService from '@/auth/AuthService'
     const auth = new AuthService()
 
@@ -64,8 +65,12 @@
             }
         },
         methods: {
+            ...mapMutations([
+                'destroySession',
+            ]),
         	signout () {
                 auth.logout()
+                this.destroySession()
             },
             toPage (url) {
             	this.$router.push(url)

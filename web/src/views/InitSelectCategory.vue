@@ -54,7 +54,7 @@
     export default {
         name: 'InitSelectCategory',
         data: () => ({
-            isShow: true,
+            isShow: false,
             id: null,
             name: null,
             valid: true,
@@ -74,11 +74,13 @@
             })
             .then(res => {
                 console.log('デフォルトカテゴリー一覧', res)
-                if (res.data.result) {
+                if (!res.data.result) {
+                	// 初期化未完了
                     this.defaultCategorys = res.data.default_categorys
+                    this.isShow = true
                 } else {
                     // 初期化が完了しているので、そのままアプリ画面へ
-                    this.$router.push('/myapp')
+                    this.toAppPage(this)
                 }
             })
             .catch(e => {
@@ -92,25 +94,35 @@
         },
         methods: {
             // ユーザー初期データ作成
-            initUserData () {
-                console.log(this.categorys)
-                this.$axios({
-                    url: '/api/signup/',
-                    method: 'POST',
-                    data: {
+            async initUserData () {
+                console.log('選択されたカテゴリー', this.categorys)
+                // 初期データ作成アクション用送信データ
+                const options = {
+                	url: '/api/signup/',
+                	method: 'POST',
+                	data: {
                         auth0_id: this.id,
                         auth0_name: this.name,
                         categorys: this.categorys,
-                    }
-                })
-                .then(res => {
-                    console.log(res)
+                	}
+                }
+                // ユーザーメタデータ更新用データ
+                const userMetadata = { signup: true }
+
+                try {
+                    await this.$axios(options)
+                    await auth.updateUserMetadata(userMetadata, (err, res) => {
+                        if (err) {
+                            console.log(err)
+                        } else {
+                            console.log(res)
+                        }
+                    })
                     this.isShow = false
-                    this.$router.push('/myapp')
-                })
-                .catch(e => {
-                    console.log(e)
-                })
+                    await this.toAppPage(this)
+                } catch (e) {
+                	console.error(e)
+                }
             },
             getImgUrl (name) {
             	return require(`@/assets/img/${name}.jpg`)

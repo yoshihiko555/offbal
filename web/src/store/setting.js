@@ -1,10 +1,12 @@
 import Vue from 'vue'
 
+const initialState = {
+	setting: {},
+}
+
 export default {
     namespaced: true,
-    state: {
-    	setting: {},
-    },
+    state: { ...{}, ...initialState },
     getters: {
     	setting: state => state.setting,
     },
@@ -12,6 +14,13 @@ export default {
     	setSetting (state, payload) {
     		state.setting = payload
     	},
+    	destorySession (state) {
+			for (const key in state) {
+				if (Object.prototype.hasOwnProperty.call(initialState, key)) {
+					state[key] = initialState[key]
+				}
+			}
+    	}
     },
     actions: {
         updateSettingAction (ctx, kwargs) {

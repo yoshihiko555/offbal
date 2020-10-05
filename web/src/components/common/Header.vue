@@ -12,7 +12,6 @@
 
 				<div class='header_navi_wrap'>
 		            <vs-button
-		            	v-show='!isAuth'
 		            	@click='signin'
 		            >
 		            	SignIn
@@ -32,7 +31,6 @@ export default {
     components: {
     },
     data: () => ({
-		isAuth: false,
 	}),
 	created () {
     	// 認証済みじゃなかったらハッシュから認証情報を取得する
@@ -40,31 +38,24 @@ export default {
 			auth.handleAuthentication()
 			auth.authNotifier.on('authChange', authState => {
                 // 認証情報が変更された
-                this.isAuth = authState.authenticated
-
-                // auth0からユーザー情報の取得
-                auth.getUserProfile((err, res) => {
+                auth.getManageUserProfile((err, res) => {
                 	if (err) {
                 		console.log(err)
                 	} else {
-                		console.log(res)
-                		const namespace = 'https://auth0/user_metadata'
-                		// サインアップか判定
-                		if (!res[namespace].signup) {
-                            // サインアップなので初期データ作成画面へ
-                            this.$router.push('/init-select-category')
-                        } else {
-                            // サインインなのでそのままアプリ画面へ
-                            if (!this.isAuth) this.$router.push('/')
-                            else this.$router.push('/myapp')
-                        }
+                		console.log('ユーザー情報:', res)
+                		if (res.user_metadata.signup) {
+                			// サインアップ完了
+                			this.toAppPage(this)
+                		} else {
+                			// サインアップ未完了なので初期データ作成画面へ遷移
+                			this.$router.push('/init-select-category')
+                		}
                 	}
                 })
             })
     	} else {
     		// 既に認証済みなら
-            this.isAuth = auth.isAuthenticated()
-            if (this.$route.name !== 'MyApp') this.$router.push('/myapp')
+            this.toAppPage(this)
     	}
 	},
     methods: {

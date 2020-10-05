@@ -28,24 +28,28 @@
 </template>
 
 <script>
-    import { mapMutations } from 'vuex'
+    import { mapGetters, mapMutations } from 'vuex'
 
     export default {
         name: 'CreateSectionField',
         data: () => ({
             section: '',
         }),
+        computed: {
+        	...mapGetters([
+        		'detailCategory',
+        	])
+        },
         methods: {
             ...mapMutations([
                 'addSection',
             ]),
             create () {
-                console.log(this.$route)
                 this.$axios({
                     url: '/api/section/',
                     method: 'POST',
                     data: {
-                        target_category: this.$route.params.id,
+                        target_category: this.detailCategory.id,
                         name: this.section,
                     }
                 })

@@ -37,6 +37,9 @@ logger = logging.getLogger(__name__)
 
 
 class SignupView(generics.CreateAPIView, GetLoginUserMixin):
+    '''
+    サインアップ時に初期データ作成する
+    '''
     permission_classes = (permissions.AllowAny,)
     queryset = mUser.objects.all()
     serializer_class = UserSerializer
@@ -67,6 +70,9 @@ class SignupView(generics.CreateAPIView, GetLoginUserMixin):
 
 
 class AppInitView(generics.ListAPIView, GetLoginUserMixin):
+    '''
+    アプリ初期描画時に必要なデータを取得
+    '''
     permission_classes = (permissions.AllowAny,)
 
     def list(self, request, *args, **kwargs):
@@ -103,6 +109,9 @@ class AppInitView(generics.ListAPIView, GetLoginUserMixin):
 
 
 class DefaultCategorysView(generics.ListAPIView, GetLoginUserMixin):
+    '''
+    デフォルトカテゴリー一覧を返却する
+    '''
     permission_classes = (permissions.AllowAny,)
     queryset = DefaultCategory.objects.all()
     serializer_class = DefaultCategorySerializer
@@ -117,7 +126,7 @@ class DefaultCategorysView(generics.ListAPIView, GetLoginUserMixin):
             return Response(
                 {
                     'default_categorys': serializer.data,
-                    'result': False,
+                    'result': True,
                 },
                 status=status.HTTP_200_OK
             )
@@ -126,7 +135,7 @@ class DefaultCategorysView(generics.ListAPIView, GetLoginUserMixin):
             return Response(
                 {
                     'default_categorys': serializer.data,
-                    'result': True,
+                    'result': False,
                 },
                 status=status.HTTP_200_OK
             )

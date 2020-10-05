@@ -6,13 +6,15 @@ import setting from './setting'
 
 Vue.use(Vuex)
 
+const initialState = {
+	categorys: [],
+	labels: [],
+	detailCategory: {},
+}
+
 export default new Vuex.Store({
 	strict: true,
-	state: {
-	    categorys: [],
-		labels: [],
-	    detailCategory: {},
-	},
+	state: { ...{}, ...initialState },
 	getters: {
 	    categorys: state => state.categorys,
 		labels: state => state.labels,
@@ -215,6 +217,14 @@ export default new Vuex.Store({
 				const index = state.detailCategory.complete_tasks.findIndex(task => task.id === payload[i].id)
 				if (index !== -1) state.detailCategory.complete_tasks = state.detailCategory.complete_tasks.filter((_, i) => i !== index)
 			}
+		},
+		destroySession (state) {
+			for (const key in state) {
+				if (Object.prototype.hasOwnProperty.call(initialState, key)) {
+					state[key] = initialState[key]
+				}
+			}
+			this.commit('setting/destorySession')
 		}
 	},
 	actions: {
@@ -233,7 +243,7 @@ export default new Vuex.Store({
 					resolve(res)
 	        	})
 	        	.catch(e => {
-	        		console.log(e)
+	        		console.log('初期データ取得失敗:', e.response)
 	        		reject(e)
 	        	})
 			})

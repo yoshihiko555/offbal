@@ -21,7 +21,7 @@ export const setDescription = pathMeta => {
 /**
  * Object配列のソート
  */
- export const objectArraySort = (data, key, order) => {
+export const objectArraySort = (data, key, order) => {
 	 let numA = -1
 	 let numB = 1
 	 if (order === 'asc') {
@@ -36,12 +36,25 @@ export const setDescription = pathMeta => {
 		 return 0
 	 })
 	 return data
- }
+}
+
+export const toAppPage = (self) => {
+	if (self.$route.name !== 'MyApp') {
+		self.$store.dispatch('appInitAction')
+		.then(res => {
+			self.$router.push('/myapp')
+		})
+		.catch(e => {
+			if (!e.response.data.result) self.$router.push('/init-select-category')
+		})
+	}
+}
 
 export const globalMixins = {
 		methods: {
 			setTitle,
             setDescription,
 			objectArraySort,
+			toAppPage,
 		}
 }

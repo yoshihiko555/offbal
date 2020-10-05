@@ -56,3 +56,36 @@ class KarmaFilter(django_filter.FilterSet):
         user = mUser.objects.get(auth0_id=value)
         res = queryset.filter(target_user=user)
         return res
+
+
+class TaskFilter(django_filter.FilterSet):
+
+    auth0_id = django_filter.CharFilter(method='user_filter')
+    searchText = django_filter.CharFilter(method='task_filter')
+
+    class Meta:
+        model = Task
+        fields = []
+
+    def user_filter(self, queryset, name, value):
+        user = mUser.objects.get(auth0_id=value)
+        res = queryset.filter(target_user=user)
+        return res
+
+    def task_filter(self, queryset, name, value):
+        """
+        タスク内容、ラベル名、サブタスク内容に一致するタスクを検索する。
+        """
+        t_list = []
+        l_list = []
+        s_list = []
+        qs = list({i.strip() for i in value.split(',')})
+        for q in qs:
+            t_list.append('Q(content__contains="{}")'.format(q))
+            l_list.append('Q(label__name="{}")'.format(q))
+            s_list.append('Q(subtask_target_task__content__contains="{}")'.format(q))
+        query_str = '&'.join(t_list) + '|'
+        query_str = '&'.join(l_list) + '|'
+        query_str = '&'.join(s_list)
+        res = queryset.filter(eval(query_str))
+        return res

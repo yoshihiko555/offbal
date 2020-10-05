@@ -31,6 +31,9 @@ from .serializers import (
 from .mixins import (
     GetLoginUserMixin,
 )
+from .filters import (
+    TaskFilter,
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -132,3 +135,25 @@ class DefaultCategorysView(generics.ListAPIView, GetLoginUserMixin):
             )
 
 
+class SearchView(generics.ListAPIView, GetLoginUserMixin):
+    permission_classes = (permissions.AllowAny,)
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    filter_class = TaskFilter
+
+    def list(self, request, *args, **kwargs):
+        logger.debug(request.query_params)
+        self.set_auth0_id(request)
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(
+                page,
+                many=True
+            )
+            return self.get_paginated_respose(serializer.data)
+        serializer = self.get_serializer(
+            queryset,
+            many=True
+        )
+        return Response(serializer.data)

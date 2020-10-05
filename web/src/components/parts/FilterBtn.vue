@@ -1,11 +1,22 @@
 <template>
-    <vs-button
-        icon
-        relief
-        @click='filter'
+    <v-menu
+        offset-y
+        transition="slide-y-transition"
     >
-        <i class='bx bx-filter' ></i>
-    </vs-button>
+        <template #activator="{ attrs, on }">
+            <vs-button
+                icon
+                relief
+                v-bind="attrs"
+                v-on="on"
+            >
+                <i class='bx bx-filter' ></i>
+            </vs-button>
+        </template>
+        <v-card>
+            フィルター設定
+        </v-card>
+    </v-menu>
 </template>
 
 <script>

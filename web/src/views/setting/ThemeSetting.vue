@@ -97,6 +97,7 @@
                 .then(res => {
                     this.disabled = true
                     this.$emit('update-is-change', this.disabled)
+                    this.setTheme(this, this.cloneSetting)
                     this.$vs.notification({
                         color: 'primary',
                         classNotification: 'category_sort',
@@ -107,7 +108,7 @@
             themeSelect (theme) {
                 this.active = theme
                 this.cloneSetting.theme = theme
-            }
+            },
         },
     }
 </script>

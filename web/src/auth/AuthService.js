@@ -146,6 +146,47 @@ export default class AuthService {
     	}
     }
 
+    /**
+     * パスワードリセットのメールを送信する
+     */
+    sendResetPasswordMail (connection, email) {
+    	this.auth0.changePassword({
+    		connection: 'Username-Password-Authentication',
+    		email: email,
+    	}, function (err, res) {
+    		if (err) {
+    			console.log(err)
+    		} else {
+    			console.log(res)
+    		}
+    	})
+    }
+
+    /**
+     * Auth0のユーザーを削除する
+     */
+    deleteUser (sub) {
+    	AuthService.getManageAPIToken()
+    	.then(res => {
+    		console.log(res)
+    		axios({
+    			url: `https://${process.env.VUE_APP_AUTH_DOMAIN}/api/v2/users/${sub}`,
+    			method: 'DELETE',
+    			headers: { Authorization: `Bearer ${res.data.access_token}` },
+    			data: {}
+    		})
+    		.then(res => {
+    			console.log(res)
+    		})
+    		.catch(e => {
+    			console.log(e)
+    		})
+    	})
+    	.catch(e => {
+    		console.log(e)
+    	})
+    }
+
     /*********************************
      * 静的メソッド
      ********************************/

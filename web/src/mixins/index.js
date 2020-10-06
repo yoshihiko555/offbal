@@ -38,7 +38,10 @@ export const objectArraySort = (data, key, order) => {
 	 return data
 }
 
-export const toAppPage = (self) => {
+/**
+ * アプリページ遷移処理
+ */
+export const toAppPage = self => {
 	if (self.$route.name !== 'MyApp') {
 		self.$store.dispatch('appInitAction')
 		.then(res => {
@@ -50,11 +53,34 @@ export const toAppPage = (self) => {
 	}
 }
 
+/**
+ * 設定情報からテーマを設定
+ */
+export const setTheme = (self, setting) => {
+    const body = document.body
+    body.removeAttribute('vs-theme')
+
+    switch (setting.theme) {
+    case ('default'):
+        self.$vuetify.theme.isDark = false
+        break
+
+    case ('dark'):
+        self.$vuetify.theme.isDark = true
+        body.setAttribute('vs-theme', 'dark')
+        break
+
+    default:
+        break
+    }
+}
+
 export const globalMixins = {
 		methods: {
 			setTitle,
             setDescription,
 			objectArraySort,
 			toAppPage,
+			setTheme,
 		}
 }

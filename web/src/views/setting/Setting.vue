@@ -74,9 +74,7 @@
             this.$eventHub.$on('confirm-apply-setting', this.applySetting)
             this.$eventHub.$on('confirm-cancel-setting', this.cancelSetting)
             this.changeActiveSidebar()
-        },
-        mounted () {
-            // this.$vs.setColor('background', '#000')
+            this.setTheme(this, this.setting)
         },
         beforeRouteUpdate (to, from, next) {
             if (this.isChange) {

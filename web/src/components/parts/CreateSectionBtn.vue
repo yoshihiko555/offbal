@@ -22,7 +22,7 @@
     .add_section_btn::v-deep {
         position: relative;
         width: 100%;
-        color: #777;
+        color: $theme-color;
         transition: .2s;
 
         &::before {
@@ -45,7 +45,7 @@
             z-index: 2;
             margin: 0 2.5em;
             padding: 0 1em;
-            background-color: #fff;
+            background-color: $theme-background;
             text-align: center;
         }
     }

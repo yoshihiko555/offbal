@@ -69,6 +69,9 @@
                 'destroySession',
             ]),
         	signout () {
+                const body = document.body
+                body.removeAttribute('vs-theme')
+                this.$vuetify.theme.isDark = false
                 auth.logout()
                 this.destroySession()
             },

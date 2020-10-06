@@ -33,7 +33,7 @@
         	this.appInitAction()
         	.then(res => {
                 // 何もしない
-                this.setTheme()
+                this.setTheme(this, res.data.setting)
         	})
         	.catch(e => {
                 console.log(e.response)
@@ -50,9 +50,6 @@
             ...mapActions([
             	'appInitAction',
             ]),
-            setTheme () {
-                this.$vuetify.theme.isDark = (this.setting.theme === 'dark')
-            }
         },
     }
 </script>

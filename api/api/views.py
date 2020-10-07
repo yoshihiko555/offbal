@@ -34,6 +34,9 @@ from .mixins import (
 from .filters import (
     TaskFilter,
 )
+from api.mails import (
+    send_signup_mail,
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -56,6 +59,8 @@ class SignupView(generics.CreateAPIView, GetLoginUserMixin):
             mSetting.objects.create(
                 target_user=user
             )
+
+            # 選択されたカテゴリーを作成してユーザーに紐付ける
             categorys = []
             req_categorys = request.data['categorys']
             for i, category in enumerate(req_categorys, 1):
@@ -67,6 +72,9 @@ class SignupView(generics.CreateAPIView, GetLoginUserMixin):
                     index=i,
                 ))
             Category.objects.bulk_create(categorys)
+
+            # サインアップのメールを送信する
+            send_signup_mail(user, request.data['email'], request.data['profile_img'])
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

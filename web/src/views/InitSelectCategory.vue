@@ -36,6 +36,7 @@
                         size='xl'
                         :disabled='valid'
                         @click="initUserData"
+                        :loading='loading'
                     >
                         offbalを始める
                     </vs-button>
@@ -57,10 +58,13 @@
             isShow: false,
             id: null,
             name: null,
+            email: null,
+            profileImg: null,
             valid: true,
             defaultCategorys: [],
             msgs: Con.DEFAULT_CATEGORY_MSG,
             categorys: [],
+            loading: false,
         }),
         created () {
             // 認証が完了していなければ、HOME画面へ
@@ -68,6 +72,8 @@
 
             this.id = AuthService.getAuth0Id()
             this.name = AuthService.getUserName()
+            this.email = AuthService.getEmail()
+            this.profileImg = AuthService.getProfileImg()
             this.$axios({
             	url: '/api/default-categorys/',
             	method: 'GET',
@@ -96,6 +102,8 @@
             // ユーザー初期データ作成
             async initUserData () {
                 console.log('選択されたカテゴリー', this.categorys)
+                this.loading = true
+
                 // 初期データ作成アクション用送信データ
                 const options = {
                 	url: '/api/signup/',
@@ -104,6 +112,8 @@
                         auth0_id: this.id,
                         auth0_name: this.name,
                         categorys: this.categorys,
+                        email: this.email,
+                        profile_img: this.profileImg,
                 	}
                 }
                 // ユーザーメタデータ更新用データ
@@ -120,12 +130,14 @@
                     })
                     this.isShow = false
                     await this.toAppPage(this)
+                    this.loading = false
                     // 一旦サインアップ時は、リロード処理を入れるように修正
                     this.$router.go({
                         path: this.$router.currentRoute.path, force: true
                     })
                 } catch (e) {
-                	console.error(e)
+                    console.error(e)
+                    this.loading = false
                 }
             },
             getImgUrl (name) {

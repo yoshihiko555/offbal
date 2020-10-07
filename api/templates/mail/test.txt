@@ -1,6 +1,0 @@
-テストメールです。
-
-名前 : {{ name }}
-E-Mail : {{ email }}
-内容 :
-{{ content }}

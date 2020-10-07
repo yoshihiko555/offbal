@@ -59,6 +59,8 @@ export default class AuthService {
         localStorage.setItem('expires_at', expiresAt)
         localStorage.setItem('auth0_id', authResult.idTokenPayload.sub)
         localStorage.setItem('username', authResult.idTokenPayload.name)
+        localStorage.setItem('email', authResult.idTokenPayload.email)
+        localStorage.setItem('picture', authResult.idTokenPayload.picture)
         this.authNotifier.emit('authChange', { authenticated: true })
     }
 
@@ -70,6 +72,8 @@ export default class AuthService {
         localStorage.removeItem('expires_at')
         localStorage.removeItem('auth0_id')
         localStorage.removeItem('username')
+        localStorage.removeItem('email')
+        localStorage.removeItem('picture')
         this.authNotifier.emit('authChange', false)
         // ホームルートに移動する
 		if (router.currentRoute.fullPath !== '/') {
@@ -204,6 +208,16 @@ export default class AuthService {
     // Usernameを取得する静的メソッド
     static getUserName () {
     	return localStorage.getItem('username')
+    }
+
+    // メールアドレスを取得する静的メソッド
+    static getEmail () {
+    	return localStorage.getItem('email')
+    }
+
+    // ユーザーアイコン画像を取得する静的メソッド
+    static getProfileImg () {
+    	return localStorage.getItem('picture')
     }
 
     // 管理APIへのアクセストークンを取得する静的メソッド

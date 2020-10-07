@@ -43,10 +43,11 @@
                 <div class="pb-2"></div>
             </div>
             <div v-if="isLoading">
-
+                <div ref="loadingContent" class="loading_div">
+                </div>
             </div>
             <TaskList
-                v-show="!isLoading"
+                v-else
                 :tasks=searchResult
             />
         </v-container>
@@ -72,12 +73,26 @@
             searchText: '',
             searchResult: [],
             isLoading: false,
+            loading: {},
         }),
         created () {
         },
         mounted: function () {
             this.searchText = this.$route.query.text
             this.search()
+        },
+        watch: {
+            isLoading: function (val) {
+                if (val) {
+                    this.loading = this.$vs.loading({
+                        target: this.$refs.loadingContent,
+                        scale: '0.6',
+                        text: 'Loading...'
+                    })
+                } else {
+                    this.loading.close()
+                }
+            }
         },
         beforeRouteUpdate (to, from, next) {
             this.searchText = to.query.text

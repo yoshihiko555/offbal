@@ -11,6 +11,7 @@ export { default as Activitys } from './app/Activitys'
 export { default as DetailCategory } from './app/DetailCategory'
 export { default as FutureScheduled } from './app/FutureScheduled'
 export { default as Karma } from './app/Karma'
+export { default as SearchResult } from './app/SearchResult'
 export { default as StartApp } from './app/StartApp'
 export { default as TodayScheduled } from './app/TodayScheduled'
 

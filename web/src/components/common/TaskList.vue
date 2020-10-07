@@ -147,9 +147,13 @@
         components: {
             TaskMenuBtn
         },
-        props: [
-            'tasks',
-        ],
+        props: {
+            tasks: {
+                type: Array,
+                required: true,
+                default: () => ([])
+            }
+        },
         data: () => ({
             complete_task_list: [],
         }),

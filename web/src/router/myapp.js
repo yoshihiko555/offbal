@@ -1,5 +1,4 @@
-import { MyApp, StartApp, Activitys, DetailCategory, TodayScheduled, FutureScheduled, Karma } from '@/views/index'
-import SearchResult from '@/components/parts/SearchResult'
+import { MyApp, StartApp, Activitys, DetailCategory, TodayScheduled, FutureScheduled, Karma, SearchResult } from '@/views/index'
 
 const routes = {
 	path: '/myapp',

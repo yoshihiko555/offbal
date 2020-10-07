@@ -61,7 +61,6 @@
     import CompleteTaskList from '@/components/common/CompleteTaskList'
     import TaskDetail from '@/components/common/TaskDetail'
     import TodayTaskCountBtn from '@/components/parts/TodayTaskCountBtn'
-    import SearchResult from '@/components/parts/SearchResult'
 
     import { mapGetters, mapActions } from 'vuex'
 
@@ -79,7 +78,6 @@
             CompleteTaskList,
             TaskDetail,
             TodayTaskCountBtn,
-            SearchResult,
         },
         data: () => ({
             isCreateBtn: true,        // セクション追加ボタン

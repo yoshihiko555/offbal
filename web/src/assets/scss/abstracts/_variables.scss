@@ -1,4 +1,5 @@
 /*----------共通----------*/
 $header: 48px;
 $footer: 31px;
-$default-color: #333;
+$theme-color: var(--vs-text);
+$theme-background: rgba(var(--vs-background), 1);

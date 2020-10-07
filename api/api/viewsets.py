@@ -70,6 +70,7 @@ class UserViewSet(BaseModelViewSet):
     permission_classes = (permissions.AllowAny,)
     queryset = mUser.objects.all()
     serializer_class = UserSerializer
+    lookup_field = 'auth0_id'
 
     def list(self, request, *args, **kwargs):
         logger.debug('=======================USER VIEW SET=====================')

@@ -61,6 +61,7 @@
     import CompleteTaskList from '@/components/common/CompleteTaskList'
     import TaskDetail from '@/components/common/TaskDetail'
     import TodayTaskCountBtn from '@/components/parts/TodayTaskCountBtn'
+    import SearchResult from '@/components/parts/SearchResult'
 
     import { mapGetters, mapActions } from 'vuex'
 
@@ -78,6 +79,7 @@
             CompleteTaskList,
             TaskDetail,
             TodayTaskCountBtn,
+            SearchResult,
         },
         data: () => ({
             isCreateBtn: true,        // セクション追加ボタン
@@ -96,7 +98,6 @@
             })
             this.$eventHub.$on('open-edit', this.openEdit)
             this.$eventHub.$on('change-toggle-drawer', this.changeToggleDrawer)
-            this.$eventHub.$on('search-task', this.search)
         },
         mounted: function () {
         },
@@ -142,30 +143,6 @@
             changeToggleDrawer (value) {
                 this.drawer = value
             },
-            search: _.debounce(function search (searchText) {
-                console.log('isSearch')
-                const trimedText = this.trim(searchText)
-                const trimedTextList = [...new Set(trimedText.split(/\s+/))]
-                const searchWord = trimedTextList.join(',')
-                console.log('検索文字列 : ' + searchWord)
-                this.$axios({
-                    url: '/api/search/',
-                    method: 'GET',
-                    params: {
-                        searchText: searchText
-                    }
-                })
-                .then(res => {
-                    console.log(res)
-                    // TODO ここで検索結果反映
-                })
-                .catch(e => {
-                    console.log(e)
-                })
-            }, 200),
-            trim (word) {
-                return String(word).replace(/^\s+|\s+$/g, '')
-            }
         },
     }
 </script>

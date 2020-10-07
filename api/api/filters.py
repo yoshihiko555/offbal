@@ -82,10 +82,10 @@ class TaskFilter(django_filter.FilterSet):
         qs = list({i.strip() for i in value.split(',')})
         for q in qs:
             t_list.append('Q(content__contains="{}")'.format(q))
-            l_list.append('Q(label__name="{}")'.format(q))
+            l_list.append('Q(label__name__contains="{}")'.format(q))
             s_list.append('Q(subtask_target_task__content__contains="{}")'.format(q))
         query_str = '&'.join(t_list) + '|'
-        query_str = '&'.join(l_list) + '|'
-        query_str = '&'.join(s_list)
-        res = queryset.filter(eval(query_str))
+        query_str += '|'.join(l_list) + '|'
+        query_str += '|'.join(s_list)
+        res = queryset.filter(eval(query_str) & Q(completed=False)).distinct()
         return res

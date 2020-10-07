@@ -93,7 +93,6 @@ export default new Vuex.Store({
 				state.detailCategory.tasks.push(payload)
 			} else {
 				// セクションのタスクに追加
-				console.log('セクションのタスクに追加')
 				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
 				section.tasks.push(payload)
 			}

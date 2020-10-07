@@ -73,35 +73,27 @@
             searchText: '',
             searchResult: [],
             isLoading: false,
-            loading: {},
         }),
         created () {
         },
         mounted: function () {
-            this.searchText = this.$route.query.text
-            this.search()
+            this.searchStart(this.$route.query.text)
         },
         watch: {
-            isLoading: function (val) {
-                if (val) {
-                    this.loading = this.$vs.loading({
-                        target: this.$refs.loadingContent,
-                        scale: '0.6',
-                        text: 'Loading...'
-                    })
-                } else {
-                    this.loading.close()
-                }
-            }
         },
         beforeRouteUpdate (to, from, next) {
-            this.searchText = to.query.text
-            this.search()
+            this.searchStart(to.query.text)
             next()
         },
         methods: {
             search () {
                 this.isLoading = true
+                const loading = this.$vs.loading({
+                    target: this.$refs.loadingContent,
+                    scale: '0.6',
+                    text: 'Loading...',
+                    opacity: '0',
+                })
                 this.$axios({
                     url: '/api/search/',
                     method: 'GET',
@@ -112,12 +104,18 @@
                 .then(res => {
                     console.log(res)
                     this.searchResult = res.data
+                    loading.close()
                     this.isLoading = false
                 })
                 .catch(e => {
                     console.log(e)
+                    loading.close()
                 })
             },
+            searchStart (text) {
+                this.searchText = text
+                this.search()
+            }
         }
     }
 </script>
@@ -130,5 +128,7 @@
         .vs-button {
             display: inline-block;
         }
+    }
+    .loading_div {
     }
 </style>

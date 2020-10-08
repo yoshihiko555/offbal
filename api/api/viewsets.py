@@ -174,13 +174,13 @@ class CategoryViewSet(BaseModelViewSet):
         '''
         self.auth0_id = request.data['auth0_id']
         user = mUser.objects.get(auth0_id=request.data['auth0_id'])
-        categorys = []
-        for i, category in enumerate(request.data['categorys'], 1):
+        categories = []
+        for i, category in enumerate(request.data['categories'], 1):
             cate = Category.objects.get(pk=category['id'])
             cate.index = i
-            categorys.append(cate)
+            categories.append(cate)
 
-        Category.objects.bulk_update(categorys, fields=['index'])
+        Category.objects.bulk_update(categories, fields=['index'])
         user_category = user.category_creator_user.filter(is_active=True).order_by('index')
         serializer = self.get_serializer(user_category, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -196,7 +196,7 @@ class CategoryViewSet(BaseModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=['PUT'], detail=False)
-    def change_categorys(self, request, pk=None):
+    def change_categories(self, request, pk=None):
         '''
         カテゴリー切り替え時のアクション
 
@@ -208,19 +208,19 @@ class CategoryViewSet(BaseModelViewSet):
 
         **リクエストデータ**
             - auth0_id : ログイン中のユーザーID
-            - categorys : 選択されたカテゴリー一覧
+            - categories : 選択されたカテゴリー一覧
         '''
 
         # ユーザー情報を取得
         self.auth0_id = request.data['auth0_id']
         user = mUser.objects.get(auth0_id=request.data['auth0_id'])
-        user_categorys = user.category_creator_user.all()
+        user_categories = user.category_creator_user.all()
 
         # ユーザーにまだ紐づいていないカテゴリーを作成する処理
-        create_categorys = []
-        for category in request.data['categorys']:
-            if not user_categorys.filter(name=category['name']).exists():
-                create_categorys.append(Category(
+        create_categories = []
+        for category in request.data['categories']:
+            if not user_categories.filter(name=category['name']).exists():
+                create_categories.append(Category(
                     creator=user,
                     name=category['name'],
                     color=category['color'],
@@ -228,24 +228,24 @@ class CategoryViewSet(BaseModelViewSet):
                     index=self.autoincrement(user)
                 ))
         logger.info('追加で作成するカテゴリー')
-        logger.info(create_categorys)
-        Category.objects.bulk_create(create_categorys)
+        logger.info(create_categories)
+        Category.objects.bulk_create(create_categories)
 
         # カテゴリーのis_activeを更新
-        update_categorys = []
-        for user_category in user_categorys:
+        update_categories = []
+        for user_category in user_categories:
             active_flg = False
-            for category in request.data['categorys']:
+            for category in request.data['categories']:
                 if user_category.name == category['name']:
                     # 選択されたカテゴリーなので有効フラグをTrueに変更
                     active_flg = True
                     break
 
             user_category.is_active = active_flg
-            update_categorys.append(user_category)
+            update_categories.append(user_category)
 
-        Category.objects.bulk_update(update_categorys, fields=['is_active'])
-        res = user_categorys.filter(is_active=True).order_by('index')
+        Category.objects.bulk_update(update_categories, fields=['is_active'])
+        res = user_categories.filter(is_active=True).order_by('index')
         serializer = self.get_serializer(res, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -430,17 +430,17 @@ class TaskViewSet(BaseModelViewSet):
 
         return Response(data=data, status=status.HTTP_200_OK)
 
-    def get_active_category_comp_tasks(self, categorys, tasks):
+    def get_active_category_comp_tasks(self, categories, tasks):
         '''
         現在有効なカテゴリーの完了タスク数を返却する
 
         **params**
-            - categorys : 有効カテゴリー
+            - categories : 有効カテゴリー
             - tasks : 完了タスク
         '''
         res = {}
 
-        for category in categorys:
+        for category in categories:
             res[category.name] = 0
 
         for task in tasks:

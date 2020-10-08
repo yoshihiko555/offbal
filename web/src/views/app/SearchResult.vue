@@ -23,7 +23,9 @@
                     >
                         <div class="operation_btn_wrap pl-10">
                             <v-spacer></v-spacer>
-                            <FilterBtn/>
+                            <FilterBtn
+                                :isSearchResult=true
+                            />
                             <SortBtn/>
                         </div>
                     </v-col>

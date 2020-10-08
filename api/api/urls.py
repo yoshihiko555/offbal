@@ -18,6 +18,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('signup/', views.SignupView.as_view(), name='signup'),
     path('appinit/', views.AppInitView.as_view(), name='appinit'),
-    path('default-categorys/', views.DefaultCategorysView.as_view(), name='default-categorys'),
+    path('default-categories/', views.DefaultCategoriesView.as_view(), name='default-categories'),
     path('search/', views.SearchView.as_view(), name='search'),
 ]

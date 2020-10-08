@@ -13,7 +13,7 @@
 
         <v-container>
             <v-row>
-                <v-col v-for='category in defaultCategorys' :key='category.id' cols='4'>
+                <v-col v-for='category in defaultCategories' :key='category.id' cols='4'>
                     <vs-card type='2' @click='togle(category)'>
                         <template #title>
                             <h4>{{ category.name }}</h4>
@@ -25,7 +25,7 @@
                             <img :src='getImgUrl(category.name)'>
                         </template>
                         <template #interactions>
-                            <vs-checkbox :val='category' v-model='selectCategorys' @click.stop=''/>
+                            <vs-checkbox :val='category' v-model='selectCategories' @click.stop=''/>
                         </template>
                     </vs-card>
                 </v-col>
@@ -33,7 +33,7 @@
                     <vs-button
                         size='xl'
                         :disabled='valid'
-                        @click="changeCategorys"
+                        @click="changeCategories"
                     >
                         カテゴリーを<br>入れ替える
                     </vs-button>
@@ -57,40 +57,40 @@
             isShow: false,
             id: null,
             valid: true,
-            defaultCategorys: [],
-            selectCategorys: [],
+            defaultCategories: [],
+            selectCategories: [],
         }),
         created () {
         },
         computed: {
             ...mapGetters([
-                'categorys',
+                'categories',
             ]),
         },
         watch: {
-        	selectCategorys: function (val) {
+        	selectCategories: function (val) {
                 this.valid = (val.length === 5) ? false : true
             }
         },
         methods: {
             ...mapMutations([
-                'setCategorys',
+                'setCategories',
             ]),
             open () {
             	// 初期化
-            	this.selectCategorys = []
+            	this.selectCategories = []
 
                 this.$axios({
-                    url: '/api/default-categorys/',
+                    url: '/api/default-categories/',
                     method: 'GET',
                 })
                 .then(res => {
                     console.log('デフォルトカテゴリー一覧', res)
-                    this.defaultCategorys = res.data.default_categorys
+                    this.defaultCategories = res.data.default_categories
                     // 初期選択状態を格納
-                    this.defaultCategorys.forEach(el => {
-                    	const idx = this.categorys.findIndex(i => i.name === el.name)
-                    	if (idx !== -1) this.selectCategorys.push(el)
+                    this.defaultCategories.forEach(el => {
+                    	const idx = this.categories.findIndex(i => i.name === el.name)
+                    	if (idx !== -1) this.selectCategories.push(el)
                     })
                     this.id = AuthService.getAuth0Id()
                     this.isShow = true
@@ -99,21 +99,21 @@
                     console.log(e)
                 })
             },
-            changeCategorys () {
+            changeCategories () {
                 // TODO : ここもVuexのActionに任せちゃうようにする
                 // 極力store管理しているものでaxiosが絡んでいるものはVuexのActionを通したい
-                console.log('選択カテゴリー', this.selectCategorys)
+                console.log('選択カテゴリー', this.selectCategories)
                 this.$axios({
-                    url: '/api/category/change_categorys/',
+                    url: '/api/category/change_categories/',
                     method: 'PUT',
                     data: {
                         auth0_id: this.id,
-                        categorys: this.selectCategorys,
+                        categories: this.selectCategories,
                     }
                 })
                 .then(res => {
                     console.log(res)
-                    this.setCategorys(res.data)
+                    this.setCategories(res.data)
                     this.isShow = false
                 })
                 .catch(e => {
@@ -124,9 +124,9 @@
             	return require(`@/assets/img/${name}.jpg`)
             },
             togle (category) {
-                const idx = this.selectCategorys.findIndex(i => i.name === category.name)
-                if (idx !== -1) this.selectCategorys = this.selectCategorys.filter((_, i) => i !== idx)
-                else this.selectCategorys.push(category)
+                const idx = this.selectCategories.findIndex(i => i.name === category.name)
+                if (idx !== -1) this.selectCategories = this.selectCategories.filter((_, i) => i !== idx)
+                else this.selectCategories.push(category)
             },
         }
     }

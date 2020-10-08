@@ -6,12 +6,14 @@ class Command (createsuperuser.Command):
     def handle(self, *args, **options):
         options.setdefault('interactive', False)
         username = 'auth0user'
+        email = 'auth0@gmail.com'
         password = 'admin'
         auth0_id = 'auth0user'
         database = options.get('database')
 
         user_data = {
             'username': username,
+            'email': email,
             'password': password,
             'auth0_id': auth0_id,
         }

@@ -167,7 +167,11 @@
         created () {
             this.$eventHub.$on('filter_task_list', this.filterTaskList)
         },
-        mounted: function () {
+        mounted () {
+            window.addEventListener('click', this.onClickTaskDetailOuter)
+        },
+        beforeDestroy () {
+            window.removeEventListener('click', this.onClickTaskDetailOuter)
         },
     	computed: {
     		...mapGetters([
@@ -214,6 +218,12 @@
             filterTaskList (val) {
                 console.log('filterTaskList')
                 console.log(val)
+            },
+            onClickTaskDetailOuter (e) {
+                // タスク詳細の外側をクリックしたときに、タスク詳細を閉じる
+                if (!this.$el.contains(e.target)) {
+                    this.$eventHub.$emit('closeTaskDetail')
+                }
             }
         },
     }

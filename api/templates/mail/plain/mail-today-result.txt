@@ -1,1 +1,6 @@
-TODO 今日の結果メールの内容を記載する
+{{ name }} Today Result!
+
+{{ name }}様の今日の結果
+
+今日のカルマポイント : {{ today_result }}
+次のカルマレベルまでのポイント : {{ next_point }}

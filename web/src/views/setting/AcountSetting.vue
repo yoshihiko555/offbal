@@ -116,6 +116,20 @@
                         this.disabled = true
                         this.userProfile = res
                         this.cloneUserProfile = _.cloneDeep(this.userProfile)
+                        this.$axios({
+                            url: `/api/user/${AuthService.getAuth0Id()}/`,
+                            method: 'PUT',
+                            data: {
+                                auth0_name: this.cloneUserProfile.nickname,
+                                email: this.cloneUserProfile.email,
+                            }
+                        })
+                        .then(res => {
+                            console.log(res)
+                        })
+                        .catch(e => {
+                            console.log(e)
+                        })
                     }
                 })
             },

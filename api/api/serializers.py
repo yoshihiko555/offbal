@@ -65,12 +65,12 @@ class UserSerializer(DynamicFieldsModelSerializer):
         fields = [
             'auth0_id',
             'auth0_name',
-#             'email',
+            'email',
             'address',
         ]
 
     def create(self, validated_data):
-        return mUser.objects.create(auth0_id=validated_data['auth0_id'], auth0_name=validated_data['auth0_name'])
+        return mUser.objects.create(auth0_id=validated_data['auth0_id'], auth0_name=validated_data['auth0_name'], email=validated_data['email'])
 
 class SettingSerializer(DynamicFieldsModelSerializer):
 

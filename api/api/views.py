@@ -62,7 +62,7 @@ class SignupView(generics.CreateAPIView, GetLoginUserMixin):
 
             # 選択されたカテゴリーを作成してユーザーに紐付ける
             categories = []
-            req_categorys = request.data['categories']
+            req_categories = request.data['categories']
             for i, category in enumerate(req_categories, 1):
                 categories.append(Category(
                     creator=user,
@@ -74,7 +74,7 @@ class SignupView(generics.CreateAPIView, GetLoginUserMixin):
             Category.objects.bulk_create(categories)
 
             # サインアップのメールを送信する
-            send_signup_mail(user, request.data['email'], request.data['profile_img'])
+            send_signup_mail(user, request.data['profile_img'])
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

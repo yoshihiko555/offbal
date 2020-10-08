@@ -517,6 +517,30 @@ class TaskViewSet(BaseModelViewSet):
         }
         return Response(data=data, status=status.HTTP_200_OK)
 
+    @action(methods=['GET'], detail=False)
+    def get_today_tasks(self, request):
+        '''
+        今日期限の未完了タスクを返却アクション
+        '''
+        user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+        user_tasks = user.task_target_user.all()
+        today_tasks = self.get_serializer(user_tasks.filter(completed=False, deadline__date=date.today()), many=True)
+        return Response(today_tasks.data, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=False)
+    def get_future_tasks(self, request):
+        '''
+        明日から1週間まで期限の未完了タスクを返却するアクション
+        '''
+        user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+        user_tasks = user.task_target_user.all()
+        future_tasks = self.get_serializer(user_tasks.filter(
+            completed=False,
+            deadline__date__gte=date.today() + timedelta(days=1),
+            deadline__date__lte=date.today() + timedelta(weeks=1),
+        ), many=True)
+        return Response(future_tasks.data, status=status.HTTP_200_OK)
+
 
 class SubTaskViewSet(BaseModelViewSet):
 

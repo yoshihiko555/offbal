@@ -1,42 +1,47 @@
 <template>
-    <v-list>
-        <div v-if="tasks.length === 0">
-        </div>
-        <div v-else>
-            <v-list-item
-                v-for="task in tasks"
-                :key="task.id"
-                class="task_content"
-            >
-                <v-list-item-action
-                    class="mr-3 ml-1"
+    <div>
+        <v-list>
+            <div v-if="tasks.length === 0">
+            </div>
+            <div v-else>
+                <v-list-item
+                    v-for="task in tasks"
+                    :key="task.id"
+                    class="task_content"
                 >
-                    <vs-checkbox
-                        color="primary"
-                        v-model="complete_task_list"
-                        :val="task"
-                        @change="checkTask(task)"
+                    <v-list-item-action
+                        class="mr-3 ml-1"
                     >
-                    </vs-checkbox>
-                </v-list-item-action>
-                <v-list-item-content>
-                    <v-list-item-title
-                        v-text="task.content"
-                        @click="showTaskDetail(task)"
-                    ></v-list-item-title>
-                    <v-list-item-subtitle
-                        v-if="task.sub_tasks.length > 0"
-                        @click="showTaskDetail(task)"
-                    >
-                        {{ restOfSubTasks(task) }}
-                    </v-list-item-subtitle>
-                </v-list-item-content>
-                <TaskMenuBtn
-                    :task=task
-                />
-            </v-list-item>
-        </div>
-    </v-list>
+                        <vs-checkbox
+                            color="primary"
+                            v-model="complete_task_list"
+                            :val="task"
+                            @change="checkTask(task)"
+                        >
+                        </vs-checkbox>
+                    </v-list-item-action>
+                    <v-list-item-content>
+                        <v-list-item-title
+                            v-text="task.content"
+                            @click="showTaskDetail(task)"
+                        ></v-list-item-title>
+                        <v-list-item-subtitle
+                            v-if="task.sub_tasks.length > 0"
+                            @click="showTaskDetail(task)"
+                        >
+                            {{ restOfSubTasks(task) }}
+                        </v-list-item-subtitle>
+                    </v-list-item-content>
+                    <TaskMenuBtn
+                        :task=task
+                    />
+                </v-list-item>
+            </div>
+        </v-list>
+
+        <!-- タスク詳細画面読み込み -->
+        <TaskDetail />
+    </div>
     <!-- <v-container
         fluid
         class="task_list_wrap"
@@ -140,12 +145,14 @@
 <script>
     import { mapGetters, mapActions } from 'vuex'
     import TaskMenuBtn from '@/components/parts/TaskMenuBtn'
+    import TaskDetail from '@/components/common/TaskDetail'
     import _ from 'lodash'
 
     export default {
         name: 'TaskList',
         components: {
-            TaskMenuBtn
+            TaskMenuBtn,
+            TaskDetail,
         },
         props: {
             tasks: {

@@ -6,7 +6,6 @@
             fixed
             hide-overlay
             mobile-breakpoint=700
-            :style="{ width: '500px', top: '60px', height: 'calc(100% - 60px)'}"
         >
             <v-container
                 fluid
@@ -210,6 +209,12 @@
     }
 </script>
 <style lang="scss" scoped>
+    .v-navigation-drawer {
+        width: $task-detail-width !important;
+        top: 60px !important;
+        height: calc(100% - 60px) !important;
+    }
+
     .task_detail_wrap {
         margin: 0;
         padding: 0;

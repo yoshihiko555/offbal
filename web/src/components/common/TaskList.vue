@@ -157,6 +157,9 @@
         data: () => ({
             complete_task_list: [],
         }),
+        created () {
+            this.$eventHub.$on('filter_task_list', this.filterTaskList)
+        },
         mounted: function () {
         },
     	computed: {
@@ -200,6 +203,10 @@
             taskDeadline (task) {
                 if (task.deadline === '') return '----'
                 return task.deadline
+            },
+            filterTaskList (val) {
+                console.log('filterTaskList')
+                console.log(val)
             }
         },
     }

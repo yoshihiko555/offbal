@@ -1,9 +1,9 @@
 <template>
     <v-menu
-        :close-on-content-click="false"
         offset-x
+        :close-on-content-click="false"
         transition="slide-y-transition"
-        width="200px"
+        width="200p"
     >
         <template #activator="{ attrs, on }">
             <vs-button
@@ -12,7 +12,7 @@
                 v-bind="attrs"
                 v-on="on"
             >
-                <i class='bx bx-filter' ></i>
+                <i class="bx bx-filter"></i>
             </vs-button>
         </template>
         <v-card
@@ -25,16 +25,16 @@
                     </v-list-item-content>
                     <v-list-item-action>
                         <vs-select
-                            placeholder='指定なし'
-                            v-model='selectedCategory'
-                            :state='"success"'
+                            placeholder="指定なし"
+                            v-model="filterValue.selectedCategory"
+                            :state="'success'"
                         >
                             <vs-option
                                 v-for="(category, i) in categories"
-                                :key='i'
-                                :label='category.name'
-                                :value='category.name'
-                                :color='categoryColor(category.color)'
+                                :key="i"
+                                :label="category.name"
+                                :value="category.name"
+                                :color="categoryColor(category.color)"
                                 filter
                             >{{ category.name }}
                             </vs-option>
@@ -47,17 +47,17 @@
                     </v-list-item-content>
                     <v-list-item-action>
                         <vs-select
-                            placeholder='指定なし'
-                            v-model='selectedPriority'
+                            placeholder="指定なし"
+                            v-model="filterValue.selectedPriority"
                             chips
-                            :state='"primary"'
+                            :state="'primary'"
                         >
                             <vs-option
                                 v-for="(priority, i) in priorities"
-                                :key='i'
-                                :label='priority.name'
-                                :value='priority.value'
-                                :color='priority.color'
+                                :key="i"
+                                :label="priority.name"
+                                :value="priority.value"
+                                :color="priority.color"
                                 filter
                             >{{ priority.name }}
                             </vs-option>
@@ -70,17 +70,17 @@
                     </v-list-item-content>
                     <v-list-item-action>
                         <vs-select
-                            placeholder='指定なし'
-                            v-model='selectedDeadline'
+                            placeholder="指定なし"
+                            v-model="filterValue.selectedDeadline"
                             chips
-                            :state='"danger"'
+                            :state="'danger'"
                         >
                             <vs-option
                                 v-for="(deadline, i) in deadlines"
-                                :key='i'
-                                :label='deadline.name'
-                                :value='deadline.value'
-                                :color='deadline.color'
+                                :key="i"
+                                :label="deadline.name"
+                                :value="deadline.value"
+                                :color="deadline.color"
                                 filter
                             >{{ deadline.name }}
                             </vs-option>
@@ -99,16 +99,16 @@
                         </v-list-item-subtitle>
                         <vs-select
                             v-else
-                            v-model='selectedLabelList'
+                            v-model="filterValue.selectedLabelList"
                             multiple
                             filter
                             chips
                         >
                             <vs-option
                                 v-for="(label, i) in labels"
-                                :key='i'
-                                :label='label.name'
-                                :value='label'
+                                :key="i"
+                                :label="label.name"
+                                :value="label"
                                 filter
                             >{{ label.name }}
                             </vs-option>
@@ -120,15 +120,28 @@
                         <v-list-item-subtitle>完了状態 </v-list-item-subtitle>
                     </v-list-item-content>
                     <v-list-item-action>
-                        <vs-switch v-model="isCompleteTask">
+                        <vs-switch v-model="filterValue.isCompleteTask">
                             <template #off>
-                                <i class='bx bx-x' ></i> 未完了
+                                <i class="bx bx-x"></i> 未完了
                             </template>
                             <template #on>
-                                <i class='bx bx-check' ></i> 完了
+                                <i class="bx bx-check"></i> 完了
                             </template>
                         </vs-switch>
                     </v-list-item-action>
+                </v-list-item>
+                <v-list-item>
+                    <v-spacer></v-spacer>
+                    <v-list-item-action>
+                        <vs-button
+                            flat
+                            circle
+                            size="small"
+                            @click="init"
+                        >検索条件リセット
+                        </vs-button>
+                    </v-list-item-action>
+                    <v-spacer></v-spacer>
                 </v-list-item>
             </v-list>
         </v-card>
@@ -150,67 +163,24 @@
             }
         },
         data: () => ({
-            isUnCompleted: true,
-            priorities: [
-                {
-                    name: '優先度5',
-                    value: 5,
-                    color: '#FF0000',
-                },
-                {
-                    name: '優先度4',
-                    value: 4,
-                    color: '#FF9933',
-                },
-                {
-                    name: '優先度3',
-                    value: 3,
-                    color: '#FFA500',
-                },
-                {
-                    name: '優先度2',
-                    value: 2,
-                    color: '#FFDAB9',
-                },
-                {
-                    name: '優先度1',
-                    value: 1,
-                    color: '#C0C0C0',
-                },
-            ],
-            deadlines: [
-                {
-                    name: '今日',
-                    value: 5,
-                    color: '#FF0000',
-                },
-                {
-                    name: '3日以内',
-                    value: 4,
-                    color: '#FF9933',
-                },
-                {
-                    name: '1週間以内',
-                    value: 3,
-                    color: '#FFA500',
-                },
-                {
-                    name: '2週間以内',
-                    value: 2,
-                    color: '#00BCD4',
-                },
-                {
-                    name: '今月中',
-                    value: 1,
-                    color: '#2196F3',
-                },
-            ],
-            selectedPriority: [],
-            selectedCategory: [],
-            selectedDeadline: [],
-            selectedLabelList: [],
-            isCompleteTask: false,
+            priorities: Con.FILTER_OPTION_PRIORIEIES,
+            deadlines: Con.FILTER_OPTION_DEADLINES,
+            filterValue: {
+                selectedPriority: [],
+                selectedCategory: [],
+                selectedDeadline: [],
+                selectedLabelList: [],
+                isCompleteTask: false,
+            },
         }),
+        watch: {
+            filterValue: {
+                handler: function (val) {
+                    this.filter(val)
+                },
+                deep: true,
+            }
+        },
         computed: {
             ...mapGetters([
                 'categories',
@@ -218,8 +188,12 @@
             ]),
         },
         methods: {
-            filter () {
-                console.log('filter')
+            filter (val) {
+                if (this.isSearchResult) {
+                    this.$eventHub.$emit('filter_search_result', val)
+                } else {
+                    this.$eventHub.$emit('filter_task_list', val)
+                }
             },
             categoryColor (color) {
                 for (const i in Con.CATEGORY_COLOR) {
@@ -227,6 +201,13 @@
                         return Con.CATEGORY_COLOR[i].code
                     }
                 }
+            },
+            init () {
+                this.filterValue.selectedPriority = []
+                this.filterValue.selectedCategory = []
+                this.filterValue.selectedDeadline = []
+                this.filterValue.selectedLabelList = []
+                this.filterValue.isCompleteTask = ''
             }
         }
     }

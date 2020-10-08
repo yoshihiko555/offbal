@@ -77,6 +77,7 @@
             isLoading: false,
         }),
         created () {
+            this.$eventHub.$on('filter_search_result', this.filterSearchResult)
         },
         mounted: function () {
             this.searchStart(this.$route.query.text)
@@ -117,6 +118,10 @@
             searchStart (text) {
                 this.searchText = text
                 this.search()
+            },
+            filterSearchResult (val) {
+                console.log('filterSearchResult')
+                console.log(val)
             }
         }
     }

@@ -225,6 +225,62 @@ class Const {
             value: 'Sun.',
         },
     ]
+
+    FILTER_OPTION_PRIORIEIES = [
+        {
+            name: '優先度5',
+            value: 5,
+            color: '#FF0000',
+        },
+        {
+            name: '優先度4',
+            value: 4,
+            color: '#FF9933',
+        },
+        {
+            name: '優先度3',
+            value: 3,
+            color: '#FFA500',
+        },
+        {
+            name: '優先度2',
+            value: 2,
+            color: '#FFDAB9',
+        },
+        {
+            name: '優先度1',
+            value: 1,
+            color: '#C0C0C0',
+        },
+    ]
+
+    FILTER_OPTION_DEADLINES = [
+        {
+            name: '今日中',
+            value: 5,
+            color: '#FF0000',
+        },
+        {
+            name: '明日まで',
+            value: 4,
+            color: '#FF9933',
+        },
+        {
+            name: '3日以内',
+            value: 3,
+            color: '#FFA500',
+        },
+        {
+            name: '1週間以内',
+            value: 2,
+            color: '#00BCD4',
+        },
+        {
+            name: '今月中',
+            value: 1,
+            color: '#2196F3',
+        },
+    ]
 }
 
 export { Const }

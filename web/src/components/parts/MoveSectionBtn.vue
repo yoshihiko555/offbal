@@ -23,7 +23,7 @@
         <v-list>
             <v-list-item-group>
                 <div
-                    v-for="(category, i) in categorys"
+                    v-for="(category, i) in categories"
                     :key="i"
                 >
                     <v-list-item
@@ -58,7 +58,7 @@
         }),
         computed: {
             ...mapGetters([
-                'categorys',
+                'categories',
             ])
         },
         methods: {

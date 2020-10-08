@@ -37,7 +37,7 @@
                     <!-- フィルター絞る前 -->
                     <div v-if="filterValue.length === 0">
                         <div
-                            v-for="(category, i) in categorys"
+                            v-for="(category, i) in categories"
                             :key="i"
                         >
                             <v-list-item
@@ -131,7 +131,7 @@
             filterValue: function (val) {
                 this.filteredItems = []
                 if (val.length > 0) {
-                    const categoryList = this.categorys
+                    const categoryList = this.categories
                     for (const [k, category] of Object.entries(categoryList)) {
                         if (this.filterCategorySectionName(category)) {
                             this.filteredItems.push(category)
@@ -147,7 +147,7 @@
         },
         computed: {
             ...mapGetters([
-                'categorys',
+                'categories',
             ]),
         },
         methods: {

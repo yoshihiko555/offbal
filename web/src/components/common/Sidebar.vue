@@ -31,14 +31,14 @@
 
                 <!-- カテゴリー一覧 -->
                 <draggable
-                    :list='localCategorys'
+                    :list='localCategories'
                     animation='200'
                     chosen-class="chosen"
                     drag-class="drag"
                     @end='end'
                 >
                     <v-list-item
-                        v-for="category in localCategorys"
+                        v-for="category in localCategories"
                         :key='category.id'
                         @click='toPage("DetailCategory", category)'
                     >
@@ -82,22 +82,22 @@
             }
         },
         created () {
-        	this.localCategorys = _.cloneDeep(this.categorys)
+        	this.localCategories = _.cloneDeep(this.categories)
         },
         watch: {
-        	categorys: {
+        	categories: {
         	    deep: true,
         	    handler (val, old) {
-        	    	this.localCategorys = _.cloneDeep(val)
+        	    	this.localCategories = _.cloneDeep(val)
         	    },
         	},
         },
     	computed: {
     		...mapGetters([
-                'categorys',
+                'categories',
                 'labels',
             ]),
-            localCategorys: {
+            localCategories: {
                 get () {
                     return this.local
                 },
@@ -133,7 +133,7 @@
                     url: '/api/category/update_category_index/',
                     method: 'PUT',
                     data: {
-                        categorys: this.localCategorys,
+                        categories: this.localCategories,
                     }
                 })
                 .then(res => {

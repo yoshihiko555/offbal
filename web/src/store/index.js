@@ -7,7 +7,7 @@ import setting from './setting'
 Vue.use(Vuex)
 
 const initialState = {
-	categorys: [],
+	categories: [],
 	labels: [],
 	detailCategory: {},
 }
@@ -16,13 +16,13 @@ export default new Vuex.Store({
 	strict: true,
 	state: { ...{}, ...initialState },
 	getters: {
-	    categorys: state => state.categorys,
+	    categories: state => state.categories,
 		labels: state => state.labels,
 		detailCategory: state => state.detailCategory,
 	},
 	mutations: {
-		setCategorys (state, payload) {
-            state.categorys = payload
+		setCategories (state, payload) {
+            state.categories = payload
 		},
 		setLabels (state, payload) {
             state.labels = payload
@@ -48,11 +48,11 @@ export default new Vuex.Store({
 	        state.detailCategory = payload
 
 	        // カテゴリー一覧内のカテゴリーの更新
-	        const index = state.categorys.findIndex(category => category.id === payload.id)
-	        Vue.set(state.categorys, index, payload)
+	        const index = state.categories.findIndex(category => category.id === payload.id)
+	        Vue.set(state.categories, index, payload)
     	},
         updateCategoryIndex (state, payload) {
-            state.categorys = payload
+            state.categories = payload
         },
 	    setDetailCategory (state, payload) {
 	        state.detailCategory = payload
@@ -62,7 +62,7 @@ export default new Vuex.Store({
 	        state.detailCategory.sections.push(payload)
 
 	        // 全体の該当カテゴリー
-	        const category = state.categorys.find(category => category.id === payload.target_category)
+	        const category = state.categories.find(category => category.id === payload.target_category)
 	        category.sections.push(payload)
 	    },
 	    updateSection (state, payload) {
@@ -71,7 +71,7 @@ export default new Vuex.Store({
 	        Vue.set(state.detailCategory.sections, index, payload)
 
 	        // 全体の該当カテゴリー
-	        const category = state.categorys.find(category => category.id === payload.target_category)
+	        const category = state.categories.find(category => category.id === payload.target_category)
 	        const j = category.sections.findIndex(section => section.id === payload.id)
 	        Vue.set(category.sections, j, payload)
 	    },
@@ -81,7 +81,7 @@ export default new Vuex.Store({
 	        if (index !== -1) state.detailCategory.sections = state.detailCategory.sections.filter((_, i) => i !== index)
 
 	        // 全体の該当カテゴリー
-	        const category = state.categorys.find(category => category.id === state.detailCategory.id)
+	        const category = state.categories.find(category => category.id === state.detailCategory.id)
 	        const j = category.sections.findIndex(section => section.id === payload)
 	        if (j !== -1) category.sections = category.sections.filter((_, i) => i !== j)
 	    },
@@ -236,7 +236,7 @@ export default new Vuex.Store({
 	        	})
 	        	.then(res => {
 	        		console.log('アプリ初期描画', res)
-					this.commit('setCategorys', res.data.categorys)
+					this.commit('setCategories', res.data.categories)
 					this.commit('setLabels', res.data.labels)
 					this.commit('setting/setSetting', res.data.setting)
 					resolve(res)

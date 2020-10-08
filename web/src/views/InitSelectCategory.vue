@@ -15,7 +15,7 @@
 
         <v-container>
             <v-row>
-                <v-col v-for='category in defaultCategorys' :key='category.id' cols='4'>
+                <v-col v-for='category in defaultCategories' :key='category.id' cols='4'>
                     <vs-card type='2' @click='togle(category)'>
                         <template #title>
                             <h4>{{ category.name }}</h4>
@@ -27,7 +27,7 @@
                             <img :src='getImgUrl(category.name)'>
                         </template>
                         <template #interactions>
-                            <vs-checkbox :val='category' v-model='categorys'/>
+                            <vs-checkbox :val='category' v-model='categories'/>
                         </template>
                     </vs-card>
                 </v-col>
@@ -61,9 +61,9 @@
             email: null,
             profileImg: null,
             valid: true,
-            defaultCategorys: [],
+            defaultCategories: [],
             msgs: Con.DEFAULT_CATEGORY_MSG,
-            categorys: [],
+            categories: [],
             loading: false,
         }),
         created () {
@@ -75,14 +75,14 @@
             this.email = AuthService.getEmail()
             this.profileImg = AuthService.getProfileImg()
             this.$axios({
-            	url: '/api/default-categorys/',
+            	url: '/api/default-categories/',
             	method: 'GET',
             })
             .then(res => {
                 console.log('デフォルトカテゴリー一覧', res)
                 if (!res.data.result) {
                 	// 初期化未完了
-                    this.defaultCategorys = res.data.default_categorys
+                    this.defaultCategories = res.data.default_categories
                     this.isShow = true
                 } else {
                     // 初期化が完了しているので、そのままアプリ画面へ
@@ -94,14 +94,14 @@
             })
         },
         watch: {
-        	categorys: function (val) {
+        	categories: function (val) {
                 this.valid = (val.length === 5) ? false : true
             }
         },
         methods: {
             // ユーザー初期データ作成
             async initUserData () {
-                console.log('選択されたカテゴリー', this.categorys)
+                console.log('選択されたカテゴリー', this.categories)
                 this.loading = true
 
                 // 初期データ作成アクション用送信データ
@@ -111,7 +111,7 @@
                 	data: {
                         auth0_id: this.id,
                         auth0_name: this.name,
-                        categorys: this.categorys,
+                        categories: this.categories,
                         email: this.email,
                         profile_img: this.profileImg,
                 	}
@@ -144,9 +144,9 @@
             	return require(`@/assets/img/${name}.jpg`)
             },
             togle (category) {
-                const idx = this.categorys.indexOf(category)
-                if (idx !== -1) this.categorys = this.categorys.filter((_, i) => i !== idx)
-                else this.categorys.push(category)
+                const idx = this.categories.indexOf(category)
+                if (idx !== -1) this.categories = this.categories.filter((_, i) => i !== idx)
+                else this.categories.push(category)
             }
         }
     }

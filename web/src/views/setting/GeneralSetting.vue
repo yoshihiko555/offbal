@@ -221,7 +221,7 @@
         },
         computed: {
         	...mapGetters([
-        		'categorys',
+        		'categories',
         	]),
         },
         methods: {
@@ -242,7 +242,7 @@
             },
             addStartPageOptions () {
             	const options = []
-            	for (const category of this.categorys) {
+            	for (const category of this.categories) {
             		options.push({
             			label: category.name.toUpperCase(),
             			value: category.name

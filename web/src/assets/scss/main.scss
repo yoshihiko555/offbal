@@ -1,3 +1,4 @@
+/*----------共通----------*/
 body {
     h1, h2, h3, h4, h5, h6, p {
         font-family: 'Noto Sans JP', sans-serif;
@@ -5,12 +6,25 @@ body {
     }
 }
 
-
 .main {
     margin-top: $header;
 	min-height: calc(100vh - #{($header + $footer)}) !important;
 }
 
+/*----------テーマ----------*/
 [vs-theme=danger] {
     --vs-color: var(--vs-dander) !important;
+}
+
+/*----------メインコンテンツ画面----------*/
+.main_content_wrap {
+    max-width: calc(100% - 10px);
+    position: relative;
+    transition: .2s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.is-task-drawer {
+    margin-right: $task-detail-width;
+    max-width: calc(100% - #{$task-detail-width});
 }

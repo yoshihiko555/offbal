@@ -1,7 +1,7 @@
 <!-- アプリカテゴリー詳細画面 -->
 <template>
     <div>
-        <div id='category-list' class="detail_category_wrap" :class="{ 'is-task-drawer': drawer }">
+        <div id='category-list' class="main_content_wrap" :class="{ 'is-task-drawer': drawer }">
             <div class="detail_category_header">
                 <h1 class="category_title">{{ detailCategory.name }}</h1>
                 <v-spacer/>
@@ -37,7 +37,7 @@
             <CompleteTaskList
                 :complete_tasks=detailCategory.complete_tasks
             />
-            <TaskDetail/>
+<!--             <TaskDetail/> -->
         </div>
         <div
             class='today_todo_count_wrap pr-2'
@@ -114,7 +114,7 @@
         },
     	computed: {
     		...mapGetters([
-                'detailCategory',
+    		    'detailCategory',
     		])
     	},
         methods: {
@@ -165,18 +165,8 @@
         bottom: 0;
     }
     .today_todo_count_wrap_clicked::v-deep {
-        right: 500px;
+        right: $task-detail-width;
         transition: .2s;
         transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .detail_category_wrap {
-        max-width: calc(100% - 10px);
-        position: relative;
-        transition: .2s;
-        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .is-task-drawer {
-        margin-right: 500px;
-        max-width: calc(100% - 500px);
     }
 </style>

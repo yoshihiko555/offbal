@@ -2,7 +2,8 @@
     <div>
         <v-container
             fluid
-            class="ma-0 pa-0"
+            class="ma-0 pa-0 main_content_wrap"
+            :class="{ 'is-task-drawer': drawer }"
         >
             <div class="search_result_header_wrap pl-5">
                 <v-row>
@@ -75,11 +76,13 @@
             searchText: '',
             searchResult: [],
             isLoading: false,
+            drawer: false,
         }),
         created () {
             this.$eventHub.$on('filter_search_result', this.filterSearchResult)
         },
         mounted: function () {
+        	this.$eventHub.$on('change-toggle-drawer', this.changeToggleDrawer)
             this.searchStart(this.$route.query.text)
         },
         watch: {
@@ -122,7 +125,10 @@
             filterSearchResult (val) {
                 console.log('filterSearchResult')
                 console.log(val)
-            }
+            },
+            changeToggleDrawer (value) {
+                this.drawer = value
+            },
         }
     }
 </script>

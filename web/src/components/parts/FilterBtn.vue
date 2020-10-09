@@ -33,7 +33,7 @@
                                 v-for="(category, i) in categories"
                                 :key="i"
                                 :label="category.name"
-                                :value="category.name"
+                                :value="category.id"
                                 :color="categoryColor(category.color)"
                                 filter
                             >{{ category.name }}
@@ -173,6 +173,8 @@
                 isCompleteTask: false,
             },
         }),
+        created () {
+        },
         watch: {
             filterValue: {
                 handler: function (val) {
@@ -186,13 +188,18 @@
                 'categories',
                 'labels',
             ]),
+            ...mapGetters('setting', [
+                'setting',
+            ]),
         },
         methods: {
             filter (val) {
                 if (this.isSearchResult) {
-                    this.$eventHub.$emit('filter_search_result', val)
+                    // SearchResultで検索結果を絞る
+                    this.$eventHub.$emit('filterSearchResult', val)
                 } else {
-                    this.$eventHub.$emit('filter_task_list', val)
+                    // TaskListでタスクリストを絞る
+                    this.$eventHub.$emit('filterTaskList', val)
                 }
             },
             categoryColor (color) {

@@ -165,7 +165,7 @@
             complete_task_list: [],
         }),
         created () {
-            this.$eventHub.$on('filter_task_list', this.filterTaskList)
+            this.$eventHub.$on('filterTaskList', this.filterTaskList)
         },
         mounted () {
             window.addEventListener('click', this.onClickTaskDetailOuter)
@@ -216,8 +216,25 @@
                 return task.deadline
             },
             filterTaskList (val) {
-                console.log('filterTaskList')
-                console.log(val)
+                // FilterBtnから渡ってきた値で検索結果を絞る
+                const queryParams = {}
+                const filterValueList = [
+                    'selectedPriority',
+                    'selectedDeadline',
+                    'selectedLabelList'
+                ]
+                for (const i in val) {
+                    if (filterValueList.includes(i)) {
+                        if (val[i] instanceof Array) {
+                            if (val[i].length) {
+                                queryParams[i] = val[i]
+                            }
+                        } else {
+                            queryParams[i] = val[i]
+                        }
+                    }
+                }
+                console.log(queryParams)
             },
             onClickTaskDetailOuter (e) {
                 // タスク詳細の外側をクリックしたときに、タスク詳細を閉じる

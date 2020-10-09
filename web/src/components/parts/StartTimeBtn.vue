@@ -80,8 +80,8 @@
         watch: {
             'startTime.value': function (val) {
                 this.startTime.color = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
-                this.$eventHub.$emit('create_task_info', 'start_time_str', val)
-                this.$eventHub.$emit('set_start_time', val)
+                this.$eventHub.$emit('createTaskInfo', 'start_time_str', val)
+                this.$eventHub.$emit('setStartTime', val)
             }
         },
         computed: {

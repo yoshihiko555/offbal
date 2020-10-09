@@ -175,7 +175,7 @@
                 name: this.defaultCategory,
                 section: this.defaultSection
             }
-            this.$eventHub.$emit('create_task_info', 'category_id', this.defaultCategoryId)
+            this.$eventHub.$emit('createTaskInfo', 'category_id', this.defaultCategoryId)
         },
         mounted: function () {
         },
@@ -224,8 +224,8 @@
                 // カテゴリーを選択
                 if (value.isCategory) {
                     this.setCategoryInfo(value)
-                    this.$eventHub.$emit('create_task_info', 'category_id', value.id)
-                    this.$eventHub.$emit('create_task_info', 'section_id', 0)
+                    this.$eventHub.$emit('createTaskInfo', 'category_id', value.id)
+                    this.$eventHub.$emit('createTaskInfo', 'section_id', 0)
                 } else {
                     this.setSectionInfo(value)
                     this.selectSection(value)
@@ -235,9 +235,9 @@
             selectSection (value) {
                 // セクションを選択
                 if (value.target_category_name !== 'インボックス') {
-                    this.$eventHub.$emit('create_task_info', 'category_id', value.target_category)
+                    this.$eventHub.$emit('createTaskInfo', 'category_id', value.target_category)
                 }
-                this.$eventHub.$emit('create_task_info', 'section_id', value.id)
+                this.$eventHub.$emit('createTaskInfo', 'section_id', value.id)
             },
             filterCategorySectionName (value) {
                 // カテゴリー名・セクション名を検索する

@@ -541,6 +541,13 @@ class TaskViewSet(BaseModelViewSet):
         ), many=True)
         return Response(future_tasks.data, status=status.HTTP_200_OK)
 
+    @action(methods=['GET'], detail=False)
+    def get_filter_task_list(self, request):
+        """
+        パラメータに応じてタスクリストにフィルターをかけて取得
+        """
+        pass
+
 
 class SubTaskViewSet(BaseModelViewSet):
 

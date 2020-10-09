@@ -121,7 +121,7 @@
                 'deleteSectionAction',
             ]),
             open () {
-                this.$eventHub.$emit('open-edit', this.section)
+                this.$eventHub.$emit('openEdit', this.section)
             },
             deleteLocalSection () {
                 this.deleteSectionAction(this.section.id)

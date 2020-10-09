@@ -71,8 +71,8 @@
             isChange: true,
         }),
         created () {
-            this.$eventHub.$on('confirm-apply-setting', this.applySetting)
-            this.$eventHub.$on('confirm-cancel-setting', this.cancelSetting)
+            this.$eventHub.$on('confirmApplySetting', this.applySetting)
+            this.$eventHub.$on('confirmCancelSetting', this.cancelSetting)
             this.changeActiveSidebar()
             this.setTheme(this, this.setting)
         },

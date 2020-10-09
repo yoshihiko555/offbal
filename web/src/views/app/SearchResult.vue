@@ -79,10 +79,11 @@
             drawer: false,
         }),
         created () {
-            this.$eventHub.$on('filter_search_result', this.filterSearchResult)
+            // FilterBtnから渡ってきた値で検索結果を絞る
+            this.$eventHub.$on('filterSearchResult', this.filterSearchResult)
         },
         mounted: function () {
-        	this.$eventHub.$on('change-toggle-drawer', this.changeToggleDrawer)
+        	this.$eventHub.$on('changeToggleDrawer', this.changeToggleDrawer)
             this.searchStart(this.$route.query.text)
         },
         watch: {
@@ -123,8 +124,18 @@
                 this.search()
             },
             filterSearchResult (val) {
-                console.log('filterSearchResult')
-                console.log(val)
+                // FilterBtnから渡ってきた値で検索結果を絞る
+                const queryParams = {}
+                for (const i in val) {
+                    if (val[i] instanceof Array) {
+                        if (val[i].length) {
+                            queryParams[i] = val[i]
+                        }
+                    } else {
+                        queryParams[i] = val[i]
+                    }
+                }
+                console.log(queryParams)
             },
             changeToggleDrawer (value) {
                 this.drawer = value

@@ -38,11 +38,11 @@
             },
             close () {
                 this.dialog = false
-                this.$eventHub.$emit('confirm-cancel-setting')
+                this.$eventHub.$emit('confirmCancelSetting')
             },
             toPage () {
                 this.dialog = false
-                this.$eventHub.$emit('confirm-apply-setting', this.path, this.next)
+                this.$eventHub.$emit('confirmApplySetting', this.path, this.next)
             }
         }
     }

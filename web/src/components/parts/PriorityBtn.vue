@@ -144,7 +144,7 @@
         methods: {
             selectPriority (value) {
                 this.priority.value = value
-                this.$eventHub.$emit('create_task_info', 'priority', value)
+                this.$eventHub.$emit('createTaskInfo', 'priority', value)
                 this.isSelected = true
                 this.menu = false
             }

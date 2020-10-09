@@ -116,7 +116,7 @@
             ReminderBtn,
         },
         created () {
-            this.$eventHub.$on('create_task_info', this.create_task_info)
+            this.$eventHub.$on('createTaskInfo', this.createTaskInfo)
         },
         methods: {
             ...mapActions([
@@ -176,7 +176,7 @@
                     this.updateTaskData.label_list.push(task.label[i].id)
                 }
             },
-            create_task_info (key, value) {
+            createTaskInfo (key, value) {
                 this.updateTaskData[key] = value
             }
         }

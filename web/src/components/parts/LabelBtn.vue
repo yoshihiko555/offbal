@@ -184,7 +184,7 @@
         watch: {
             selectedLabelList: function (val) {
                 this.labelColor = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
-                this.$eventHub.$emit('create_task_info', 'label_list', val)
+                this.$eventHub.$emit('createTaskInfo', 'label_list', val)
             },
             'labelData.name': _.debounce(function (val) {
                 this.createLabelDuplicationCheck = false

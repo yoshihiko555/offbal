@@ -24,7 +24,7 @@
             drawer: false,
         }),
         created () {
-        	this.$eventHub.$on('change-toggle-drawer', this.changeToggleDrawer)
+        	this.$eventHub.$on('changeToggleDrawer', this.changeToggleDrawer)
         	this.$axios({
         		url: '/api/task/get_future_tasks',
         		method: 'GET',

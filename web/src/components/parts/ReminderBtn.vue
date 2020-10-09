@@ -76,7 +76,7 @@
             endTime: '',
         }),
         created () {
-            this.$eventHub.$on('set_deadline', this.setEndTime)
+            this.$eventHub.$on('setDeadline', this.setEndTime)
         },
         mounted: function () {
             if (this.defaultRemind !== null) this.remind.value = this.defaultRemind
@@ -90,7 +90,7 @@
                     this.remind.color = Con.NON_ACTIVE_COLOR
                     this.isSelected = false
                 }
-                this.$eventHub.$emit('create_task_info', 'remind_str', val)
+                this.$eventHub.$emit('createTaskInfo', 'remind_str', val)
             }
         },
         computed: {

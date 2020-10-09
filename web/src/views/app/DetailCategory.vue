@@ -94,8 +94,8 @@
             .catch(e => {
                 console.log(e)
             })
-            this.$eventHub.$on('open-edit', this.openEdit)
-            this.$eventHub.$on('change-toggle-drawer', this.changeToggleDrawer)
+            this.$eventHub.$on('openEdit', this.openEdit)
+            this.$eventHub.$on('changeToggleDrawer', this.changeToggleDrawer)
         },
         mounted: function () {
         },

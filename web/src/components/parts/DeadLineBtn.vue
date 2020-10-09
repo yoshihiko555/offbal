@@ -75,15 +75,15 @@
             startTime: '',
         }),
         created () {
-            this.$eventHub.$on('set_start_time', this.setStartTime)
+            this.$eventHub.$on('setStartTime', this.setStartTime)
             if (this.defaultDeadline !== null) this.deadline.value = this.defaultDeadline
         },
         mounted: function () {},
         watch: {
             'deadline.value': function (val) {
                 this.deadline.color = (val.length > 0) ? Con.ACTIVE_COLOR : Con.NON_ACTIVE_COLOR
-                this.$eventHub.$emit('create_task_info', 'deadline_str', val)
-                this.$eventHub.$emit('set_deadline', val)
+                this.$eventHub.$emit('createTaskInfo', 'deadline_str', val)
+                this.$eventHub.$emit('setDeadline', val)
             }
         },
         computed: {

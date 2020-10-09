@@ -123,7 +123,7 @@
             },
         }),
         created () {
-            this.$eventHub.$on('create_task_info', this.create_task_info)
+            this.$eventHub.$on('createTaskInfo', this.createTaskInfo)
         },
         mounted: function () {
         },
@@ -165,7 +165,7 @@
                 this.localTaskDialog = false
                 this.init()
             },
-            create_task_info (key, value) {
+            createTaskInfo (key, value) {
                 this.task[key] = value
             },
             init () {

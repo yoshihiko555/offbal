@@ -133,7 +133,7 @@
             closeTaskDetail () {
                 // タスク詳細を閉じる
                 this.drawer = false
-                this.$eventHub.$emit('change-toggle-drawer', false)
+                this.$eventHub.$emit('changeToggleDrawer', false)
                 setTimeout(this.init, 100)
             },
             closeSameTaskDetail (task) {
@@ -141,7 +141,7 @@
                 // 同じタスクの詳細を開いていたら閉じる。
                 if (this.cloneTask.id === task.id) {
                     this.drawer = false
-                    this.$eventHub.$emit('change-toggle-drawer', false)
+                    this.$eventHub.$emit('changeToggleDrawer', false)
                     setTimeout(this.init, 100)
                 }
             },
@@ -149,7 +149,7 @@
                 // 何も開いてなかったら開く
                 if (this.task.content === undefined) {
                     this.drawer = true
-                    this.$eventHub.$emit('change-toggle-drawer', true)
+                    this.$eventHub.$emit('changeToggleDrawer', true)
                 }
                 // 同じタスクをクリックしたら閉じる
                 if (this.task.id === task.id) {

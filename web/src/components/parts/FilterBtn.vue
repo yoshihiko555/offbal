@@ -108,7 +108,7 @@
                                 v-for="(label, i) in labels"
                                 :key="i"
                                 :label="label.name"
-                                :value="label"
+                                :value="label.id"
                                 filter
                             >{{ label.name }}
                             </vs-option>
@@ -149,6 +149,7 @@
 </template>
 
 <script>
+    import _ from 'lodash'
     import { mapGetters } from 'vuex'
     import { Const } from '@/assets/js/const'
     const Con = new Const()

@@ -126,16 +126,30 @@
             filterSearchResult (val) {
                 // FilterBtnから渡ってきた値で検索結果を絞る
                 const queryParams = {}
+                // 現在のタスクリストのidの文字列結合もクエリーパラメータに含める
                 for (const i in val) {
                     if (val[i] instanceof Array) {
                         if (val[i].length) {
-                            queryParams[i] = val[i]
+                            queryParams[i] = val[i].join()
                         }
                     } else {
                         queryParams[i] = val[i]
                     }
                 }
                 console.log(queryParams)
+                this.$axios({
+                    url: '/api/task/get_filter_task_list/',
+                    method: 'GET',
+                    params: {
+                        ...queryParams
+                    }
+                })
+                .then(res => {
+                    console.log(res)
+                })
+                .catch(e => {
+                    console.log(e)
+                })
             },
             changeToggleDrawer (value) {
                 this.drawer = value

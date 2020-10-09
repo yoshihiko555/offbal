@@ -522,9 +522,13 @@ class TaskViewSet(BaseModelViewSet):
         '''
         今日期限の未完了タスクを返却アクション
         '''
-        user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
-        user_tasks = user.task_target_user.all()
-        today_tasks = self.get_serializer(user_tasks.filter(completed=False, deadline__date=date.today()), many=True)
+        try:
+            user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+            user_tasks = user.task_target_user.all()
+            today_tasks = self.get_serializer(user_tasks.filter(completed=False, deadline__date=date.today()), many=True)
+        except mUser.DoesNotExist:
+            logger.error('ユーザーが見つかりませんでした。')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         return Response(today_tasks.data, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=False)
@@ -532,13 +536,18 @@ class TaskViewSet(BaseModelViewSet):
         '''
         明日から1週間まで期限の未完了タスクを返却するアクション
         '''
-        user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
-        user_tasks = user.task_target_user.all()
-        future_tasks = self.get_serializer(user_tasks.filter(
-            completed=False,
-            deadline__date__gte=date.today() + timedelta(days=1),
-            deadline__date__lte=date.today() + timedelta(weeks=1),
-        ), many=True)
+        try:
+            user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+            user_tasks = user.task_target_user.all()
+            future_tasks = self.get_serializer(user_tasks.filter(
+                completed=False,
+                deadline__date__gte=date.today() + timedelta(days=1),
+                deadline__date__lte=date.today() + timedelta(weeks=1),
+            ), many=True)
+        except mUser.DoesNotExist:
+            logger.error('ユーザーが見つかりませんでした。')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         return Response(future_tasks.data, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=False)
@@ -546,7 +555,18 @@ class TaskViewSet(BaseModelViewSet):
         """
         パラメータに応じてタスクリストにフィルターをかけて取得
         """
-        pass
+
+        # TODO パラメータでtasksを絞る
+        # tasks=現在のタスクリストの文字列結合。このidリストからタスク取得しfilter
+
+        try:
+            user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+            tasks = user.task_target_user.all()
+        except mUser.DoesNotExist:
+            logger.error('ユーザーが見つかりませんでした。')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(self.get_serializer(tasks, many=True).data, status=status.HTTP_200_OK)
 
 
 class SubTaskViewSet(BaseModelViewSet):

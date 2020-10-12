@@ -281,6 +281,30 @@ class Const {
             color: '#2196F3',
         },
     ]
+
+    // ソートボタンメニュー
+    SORT_BTN_MENU = [
+        {
+            name: '優先度',
+            icon: 'mdi-star',
+            type: 'priority',
+        },
+        {
+            name: '期限日',
+            icon: 'mdi-calendar-month-outline',
+            type: 'deadline',
+        },
+        {
+            name: 'あいうえお順',
+            icon: 'mdi-sort',
+            type: 'content',
+        },
+        {
+            name: '作成日',
+            icon: 'mdi-calendar-plus',
+            type: 'created_at',
+        },
+    ]
 }
 
 export { Const }

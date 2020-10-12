@@ -1,12 +1,14 @@
 <template>
     <div id='future-scheduled-list' class='main_content_wrap' :class="{ 'is-task-drawer': drawer }">
-        <h1>FutureScheduled</h1>
+        <h1 class="mb-4">FutureScheduled</h1>
         <div
             v-for="(data, key) in futureTasks"
             :key="key"
+            class="mb-4"
         >
-            <p>{{ key }}</p>
+            <p class="ma-0 ml-1">{{ key }}</p>
             <TaskList :tasks='data' />
+            <v-divider />
         </div>
     </div>
 </template>

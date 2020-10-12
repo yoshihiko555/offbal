@@ -5,9 +5,12 @@
             <div class="detail_category_header">
                 <h1 class="category_title">{{ detailCategory.name }}</h1>
                 <v-spacer/>
-                <div class='operation_btn_wrap pr-2'>
+                <div class='operation_btn_wrap pr-2 text-end'>
                     <FilterBtn/>
-                    <SortBtn/>
+                    <SortBtn
+                        :tasks='detailCategory.tasks'
+                        @sort-tasks='sortTasks'
+                    />
                 </div>
             </div>
 
@@ -88,7 +91,6 @@
         created () {
             this.getDetailCategoryAction(this.$route.params.name)
             .then(res => {
-                console.log(res)
                 this.$eventHub.$emit('cloneCompleteTasks', res.data.complete_tasks)
             })
             .catch(e => {
@@ -103,7 +105,6 @@
             if (to.params.name !== from.params.name) {
                 this.getDetailCategoryAction(to.params.name)
                 .then(res => {
-                    console.log(res)
                     this.$eventHub.$emit('cloneCompleteTasks', res.data.complete_tasks)
                 })
                 .catch(e => {
@@ -141,6 +142,9 @@
             changeToggleDrawer (value) {
                 this.drawer = value
             },
+            sortTasks (val) {
+                console.log(val)
+            }
         },
     }
 </script>

@@ -226,7 +226,7 @@ class Const {
         },
     ]
 
-    FILTER_OPTION_PRIORIEIES = [
+    FILTER_OPTION_PRIORITIES = [
         {
             name: '優先度5',
             value: 5,
@@ -257,12 +257,12 @@ class Const {
     FILTER_OPTION_DEADLINES = [
         {
             name: '今日中',
-            value: 5,
+            value: 1,
             color: '#FF0000',
         },
         {
             name: '明日まで',
-            value: 4,
+            value: 2,
             color: '#FF9933',
         },
         {
@@ -272,12 +272,12 @@ class Const {
         },
         {
             name: '1週間以内',
-            value: 2,
+            value: 4,
             color: '#00BCD4',
         },
         {
             name: '今月中',
-            value: 1,
+            value: 5,
             color: '#2196F3',
         },
     ]

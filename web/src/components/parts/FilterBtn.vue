@@ -4,6 +4,7 @@
         :close-on-content-click="false"
         transition="slide-y-transition"
         width="200p"
+        v-model="menu"
     >
         <template #activator="{ attrs, on }">
             <vs-button
@@ -25,9 +26,11 @@
                     </v-list-item-content>
                     <v-list-item-action>
                         <vs-select
-                            placeholder="指定なし"
                             v-model="filterValue.selectedCategory"
-                            :state="'success'"
+                            chips
+                            filter
+                            :state="isMultipleSelectStateSuccess"
+                            :multiple="setting.is_multiple_filter"
                         >
                             <vs-option
                                 v-for="(category, i) in categories"
@@ -47,10 +50,11 @@
                     </v-list-item-content>
                     <v-list-item-action>
                         <vs-select
-                            placeholder="指定なし"
                             v-model="filterValue.selectedPriority"
                             chips
-                            :state="'primary'"
+                            filter
+                            :state="isMultipleSelectStatePrimary"
+                            :multiple="setting.is_multiple_filter"
                         >
                             <vs-option
                                 v-for="(priority, i) in priorities"
@@ -119,20 +123,26 @@
                     <v-list-item-content>
                         <v-list-item-subtitle>完了状態 </v-list-item-subtitle>
                     </v-list-item-content>
-                    <v-list-item-action>
-                        <vs-switch v-model="filterValue.isCompleteTask">
+                    <!-- <v-list-item-action> -->
+                        <!-- <vs-switch v-model="filterValue.isCompleteTask">
                             <template #off>
                                 <i class="bx bx-x"></i> 未完了
                             </template>
                             <template #on>
                                 <i class="bx bx-check"></i> 完了
                             </template>
-                        </vs-switch>
-                    </v-list-item-action>
+                        </vs-switch> -->
+                    <!-- </v-list-item-action> -->
+                        <vs-radio v-model="filterValue.isCompletedTask" val="1">
+                            完了
+                        </vs-radio>
+                        <vs-radio v-model="filterValue.isCompletedTask" val="2">
+                            未完了
+                        </vs-radio>
                 </v-list-item>
                 <v-list-item>
                     <v-spacer></v-spacer>
-                    <v-list-item-action>
+                    <!-- <v-list-item-action> -->
                         <vs-button
                             flat
                             circle
@@ -140,7 +150,14 @@
                             @click="init"
                         >検索条件リセット
                         </vs-button>
-                    </v-list-item-action>
+                        <vs-button
+                            flat
+                            circle
+                            size="small"
+                            @click="menu = false"
+                        >OK
+                        </vs-button>
+                    <!-- </v-list-item-action> -->
                     <v-spacer></v-spacer>
                 </v-list-item>
             </v-list>
@@ -164,15 +181,16 @@
             }
         },
         data: () => ({
-            priorities: Con.FILTER_OPTION_PRIORIEIES,
+            priorities: Con.FILTER_OPTION_PRIORITIES,
             deadlines: Con.FILTER_OPTION_DEADLINES,
             filterValue: {
                 selectedPriority: [],
                 selectedCategory: [],
                 selectedDeadline: [],
                 selectedLabelList: [],
-                isCompleteTask: false,
+                isCompletedTask: 0,
             },
+            menu: false,
         }),
         created () {
         },
@@ -182,7 +200,7 @@
                     this.filter(val)
                 },
                 deep: true,
-            }
+            },
         },
         computed: {
             ...mapGetters([
@@ -192,9 +210,17 @@
             ...mapGetters('setting', [
                 'setting',
             ]),
+            isMultipleSelectStateSuccess () {
+                if (!this.setting.is_multiple_filter) return 'success'
+                return 'false'
+            },
+            isMultipleSelectStatePrimary () {
+                if (!this.setting.is_multiple_filter) return 'primary'
+                return 'false'
+            }
         },
         methods: {
-            filter (val) {
+            filter: _.debounce(function filter (val) {
                 if (this.isSearchResult) {
                     // SearchResultで検索結果を絞る
                     this.$eventHub.$emit('filterSearchResult', val)
@@ -202,7 +228,7 @@
                     // TaskListでタスクリストを絞る
                     this.$eventHub.$emit('filterTaskList', val)
                 }
-            },
+            }, 200),
             categoryColor (color) {
                 for (const i in Con.CATEGORY_COLOR) {
                     if (Con.CATEGORY_COLOR[i].color === color) {
@@ -215,7 +241,7 @@
                 this.filterValue.selectedCategory = []
                 this.filterValue.selectedDeadline = []
                 this.filterValue.selectedLabelList = []
-                this.filterValue.isCompleteTask = ''
+                this.filterValue.isCompletedTask = 0
             }
         }
     }

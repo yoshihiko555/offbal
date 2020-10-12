@@ -52,6 +52,8 @@ from .utils import (
     ReturnDateTime,
 )
 
+from dateutil.relativedelta import relativedelta
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -554,19 +556,91 @@ class TaskViewSet(BaseModelViewSet):
     def get_filter_task_list(self, request):
         """
         パラメータに応じてタスクリストにフィルターをかけて取得
+            selectedCategory str(カテゴリID)
+            selectedPriority str(1~5) ※複数選択の場合,カンマ区切り
+            selectedDeadline str(1~5)
+                1: 今日中
+                2: 明日まで
+                3: 3日以内
+                4: 1週間以内
+                5: 今月中
+            selectedLabelList str(ラベルID) ※複数選択の場合,カンマ区切り
+            isCompleteTask str(true or false)
+            taskList str(タスクID) ※複数選択の場合,カンマ区切り
         """
 
-        # TODO パラメータでtasksを絞る
-        # tasks=現在のタスクリストの文字列結合。このidリストからタスク取得しfilter
+        params = {
+            'selectedCategory': True,
+            'selectedPriority': True,
+            'selectedDeadline': False,
+            'selectedLabelList': True,
+        }
 
-        try:
-            user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
-            tasks = user.task_target_user.all()
-        except mUser.DoesNotExist:
-            logger.error('ユーザーが見つかりませんでした。')
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        filterRelatedName = {
+            'selectedCategory': 'target_category__id__in',
+            'selectedPriority': 'priority__in',
+            'selectedDeadline': 'deadline',
+            'selectedLabelList': 'label__id__in',
+        }
 
-        return Response(self.get_serializer(tasks, many=True).data, status=status.HTTP_200_OK)
+        if request.query_params.get('taskIdList') == None:
+            return Response([], status=status.HTTP_200_OK)
+
+        taskIdList = list(map(int, request.query_params['taskIdList'].split(',')))
+        taskList = Task.objects.filter(id__in=taskIdList)
+
+        strIsCompleted = request.query_params.get('isCompletedTask')
+
+        if strIsCompleted != None:
+            if strIsCompleted == "1":
+                taskList = taskList.filter(completed=True)
+            elif strIsCompleted == "2":
+                taskList = taskList.filter(completed=False)
+
+        for key, isMultiple in params.items():
+            value = request.query_params.get(key)
+            if value != None:
+                if isMultiple:
+                    value = list(map(int, value.split(',')))
+                taskList = self.filterValue(taskList, filterRelatedName[key], value)
+
+        return Response(self.get_serializer(taskList, many=True).data, status=status.HTTP_200_OK)
+
+    def filterValue(self, queryset, key, value):
+        """
+        クエリーパラメータの値でタスクを絞る
+        """
+        castParams = {
+            'deadline': 'self.castDeadLineParam'
+        }
+
+        if key in castParams.keys():
+            key, value = eval(castParams[key])(value)
+        return queryset.filter(**{key: value})
+
+    def castDeadLineParam(self, param):
+        """
+        1: 今日中
+        2: 明日まで
+        3: 3日以内
+        4: 1週間以内
+        5: 今月中
+        """
+        today = datetime.today()
+        tommorow = today + timedelta(days=2)
+        threeDays = today + timedelta(days=4)
+        nextWeek = today + timedelta(weeks=1, days=1)
+        nextMonth = today + relativedelta(months=1, days=1)
+
+        deadLineParams = {
+            '1': ['deadline', today],
+            '2': ['deadline__range', [today, tommorow]],
+            '3': ['deadline__range', [today, threeDays]],
+            '4': ['deadline__range', [today, nextWeek]],
+            '5': ['deadline__range', [today, nextMonth]],
+        }
+
+        return deadLineParams[param][0], deadLineParams[param][1]
 
 
 class SubTaskViewSet(BaseModelViewSet):

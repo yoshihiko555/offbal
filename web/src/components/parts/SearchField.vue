@@ -48,7 +48,7 @@
                         text: searchWord
                     }
                 })
-            }, 100),
+            }, 300),
             trim (word) {
                 return String(word).replace(/^\s+|\s+$/g, '')
             },

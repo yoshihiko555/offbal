@@ -37,7 +37,7 @@
                         class="ma-0 pa-0"
                     >
                         <v-subheader>
-                            {{ searchResult.length }} tasks
+                            {{ taskLength }} tasks
                         </v-subheader>
                     </v-col>
                 </v-row>
@@ -49,10 +49,16 @@
                 <div ref="loadingContent" class="loading_div">
                 </div>
             </div>
-            <TaskList
-                v-else
-                :tasks=searchResult
-            />
+            <div v-else>
+                <TaskList
+                    v-if="!isFilter"
+                    :tasks=searchResult
+                />
+                <TaskList
+                    v-else
+                    :tasks=filteredSearchResult
+                />
+            </div>
         </v-container>
     </div>
 </template>
@@ -77,6 +83,8 @@
             searchResult: [],
             isLoading: false,
             drawer: false,
+            filteredSearchResult: [],
+            isFilter: false,
         }),
         created () {
             // FilterBtnから渡ってきた値で検索結果を絞る
@@ -88,9 +96,20 @@
         },
         watch: {
         },
+        computed: {
+            taskLength () {
+                if (this.isFilter) {
+                    return this.filteredSearchResult.length
+                }
+                return this.searchResult.length
+            }
+        },
         beforeRouteUpdate (to, from, next) {
             this.searchStart(to.query.text)
             next()
+        },
+        destroyed () {
+            this.$eventHub.$off('filterSearchResult')
         },
         methods: {
             search () {
@@ -126,7 +145,14 @@
             filterSearchResult (val) {
                 // FilterBtnから渡ってきた値で検索結果を絞る
                 const queryParams = {}
-                // 現在のタスクリストのidの文字列結合もクエリーパラメータに含める
+                if (this.searchResult.length) {
+                    const taskIdList = []
+                    for (const i in this.searchResult) {
+                        taskIdList.push(this.searchResult[i].id)
+                    }
+                    queryParams.taskIdList = taskIdList.join()
+                }
+                console.log(queryParams)
                 for (const i in val) {
                     if (val[i] instanceof Array) {
                         if (val[i].length) {
@@ -136,7 +162,6 @@
                         queryParams[i] = val[i]
                     }
                 }
-                console.log(queryParams)
                 this.$axios({
                     url: '/api/task/get_filter_task_list/',
                     method: 'GET',
@@ -146,6 +171,8 @@
                 })
                 .then(res => {
                     console.log(res)
+                    this.filteredSearchResult = res.data
+                    this.isFilter = true
                 })
                 .catch(e => {
                     console.log(e)

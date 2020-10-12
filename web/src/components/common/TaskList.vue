@@ -1,41 +1,95 @@
 <template>
     <div>
         <v-list>
-            <div v-if="tasks.length === 0">
+            <div v-if="!isFilter">
+                <div v-if="tasks.length === 0">
+                    <v-list-item>
+                        <v-list-item-content>
+                            <v-list-item-subtitle>
+                                該当するタスクはありません。
+                            </v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item>
+                </div>
+                <div v-else>
+                    <v-list-item
+                        v-for="task in tasks"
+                        :key="task.id"
+                        class="task_content"
+                    >
+                        <v-list-item-action
+                            class="mr-3 ml-1"
+                        >
+                            <vs-checkbox
+                                color="primary"
+                                v-model="complete_task_list"
+                                :val="task"
+                                @change="checkTask(task)"
+                            >
+                            </vs-checkbox>
+                        </v-list-item-action>
+                        <v-list-item-content>
+                            <v-list-item-title
+                                v-text="task.content"
+                                @click="showTaskDetail(task)"
+                            ></v-list-item-title>
+                            <v-list-item-subtitle
+                                v-if="task.sub_tasks.length > 0"
+                                @click="showTaskDetail(task)"
+                            >
+                                {{ restOfSubTasks(task) }}
+                            </v-list-item-subtitle>
+                        </v-list-item-content>
+                        <TaskMenuBtn
+                            :task=task
+                        />
+                    </v-list-item>
+                </div>
             </div>
             <div v-else>
-                <v-list-item
-                    v-for="task in tasks"
-                    :key="task.id"
-                    class="task_content"
-                >
-                    <v-list-item-action
-                        class="mr-3 ml-1"
+                <div v-if="filteredTasks.length === 0">
+                    <v-list-item>
+                        <v-list-item-content>
+                            <v-list-item-subtitle>
+                                該当するタスクはありません。
+                            </v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item>
+                </div>
+                <div v-else>
+                    <v-list-item
+                        v-for="task in filteredTasks"
+                        :key="task.id"
+                        class="task_content"
                     >
-                        <vs-checkbox
-                            color="primary"
-                            v-model="complete_task_list"
-                            :val="task"
-                            @change="checkTask(task)"
+                        <v-list-item-action
+                            class="mr-3 ml-1"
                         >
-                        </vs-checkbox>
-                    </v-list-item-action>
-                    <v-list-item-content>
-                        <v-list-item-title
-                            v-text="task.content"
-                            @click="showTaskDetail(task)"
-                        ></v-list-item-title>
-                        <v-list-item-subtitle
-                            v-if="task.sub_tasks.length > 0"
-                            @click="showTaskDetail(task)"
-                        >
-                            {{ restOfSubTasks(task) }}
-                        </v-list-item-subtitle>
-                    </v-list-item-content>
-                    <TaskMenuBtn
-                        :task=task
-                    />
-                </v-list-item>
+                            <vs-checkbox
+                                color="primary"
+                                v-model="complete_task_list"
+                                :val="task"
+                                @change="checkTask(task)"
+                            >
+                            </vs-checkbox>
+                        </v-list-item-action>
+                        <v-list-item-content>
+                            <v-list-item-title
+                                v-text="task.content"
+                                @click="showTaskDetail(task)"
+                            ></v-list-item-title>
+                            <v-list-item-subtitle
+                                v-if="task.sub_tasks.length > 0"
+                                @click="showTaskDetail(task)"
+                            >
+                                {{ restOfSubTasks(task) }}
+                            </v-list-item-subtitle>
+                        </v-list-item-content>
+                        <TaskMenuBtn
+                            :task=task
+                        />
+                    </v-list-item>
+                </div>
             </div>
         </v-list>
 
@@ -159,19 +213,24 @@
                 type: Array,
                 required: true,
                 default: () => ([])
-            }
+            },
         },
         data: () => ({
             complete_task_list: [],
+            isFilter: false,
+            filteredTasks: [],
         }),
         created () {
-            this.$eventHub.$on('filterTaskList', this.filterTaskList)
         },
         mounted () {
+            this.$eventHub.$on('filterTaskList', this.filterTaskList)
             window.addEventListener('click', this.onClickTaskDetailOuter)
         },
         beforeDestroy () {
             window.removeEventListener('click', this.onClickTaskDetailOuter)
+        },
+        destroyed () {
+            this.$eventHub.$off('filterTaskList')
         },
     	computed: {
     		...mapGetters([
@@ -218,7 +277,13 @@
             filterTaskList (val) {
                 // FilterBtnから渡ってきた値で検索結果を絞る
                 const queryParams = {}
-                // 現在のタスクリストのidの文字列結合もクエリーパラメータに含める
+                if (this.tasks.length) {
+                    const taskIdList = []
+                    for (const i in this.tasks) {
+                        taskIdList.push(this.tasks[i].id)
+                    }
+                    queryParams.taskIdList = taskIdList.join()
+                }
                 const filterValueList = [
                     'selectedPriority',
                     'selectedDeadline',
@@ -235,7 +300,6 @@
                         }
                     }
                 }
-                console.log(queryParams)
                 this.$axios({
                     url: '/api/task/get_filter_task_list/',
                     method: 'GET',
@@ -245,6 +309,8 @@
                 })
                 .then(res => {
                     console.log(res)
+                    this.filteredTasks = res.data
+                    this.isFilter = true
                 })
                 .catch(e => {
                     console.log(e)
@@ -253,7 +319,7 @@
             onClickTaskDetailOuter (e) {
                 // タスク詳細の外側をクリックしたときに、タスク詳細を閉じる
                 if (!this.$el.contains(e.target)) {
-                    this.$eventHub.$emit('closeTaskDetail')
+                    // this.$eventHub.$emit('closeTaskDetail')
                 }
             }
         },

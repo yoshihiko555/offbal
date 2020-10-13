@@ -528,10 +528,16 @@ class TaskViewSet(BaseModelViewSet):
             user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
             user_tasks = user.task_target_user.all()
             today_tasks = self.get_serializer(user_tasks.filter(completed=False, deadline__date=date.today()), many=True)
+            expired_tasks = self.get_serializer(user_tasks.filter(completed=False, deadline__date__lt=date.today()), many=True)
         except mUser.DoesNotExist:
             logger.error('ユーザーが見つかりませんでした。')
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        return Response(today_tasks.data, status=status.HTTP_200_OK)
+
+        res = {
+            'today_tasks': today_tasks.data,
+            'expired_tasks': expired_tasks.data,
+        }
+        return Response(res, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=False)
     def get_future_tasks(self, request):

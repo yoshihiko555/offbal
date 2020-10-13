@@ -15,6 +15,7 @@
             <vs-checkbox
                 color="primary"
                 v-model="cloneTask.completed"
+                @click.stop
                 @change="checkTask()"
                 class="project_complete_checkbox"
                 line-through
@@ -26,6 +27,7 @@
                 v-if="isHover"
                 icon
                 color="primary"
+                @click.stop
                 @click="editTaskContent"
             >
                 <v-icon>mdi-square-edit-outline</v-icon>
@@ -48,6 +50,7 @@
                     class="edit_task_content_submit_btn"
                     icon
                     color="primary"
+                    @click.stop
                     @click="editTaskContentBtn"
                     :disabled="isDisabledEditTaskSubmitBtn"
                 >

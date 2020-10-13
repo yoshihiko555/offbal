@@ -8,6 +8,7 @@
                         color="success"
                         small
                         outlined
+                        @click.stop
                         @click="createNewLabelBtn"
                     >
                         <v-icon
@@ -22,6 +23,7 @@
                         color="success"
                         small
                         outlined
+                        @click.stop
                         @click="addLabelContent"
                     >
                         <v-icon
@@ -58,6 +60,7 @@
                             color="teal accent-3"
                             text-color="white"
                             small
+                            @click.stop
                             @click="addLabelContent"
                         >
                             <v-icon
@@ -84,6 +87,7 @@
                             filter
                         >
                             <vs-option
+                                @click.stop
                                 id="label_vs_option"
                                 v-for='(label, i) in labels'
                                 :key='i'
@@ -98,6 +102,7 @@
                         >
                             <vs-button
                                 dark
+                                @click.stop
                                 @click="endCreateLabel"
                             >
                                 キャンセル
@@ -105,6 +110,7 @@
                             <vs-button
                                 class="create_label_submit_btn ml-2"
                                 color="primary"
+                                @click.stop
                                 @click="addLabelBtn"
                             >
                                 変更
@@ -116,6 +122,7 @@
                             <vs-button
                                 v-if="!isCreateNewLabel"
                                 flat
+                                @click.stop
                                 @click="isCreateNewLabel = true"
                             >
                                 ラベルを作成
@@ -145,6 +152,7 @@
                         >
                             <vs-button
                                 dark
+                                @click.stop
                                 @click="endCreateNewLabel"
                             >
                                 キャンセル
@@ -152,6 +160,7 @@
                             <vs-button
                                 class="create_label_submit_btn ml-2"
                                 color="success"
+                                @click.stop
                                 @click="createLabelBtn"
                                 :disabled="createLabelDisabled"
                             >

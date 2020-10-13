@@ -33,6 +33,7 @@
                                 icon
                                 height="33px"
                                 color="primary"
+                                @click.stop
                                 @click="editSubTaskContent(subtask)"
                             >
                                 <v-icon>mdi-square-edit-outline</v-icon>
@@ -61,6 +62,7 @@
                                 class="edit_sub_task_content_submit_btn"
                                 icon
                                 color="primary"
+                                @click.stop
                                 @click="editSubTaskContentBtn(subtask, i)"
                                 size="small"
                             >
@@ -70,6 +72,7 @@
                                 class="edit_task_content_submit_btn"
                                 icon
                                 color="danger"
+                                @click.stop
                                 @click="deleteSubTask(subtask, i)"
                                 size="small"
                             >

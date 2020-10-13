@@ -158,12 +158,8 @@
             },
             onClickTaskDetailOuter (e) {
                 // タスク詳細の外側をクリックしたときに、タスク詳細を閉じる
-                console.log(this.$el)
-                console.log(e.target)
-                console.log(this.$refs.detail)
                 if (!this.$el.contains(e.target)) {
-                    console.log('外側')
-                    // this.$eventHub.$emit('closeTaskDetail')
+                    this.$eventHub.$emit('closeTaskDetail')
                 }
             }
         },

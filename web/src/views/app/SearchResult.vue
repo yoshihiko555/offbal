@@ -27,7 +27,14 @@
                             <FilterBtn
                                 :isSearchResult=true
                             />
-                            <SortBtn/>
+                            <SortBtn
+                                v-if="!isFilter"
+                                :tasks=searchResult
+                            />
+                            <SortBtn
+                                v-else
+                                :tasks=filteredSearchResult
+                            />
                         </div>
                     </v-col>
                 </v-row>

@@ -32,6 +32,7 @@
                 <v-list-item
                     v-for="(item, i) in priority_items"
                     :key="i"
+                    @click.stop
                     @click="selectPriority(item.value)"
                 >
                     <v-icon

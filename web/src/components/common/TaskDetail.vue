@@ -67,7 +67,7 @@
             TaskDetailUpdateDate,
             TaskDetailHeader,
             TaskDetailLabelArea,
-            TaskDetailSubTaskArea
+            TaskDetailSubTaskArea,
         },
         data: () => ({
             task: {},

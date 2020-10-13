@@ -280,6 +280,11 @@ class Const {
             value: 5,
             color: '#2196F3',
         },
+        {
+            name: '期限なし',
+            value: 6,
+            color: '#2196F3',
+        },
     ]
 }
 

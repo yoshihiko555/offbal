@@ -586,16 +586,16 @@ class TaskViewSet(BaseModelViewSet):
         if request.query_params.get('taskIdList') == None:
             return Response([], status=status.HTTP_200_OK)
 
+        # strIsCompleted = request.query_params.get('isCompletedTask')
+        #
+        # if strIsCompleted != None:
+        #     if strIsCompleted == "true":
+        #         taskList = taskList.filter(completed=True)
+        #     elif strIsCompleted == "false":
+        #         taskList = taskList.filter(completed=False)
+
         taskIdList = list(map(int, request.query_params['taskIdList'].split(',')))
         taskList = Task.objects.filter(id__in=taskIdList)
-
-        strIsCompleted = request.query_params.get('isCompletedTask')
-
-        if strIsCompleted != None:
-            if strIsCompleted == "1":
-                taskList = taskList.filter(completed=True)
-            elif strIsCompleted == "2":
-                taskList = taskList.filter(completed=False)
 
         for key, isMultiple in params.items():
             value = request.query_params.get(key)
@@ -625,6 +625,7 @@ class TaskViewSet(BaseModelViewSet):
         3: 3日以内
         4: 1週間以内
         5: 今月中
+        6: 期限なし
         """
         today = datetime.today()
         tommorow = today + timedelta(days=2)
@@ -638,6 +639,7 @@ class TaskViewSet(BaseModelViewSet):
             '3': ['deadline__range', [today, threeDays]],
             '4': ['deadline__range', [today, nextWeek]],
             '5': ['deadline__range', [today, nextMonth]],
+            '6': ['deadline', None],
         }
 
         return deadLineParams[param][0], deadLineParams[param][1]

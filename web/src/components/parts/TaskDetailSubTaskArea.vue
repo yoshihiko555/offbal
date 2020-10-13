@@ -11,29 +11,33 @@
                     @mouseover="mouseOverSubTask(subtask)"
                     @mouseleave="mouseLeaveSubTask(subtask)"
                 >
-                    <v-col cols="10">
-                        <vs-checkbox
-                            color="success"
-                            v-model="completeSubTaskList"
-                            :val="subtask"
-                            @change="checkSubTask(subtask)"
-                            line-through
-                        >
-                            <v-list-item-title
-                                class="subtask_content"
-                            >{{ subtask.content | truncate(18) }}</v-list-item-title>
-                        </vs-checkbox>
+                    <v-col cols="10" class="subtask_content_wrap">
+                        <!-- <v-list-item-content class="subtask_content_list"> -->
+                            <vs-checkbox
+                                color="success"
+                                v-model="completeSubTaskList"
+                                :val="subtask"
+                                @change="checkSubTask(subtask)"
+                                line-through
+                            >
+                                <v-list-item-subtitle
+                                    class="subtask_content"
+                                >{{ subtask.content | truncate(18) }}</v-list-item-subtitle>
+                            </vs-checkbox>
+                        <!-- </v-list-item-content> -->
                     </v-col>
                     <v-col cols="2">
-                        <v-btn
-                            v-if="isMouseOverSubTask(subtask)"
-                            icon
-                            height="33px"
-                            color="primary"
-                            @click="editSubTaskContent(subtask)"
-                        >
-                            <v-icon>mdi-square-edit-outline</v-icon>
-                        </v-btn>
+                        <!-- <v-list-item-action> -->
+                            <v-btn
+                                v-if="isMouseOverSubTask(subtask)"
+                                icon
+                                height="33px"
+                                color="primary"
+                                @click="editSubTaskContent(subtask)"
+                            >
+                                <v-icon>mdi-square-edit-outline</v-icon>
+                            </v-btn>
+                        <!-- </v-list-item-action> -->
                     </v-col>
                 </v-row>
                 <v-row

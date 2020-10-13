@@ -87,5 +87,5 @@ class TaskFilter(django_filter.FilterSet):
         query_str = '&'.join(t_list) + '|'
         query_str += '|'.join(l_list) + '|'
         query_str += '|'.join(s_list)
-        res = queryset.filter(eval(query_str)).distinct()
+        res = queryset.filter(eval(query_str), completed=False).distinct()
         return res

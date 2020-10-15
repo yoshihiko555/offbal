@@ -28,12 +28,7 @@
                                 :isSearchResult=true
                             />
                             <SortBtn
-                                v-if="!isFilter"
                                 :tasks=searchResult
-                            />
-                            <SortBtn
-                                v-else
-                                :tasks=filteredSearchResult
                             />
                         </div>
                     </v-col>
@@ -58,12 +53,7 @@
             </div>
             <div v-else>
                 <TaskList
-                    v-if="!isFilter"
                     :tasks=searchResult
-                />
-                <TaskList
-                    v-else
-                    :tasks=filteredSearchResult
                 />
             </div>
         </v-container>
@@ -90,8 +80,6 @@
             searchResult: [],
             isLoading: false,
             drawer: false,
-            filteredSearchResult: [],
-            isFilter: false,
         }),
         created () {
             // FilterBtnから渡ってきた値で検索結果を絞る
@@ -105,9 +93,6 @@
         },
         computed: {
             taskLength () {
-                if (this.isFilter) {
-                    return this.filteredSearchResult.length
-                }
                 return this.searchResult.length
             }
         },
@@ -152,13 +137,7 @@
             filterSearchResult (val) {
                 // FilterBtnから渡ってきた値で検索結果を絞る
                 const queryParams = {}
-                if (this.searchResult.length) {
-                    const taskIdList = []
-                    for (const i in this.searchResult) {
-                        taskIdList.push(this.searchResult[i].id)
-                    }
-                    queryParams.taskIdList = taskIdList.join()
-                }
+                queryParams.searchText = this.searchText
                 console.log(queryParams)
                 for (const i in val) {
                     if (val[i] instanceof Array) {
@@ -178,8 +157,7 @@
                 })
                 .then(res => {
                     console.log(res)
-                    this.filteredSearchResult = res.data
-                    this.isFilter = true
+                    this.searchResult = res.data
                 })
                 .catch(e => {
                     console.log(e)

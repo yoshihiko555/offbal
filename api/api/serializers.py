@@ -301,6 +301,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     remind = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
+    is_expired = serializers.SerializerMethodField()
 
     # サブタスク全部（表示に使用)
     sub_tasks = serializers.SerializerMethodField()
@@ -341,6 +342,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'completed_at',
             'start_time',
             'start_time_str',
+            'is_expired',
         ]
 
     def get_label(self, obj):
@@ -378,6 +380,18 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     def get_complete_sub_tasks(self, obj):
         complete_sub_tasks = obj.subtask_target_task.all().filter(completed=True)
         return SubTaskSerializer(complete_sub_tasks, many=True).data
+
+    def get_is_expired(self, obj):
+        # TODO timezone問題
+        if obj.deadline == None:
+            return False
+        now = datetime.now(timezone(timedelta(hours=+9), 'JST'))
+        logger.info(obj.deadline)
+        logger.info(now)
+
+        # if (obj.deadline - now).days < 0:
+            # return True
+        return False
 
     def create(self, validated_data):
 

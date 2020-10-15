@@ -130,6 +130,20 @@ export default new Vuex.Store({
 				Vue.set(section.tasks, index, payload)
 			}
 		},
+		updateTasks (state, payload) {
+			state.detailCategory.tasks.splice(0, state.detailCategory.tasks.length)
+			for (const i in state.detailCategory.sections) {
+				state.detailCategory.sections[i].tasks.splice(0, state.detailCategory.sections[i].tasks.length)
+			}
+			for (const j in payload) {
+				if (payload[j].target_section === 0) {
+					state.detailCategory.tasks.push(payload[j])
+				} else {
+					const section = state.detailCategory.sections.find(section => section.id === payload[j].target_section)
+					section.tasks.push(payload[j])
+				}
+			}
+		},
 		addCompleteTask (state, payload) {
 			state.detailCategory.complete_tasks.push(payload)
 		},

@@ -17,14 +17,14 @@
                     >
                     </vs-checkbox>
                 </v-list-item-action>
-                <v-list-item-content>
+                <v-list-item-content
+                    @click="showTaskDetail(task)"
+                >
                     <v-list-item-title
                         v-text="task.content"
-                        @click="showTaskDetail(task)"
                     ></v-list-item-title>
                     <v-list-item-subtitle
                         v-if="task.sub_tasks.length > 0"
-                        @click="showTaskDetail(task)"
                     >
                         {{ restOfSubTasks(task) }}
                     </v-list-item-subtitle>
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex'
+    import { mapGetters, mapMutations, mapActions } from 'vuex'
     import TaskMenuBtn from '@/components/parts/TaskMenuBtn'
     import TaskDetail from '@/components/common/TaskDetail'
     import _ from 'lodash'
@@ -79,6 +79,9 @@
     		]),
     	},
         methods: {
+            ...mapMutations([
+                'updateTasks',
+            ]),
             ...mapActions([
                 'updateCompleteTasksAction',
             ]),
@@ -117,13 +120,8 @@
             },
             filterTaskList (val) {
                 // FilterBtnから渡ってきた値で検索結果を絞る
-                const queryParams = {}
-                if (this.tasks.length) {
-                    const taskIdList = []
-                    for (const i in this.tasks) {
-                        taskIdList.push(this.tasks[i].id)
-                    }
-                    queryParams.taskIdList = taskIdList.join()
+                const queryParams = {
+                    categoryId: this.detailCategory.id
                 }
                 const filterValueList = [
                     'selectedPriority',
@@ -141,6 +139,7 @@
                         }
                     }
                 }
+                console.log(queryParams)
                 this.$axios({
                     url: '/api/task/get_filter_task_list/',
                     method: 'GET',
@@ -150,7 +149,7 @@
                 })
                 .then(res => {
                     console.log(res)
-                    // TODO フィルターで絞ったやつstoreに反映?
+                    this.updateTasks(res.data)
                 })
                 .catch(e => {
                     console.log(e)

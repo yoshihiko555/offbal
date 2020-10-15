@@ -8,7 +8,7 @@ from rest_framework import (
 )
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db.models import Sum
+from django.db.models import Sum, Q
 
 from .serializers import (
     UserSerializer,
@@ -570,6 +570,7 @@ class TaskViewSet(BaseModelViewSet):
                 3: 3日以内
                 4: 1週間以内
                 5: 今月中
+                6: 期限なし
             selectedLabelList str(ラベルID) ※複数選択の場合,カンマ区切り
             isCompleteTask str(true or false)
             taskList str(タスクID) ※複数選択の場合,カンマ区切り
@@ -589,19 +590,21 @@ class TaskViewSet(BaseModelViewSet):
             'selectedLabelList': 'label__id__in',
         }
 
-        if request.query_params.get('taskIdList') == None:
-            return Response([], status=status.HTTP_200_OK)
+        try:
+            user = mUser.objects.get(auth0_id=request.query_params['auth0_id'])
+            taskList = user.task_target_user.all()
+        except mUser.DoesNotExist:
+            logger.error('ユーザーが見つかりませんでした。')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        # strIsCompleted = request.query_params.get('isCompletedTask')
-        #
-        # if strIsCompleted != None:
-        #     if strIsCompleted == "true":
-        #         taskList = taskList.filter(completed=True)
-        #     elif strIsCompleted == "false":
-        #         taskList = taskList.filter(completed=False)
+        if request.query_params.get('searchText') != None:
+            taskList = self.task_filter(taskList, request.query_params['searchText'])
 
-        taskIdList = list(map(int, request.query_params['taskIdList'].split(',')))
-        taskList = Task.objects.filter(id__in=taskIdList)
+        elif request.query_params.get('categoryId') != None:
+            taskList = taskList.filter(
+                Q(target_category__id=request.query_params['categoryId']) & \
+                Q(completed=False)
+            )
 
         for key, isMultiple in params.items():
             value = request.query_params.get(key)
@@ -650,6 +653,24 @@ class TaskViewSet(BaseModelViewSet):
 
         return deadLineParams[param][0], deadLineParams[param][1]
 
+    def task_filter(self, tasks, value):
+        """
+        検索文字列でタスク絞る
+        """
+
+        t_list = []
+        l_list = []
+        s_list = []
+        qs = list({i.strip() for i in value.split(',')})
+        for q in qs:
+            t_list.append('Q(content__contains="{}")'.format(q))
+            l_list.append('Q(label__name__contains="{}")'.format(q))
+            s_list.append('Q(subtask_target_task__content__contains="{}")'.format(q))
+        query_str = '&'.join(t_list) + '|'
+        query_str += '|'.join(l_list) + '|'
+        query_str += '|'.join(s_list)
+        res = tasks.filter(eval(query_str), completed=False).distinct()
+        return res
 
 class SubTaskViewSet(BaseModelViewSet):
 

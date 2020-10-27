@@ -107,12 +107,14 @@ WSGI_APPLICATION = 'offbal.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# 開発環境
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+# 開発環境 MySQL版
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
@@ -123,6 +125,18 @@ DATABASES = {
 #         'POST': 3306
 #     }
 # }
+
+# 本番環境
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'offbal_db',
+        'USER': 'admin',
+        'PASSWORD': 'admin0000',
+        'HOST': 'offbal-database1.cr3dgiurtqh1.ap-northeast-1.rds.amazonaws.com',
+        'PORT': '3306',
+    }
+}
 
 
 # Password validation
@@ -212,7 +226,7 @@ if DEBUG:
     MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
     CORS_ORIGIN_WHITELIST = (
         'http://localhost:8080',
-        'http://ec2-52-196-50-93.ap-northeast-1.compute.amazonaws.com/',
+        'http://ec2-52-196-50-93.ap-northeast-1.compute.amazonaws.com',
     )
 
 else:

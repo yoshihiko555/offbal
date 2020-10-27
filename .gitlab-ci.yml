@@ -1,0 +1,112 @@
+workflow:
+    - rules:
+        # masterブランチにpushされた時のみ、ジョブを実行
+        - if: '$CI_COMMIT_REF_NAME == "master"'
+          when: always
+
+stages:
+    - build
+    - deploy
+
+# Vueをビルドして、Dockerイメージを作成後、ECRにpush
+vue_build:
+    stage: build
+    image: docker
+    services:
+        - docker:dind
+    rules:
+        - changes:
+            - web/*
+    variables:
+        AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
+    before_script:
+        - . install.sh
+    script:
+        - cd web
+        - npm install
+        - npm run build
+        - docker build -t vue -f Dockerfile_pro .
+        - docker tag vue:latest 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF
+        - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com
+        - docker push 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF
+    # デプロイステージへビルドされたdistディレクトリを共有
+    # S3に配信する時に必要なら使用
+    artifacts:
+        paths:
+            - web/dist/
+
+# DRFのDockerイメージをビルドしてECRにpush
+drf_build:
+    stage: build
+    image: docker
+    services:
+        - docker:dind
+    rules:
+        - changes:
+            - api/*
+    before_script:
+        - . install.sh
+    variables:
+        AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
+    script:
+        - cd api
+        - docker build -t drf .
+        - docker tag drf:latest 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/drf:$CI_BUILD_REF
+        - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com
+        - docker push 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/drf:$CI_BUILD_REF
+
+# ECRにpushされたVueのイメージを元にタスク定義を更新
+s_vue_deploy:
+    stage: deploy
+    image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+    rules:
+        - changes:
+            - web/*
+    script:
+        - apt install -y jq
+        - chmod 777 ecs-deploy
+        - . ecs-deploy -c arn:aws:ecs:ap-northeast-1:669310959254:cluster/nginx -n offbal-nginx-service -i 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF -t 300
+
+# ECRにpushされたDRFのイメージを元にタスク定義を更新
+s_drf_deploy:
+    stage: deploy
+    image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+    rules:
+        - changes:
+            - api/*
+    script:
+        - apt install -y jq
+        - chmod 777 ecs-deploy
+        - . ecs-deploy -c arn:aws:ecs:ap-northeast-1:669310959254:cluster/nginx -n off-drf-service -i 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/drf:$CI_BUILD_REF -t 300
+
+# ここから下にぶっちー用のデプロイを定義
+# k_vue_deploy:
+#     stage: deploy
+#     rules:
+#         - changes:
+#             - web/*
+#     # デプロイ時にアクセスキー等が必要になったら、ここで更新する
+#     # K_AWS_ACCESS_KEY_IDはGitlabの設定画面から定義する
+#     variables:
+#         AWS_ACCESS_KEY_ID: $K_AWS_ACCESS_KEY_ID
+#         AWS_SECRET_ACCESS_KEY: $K_AWS_SECRET_ACCESS_KEY
+#     script:
+#         # ここにデプロイまでの流れを記述
+#     # vueのビルドで生成されてdistディレクトリを取得
+#     dependencies:
+#         - vue_build
+#
+# k_drf_deploy:
+#     stage: deploy
+#     rules:
+#         - changes:
+#             - api/*
+#     # デプロイ時にアクセスキー等が必要になったら、ここで更新する
+#     # K_AWS_ACCESS_KEY_IDはGitlabの設定画面から定義する
+#     variables:
+#         AWS_ACCESS_KEY_ID: $K_AWS_ACCESS_KEY_ID
+#         AWS_SECRET_ACCESS_KEY: $K_AWS_SECRET_ACCESS_KEY
+#     script:
+#         # ここにデプロイまでの流れを記述

@@ -212,6 +212,7 @@ if DEBUG:
     MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
     CORS_ORIGIN_WHITELIST = (
         'http://localhost:8080',
+        'http://ec2-52-196-50-93.ap-northeast-1.compute.amazonaws.com/',
     )
 
 else:

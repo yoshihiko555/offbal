@@ -8,7 +8,7 @@ export default {
 	install: function (Vue, options) {
 		// デフォルト定義
 		const http = axios.create({
-			baseURL: process.env.NODE_ENV !== 'production' ? 'http://localhost:8000/' : '',
+			baseURL: process.env.NODE_ENV !== 'production' ? 'http://localhost:8000/' : 'http://ec2-52-196-50-93.ap-northeast-1.compute.amazonaws.com:8000/',
 			xsrfCookieName: 'csrftoken',
 			xsrfHeaderName: 'X-CSRFTOKEN',
 			timeout: 10000,

@@ -1,0 +1,26 @@
+# workflow:
+#     - rules:
+#         - if: '$CI_COMMIT_REF_NAME == "master"'
+#           when: always
+
+stages:
+    - build
+    - deploy
+
+vue_build:
+    stage: build
+    image: docker
+    services:
+        - docker: dind
+    rules:
+        - changes:
+            - web/*
+    before_script:
+        - . install.sh
+    script:
+        - npm install
+        - npm run build
+        - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com
+        - docker build -t vue -f Dockerfile_pro .
+        - docker tag vue:latest 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF
+        - docker push 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF

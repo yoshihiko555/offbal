@@ -4,57 +4,58 @@
 #           when: always
 
 stages:
-  - build
-  - deploy
+    - build
+  # - deploy
 
 # Vueをビルドして、Dockerイメージを作成後、ECRにpush
 vue_build:
-  stage: build
-    # image: docker
-    # services:
-    #     - docker:dind
+    stage: build
+    image: docker
+    services:
+        - docker:dind
     # rules:
-    #     - changes:
-    #         - web/*
-    # variables:
-    #     AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
-    #     AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
-    # before_script:
-    #     - . install.sh
-  script:
-        # - cd web
-        # - npm install
-        # - npm run build
-        # - docker build -t vue -f Dockerfile_pro .
-        # - docker tag vue:latest 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF
-        # - cd ..
-        # - echo $S_AWS_ACCESS_KEY_ID
-  - echo $CI_COMMIT_REF_NAME
-  - echo $AWS_ACCESS_KEY_ID
-  - echo $TEST_VALUE
-        # - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com
-        # - docker push 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF
+        # - changes:
+            # - web/*
+    variables:
+        AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
+    before_script:
+        - . install.sh
+    script:
+        - cd web
+        - npm install
+        - npm run build
+        - docker build -t vue -f Dockerfile_pro .
+        - docker tag vue:latest 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF
+        - cd ..
+        - echo $S_AWS_ACCESS_KEY_ID
+        - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com
+        - docker push 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF
     # デプロイステージへビルドされたdistディレクトリを共有
     # S3に配信する時に必要なら使用
-    # artifacts:
-    #     paths:
-    #         - dist/
+    artifacts:
+        paths:
+            - dist/
 
 # DRFのDockerイメージをビルドしてECRにpush
-# drf_build:
-#     stage: build
-#     image: docker
-#     services:
-#         - docker:dind
-#     rules:
-#         - changes:
-#             - api/*
-#         - . install.sh
-#     script:
-#         - cd api
-#         - docker build -t drf .
-#         - docker tag drf:latest 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/drf:$CI_BUILD_REF
-#         - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com
-#         - docker push 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/drf:$CI_BUILD_REF
+drf_build:
+    stage: build
+    image: docker
+    services:
+        - docker:dind
+    # rules:
+    #     - changes:
+    #         - api/*
+    before_script:
+        - . install.sh
+    variables:
+        AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
+    script:
+        - cd api
+        - docker build -t drf .
+        - docker tag drf:latest 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/drf:$CI_BUILD_REF
+        - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com
+        - docker push 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/drf:$CI_BUILD_REF
 #
 # s_vue_deploy:

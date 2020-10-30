@@ -1,8 +1,7 @@
-workflow:
-    - rules:
-        # masterブランチにpushされた時のみ、ジョブを実行
-        - if: '$CI_COMMIT_REF_NAME == "master"'
-          when: always
+# workflow:
+#   rules:
+#     - if: '$CI_COMMIT_REF_NAME == "master"'
+#       when: always
 
 stages:
     - build
@@ -16,7 +15,7 @@ vue_build:
         - docker:dind
     rules:
         - changes:
-            - web/*
+            - web/**/*
     variables:
         AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
         AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
@@ -44,7 +43,7 @@ drf_build:
         - docker:dind
     rules:
         - changes:
-            - api/*
+            - api/**/*
     before_script:
         - . install.sh
     variables:
@@ -63,11 +62,12 @@ s_vue_deploy:
     image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
     rules:
         - changes:
-            - web/*
+            - web/**/*
     script:
         - apt install -y jq
         - chmod 777 ecs-deploy
-        - . ecs-deploy -c arn:aws:ecs:ap-northeast-1:669310959254:cluster/nginx -n offbal-nginx-service -i 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF -t 300
+        - ls
+        - bash ecs-deploy -c arn:aws:ecs:ap-northeast-1:669310959254:cluster/nginx -n offbal-nginx-service -i 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF -t 300
 
 # ECRにpushされたDRFのイメージを元にタスク定義を更新
 s_drf_deploy:
@@ -75,18 +75,18 @@ s_drf_deploy:
     image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
     rules:
         - changes:
-            - api/*
+            - api/**/*
     script:
         - apt install -y jq
         - chmod 777 ecs-deploy
-        - . ecs-deploy -c arn:aws:ecs:ap-northeast-1:669310959254:cluster/nginx -n off-drf-service -i 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/drf:$CI_BUILD_REF -t 300
+        - bash ecs-deploy -c arn:aws:ecs:ap-northeast-1:669310959254:cluster/nginx -n off-drf-service -i 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/drf:$CI_BUILD_REF -t 300
 
 # ここから下にぶっちー用のデプロイを定義
 # k_vue_deploy:
 #     stage: deploy
 #     rules:
 #         - changes:
-#             - web/*
+#             - web/**/*
 #     # デプロイ時にアクセスキー等が必要になったら、ここで更新する
 #     # K_AWS_ACCESS_KEY_IDはGitlabの設定画面から定義する
 #     variables:
@@ -102,7 +102,7 @@ s_drf_deploy:
 #     stage: deploy
 #     rules:
 #         - changes:
-#             - api/*
+#             - api/**/*
 #     # デプロイ時にアクセスキー等が必要になったら、ここで更新する
 #     # K_AWS_ACCESS_KEY_IDはGitlabの設定画面から定義する
 #     variables:

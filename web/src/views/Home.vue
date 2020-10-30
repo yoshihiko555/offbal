@@ -6,6 +6,7 @@
                 <v-col cols='12' class="text-center">
                     <h1>Welcome offbal !</h1>
                     <p>Please sign in</p>
+                    <p>A</p>
                 </v-col>
             </v-row>
         </v-container>

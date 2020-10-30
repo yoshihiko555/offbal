@@ -63,10 +63,13 @@ s_vue_deploy:
     rules:
         - changes:
             - web/**/*
+    variables:
+        AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
     script:
         - apt install -y jq
-        - chmod 777 ecs-deploy
-        - . ecs-deploy -c arn:aws:ecs:ap-northeast-1:669310959254:cluster/nginx -n offbal-nginx-service -i 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF -t 300
+        - chmod 777 ecs-deploy-develop/ecs-deploy
+        - ./ecs-deploy-develop/ecs-deploy -c arn:aws:ecs:ap-northeast-1:669310959254:cluster/nginx -n offbal-nginx-service -i 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF -t 300
 
 # ECRにpushされたDRFのイメージを元にタスク定義を更新
 s_drf_deploy:
@@ -75,10 +78,13 @@ s_drf_deploy:
     rules:
         - changes:
             - api/**/*
+    variables:
+        AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
+        AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
     script:
         - apt install -y jq
-        - chmod 777 ecs-deploy
-        - . ecs-deploy -c arn:aws:ecs:ap-northeast-1:669310959254:cluster/nginx -n off-drf-service -i 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/drf:$CI_BUILD_REF -t 300
+        - chmod 777 ecs-deploy-develop/ecs-deploy
+        - ./ecs-deploy-develop/ecs-deploy -c arn:aws:ecs:ap-northeast-1:669310959254:cluster/nginx -n off-drf-service -i 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/drf:$CI_BUILD_REF -t 300
 
 # ここから下にぶっちー用のデプロイを定義
 # k_vue_deploy:

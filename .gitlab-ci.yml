@@ -12,9 +12,9 @@ vue_build:
     image: docker
     services:
         - docker:dind
-    rules:
-        - changes:
-            - web/*
+    # rules:
+    #     - changes:
+    #         - web/*
     before_script:
         - . install.sh
     script:

@@ -15,7 +15,7 @@ vue_build:
         - docker:dind
     rules:
         - changes:
-            - web/*
+            - web/**/*
     variables:
         AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
         AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
@@ -43,7 +43,7 @@ drf_build:
         - docker:dind
     rules:
         - changes:
-            - api/*
+            - api/**/*
     before_script:
         - . install.sh
     variables:
@@ -62,7 +62,7 @@ s_vue_deploy:
     image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
     rules:
         - changes:
-            - web/*
+            - web/**/*
     script:
         - apt install -y jq
         - chmod 777 ecs-deploy
@@ -74,7 +74,7 @@ s_drf_deploy:
     image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
     rules:
         - changes:
-            - api/*
+            - api/**/*
     script:
         - apt install -y jq
         - chmod 777 ecs-deploy
@@ -85,7 +85,7 @@ s_drf_deploy:
 #     stage: deploy
 #     rules:
 #         - changes:
-#             - web/*
+#             - web/**/*
 #     # デプロイ時にアクセスキー等が必要になったら、ここで更新する
 #     # K_AWS_ACCESS_KEY_IDはGitlabの設定画面から定義する
 #     variables:
@@ -101,7 +101,7 @@ s_drf_deploy:
 #     stage: deploy
 #     rules:
 #         - changes:
-#             - api/*
+#             - api/**/*
 #     # デプロイ時にアクセスキー等が必要になったら、ここで更新する
 #     # K_AWS_ACCESS_KEY_IDはGitlabの設定画面から定義する
 #     variables:

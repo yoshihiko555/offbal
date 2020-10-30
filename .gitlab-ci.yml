@@ -15,9 +15,9 @@ vue_build:
     # rules:
     #     - changes:
     #         - web/*
-    variables:
-        AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
-        AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
+    # variables:
+    #     AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
+    #     AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
     before_script:
         - . install.sh
     script:
@@ -27,7 +27,12 @@ vue_build:
         - docker build -t vue -f Dockerfile_pro .
         - docker tag vue:latest 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF
         - cd ..
-        - echo $S_AWS_ACCESS_KEY_ID
+        # - echo $S_AWS_ACCESS_KEY_ID
         - echo $AWS_ACCESS_KEY_ID
         - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com
         - docker push 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF
+    # デプロイステージへビルドされたdistディレクトリを共有
+    # S3に配信する時に必要なら使用
+    artifacts:
+        paths:
+            - dist/

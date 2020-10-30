@@ -5,7 +5,7 @@
 
 stages:
     - build
-  # - deploy
+    - deploy
 
 # Vueをビルドして、Dockerイメージを作成後、ECRにpush
 vue_build:
@@ -59,9 +59,9 @@ drf_build:
 s_vue_deploy:
     stage: deploy
     image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
-    rules:
-        - changes:
-            - web/*
+    # rules:
+    #     - changes:
+    #         - web/*
     scritp:
         - apt install -y jq
         - chmod 777 ecs-deploy
@@ -70,9 +70,9 @@ s_vue_deploy:
 s_drf_deploy:
     stage: deploy
     image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
-    rules:
-        - changes:
-            - api/*
+    # rules:
+    #     - changes:
+    #         - api/*
     script:
         - apt install -y jq
         - chmod 777 ecs-deploy

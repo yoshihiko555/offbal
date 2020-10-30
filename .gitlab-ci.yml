@@ -4,12 +4,12 @@
 #           when: always
 
 stages:
-    - build
-    - deploy
+  - build
+  - deploy
 
 # Vueをビルドして、Dockerイメージを作成後、ECRにpush
 vue_build:
-    stage: build
+  stage: build
     # image: docker
     # services:
     #     - docker:dind
@@ -21,7 +21,7 @@ vue_build:
     #     AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
     # before_script:
     #     - . install.sh
-    script:
+  script:
         # - cd web
         # - npm install
         # - npm run build
@@ -29,8 +29,9 @@ vue_build:
         # - docker tag vue:latest 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF
         # - cd ..
         # - echo $S_AWS_ACCESS_KEY_ID
-        - echo $AWS_ACCESS_KEY_ID
-        - echo $TEST_VALUE
+  - echo $CI_COMMIT_REF_NAME
+  - echo $AWS_ACCESS_KEY_ID
+  - echo $TEST_VALUE
         # - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com
         # - docker push 669310959254.dkr.ecr.ap-northeast-1.amazonaws.com/offbal-nginx:$CI_BUILD_REF
     # デプロイステージへビルドされたdistディレクトリを共有

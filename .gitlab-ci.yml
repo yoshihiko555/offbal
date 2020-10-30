@@ -11,7 +11,7 @@ vue_build:
     stage: build
     image: docker
     services:
-        - docker: dind
+        - docker:dind
     rules:
         - changes:
             - web/*

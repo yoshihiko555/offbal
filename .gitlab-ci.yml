@@ -24,6 +24,7 @@ vue_build:
     before_script:
         - . install.sh
     script:
+        - printenv
         - cd web
         - npm install
         - npm run build

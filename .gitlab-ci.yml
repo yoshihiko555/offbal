@@ -1,7 +1,7 @@
-workflow:
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
-      when: always
+# workflow:
+#   rules:
+#     - if: '$CI_COMMIT_REF_NAME == "master"'
+#       when: always
 
 stages:
     - build
@@ -19,10 +19,12 @@ vue_build:
     variables:
         AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
         AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
+        VUE_APP_TEST_ENV: sample
     before_script:
         - . install.sh
     script:
         - cd web
+        - printenv
         - npm install
         - npm run build
         - docker build -t vue -f Dockerfile_pro .

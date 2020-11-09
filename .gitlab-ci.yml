@@ -19,10 +19,18 @@ vue_build:
     variables:
         AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
         AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
-        VUE_APP_BASE_URL: $S_VUE_APP_BASE_URL
-        VUE_APP_REDIRECT_URL: $S_VUE_APP_REDIRECT_URL
+        # VUE_APP_BASE_URL: $S_VUE_APP_BASE_URL
+        # VUE_APP_REDIRECT_URL: $S_VUE_APP_REDIRECT_URL
     before_script:
         - . install.sh
+        - |
+          if ['$GITLAB_USER_LOGIN' == 'shutotakizawa']; then
+            echo "shutotakizawaのコミット"
+            VUE_APP_BASE_URL=$S_VUE_APP_BASE_URL
+            VUE_APP_REDIRECT_URL=$S_VUE_APP_REDIRECT_URL
+          else
+            echo "それ以外"
+          fi
     script:
         - cd web
         - printenv

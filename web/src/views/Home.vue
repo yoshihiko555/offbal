@@ -26,7 +26,6 @@ export default {
     data: () => ({
     }),
     created () {
-    	console.log(process.env.VUE_APP_TEST_ENV)
     },
     computed: {
     },

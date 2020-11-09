@@ -19,7 +19,8 @@ vue_build:
     variables:
         AWS_ACCESS_KEY_ID: $S_AWS_ACCESS_KEY_ID
         AWS_SECRET_ACCESS_KEY: $S_AWS_SECRET_ACCESS_KEY
-        VUE_APP_TEST_ENV: sample
+        VUE_APP_BASE_URL: $S_VUE_APP_BASE_URL
+        VUE_APP_REDIRECT_URL: $S_VUE_APP_REDIRECT_URL
     before_script:
         - . install.sh
     script:

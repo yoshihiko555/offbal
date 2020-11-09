@@ -20,11 +20,15 @@ export default class AuthService {
     // auth0.WebAuth のインスタンスをAPI および Client
     // 資格情報で作る
     auth0 = new auth0.WebAuth({
-        domain: 'dev-orr54nx8.us.auth0.com',
-        clientID: 'PBarwrwjyH8XR7ItR9dTVKilLZRhhEeh',
-        redirectUri: 'http://ec2-52-196-50-93.ap-northeast-1.compute.amazonaws.com/',
-//        redirectUri: 'http://localhost:8080',
-        audience: 'https://offbal-api.com.br',
+        domain: process.env.VUE_APP_AUTH_DOMAIN,
+        clientID: process.env.VUE_APP_AUTH_CLIENT_ID,
+        redirectUri: process.env.VUE_APP_REDIRECT_URL,
+        audience: process.env.VUE_APP_AUTH_AUDIENCE,
+//         domain: 'dev-orr54nx8.us.auth0.com',
+//         clientID: 'PBarwrwjyH8XR7ItR9dTVKilLZRhhEeh',
+//         redirectUri: 'http://ec2-52-196-50-93.ap-northeast-1.compute.amazonaws.com/',
+// //        redirectUri: 'http://localhost:8080',
+//         audience: 'https://offbal-api.com.br',
         responseType: 'token id_token',
         scope: 'openid profile email'
     });

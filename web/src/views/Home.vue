@@ -26,7 +26,6 @@ export default {
     data: () => ({
     }),
     created () {
-
         console.log(VUE_APP_BASE_URL)
     },
     computed: {

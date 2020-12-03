@@ -138,7 +138,6 @@
                 // FilterBtnから渡ってきた値で検索結果を絞る
                 const queryParams = {}
                 queryParams.searchText = this.searchText
-                console.log(queryParams)
                 for (const i in val) {
                     if (val[i] instanceof Array) {
                         if (val[i].length) {

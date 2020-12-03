@@ -120,7 +120,7 @@
                 const userMetadata = { signup: true }
 
                 try {
-                    await this.$axios(options)
+                    const res = await this.$axios(options).catch(e => e)
                     await auth.updateUserMetadata(userMetadata, (err, res) => {
                         if (err) {
                             console.log(err)
@@ -129,7 +129,7 @@
                         }
                     })
                     this.isShow = false
-                    await this.toAppPage(this)
+                    // await this.toAppPage(this)
                     this.loading = false
                     // 一旦サインアップ時は、リロード処理を入れるように修正
                     this.$router.go({

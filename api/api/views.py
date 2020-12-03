@@ -59,7 +59,6 @@ class SignupView(generics.CreateAPIView, GetLoginUserMixin):
             mSetting.objects.create(
                 target_user=user
             )
-
             # 選択されたカテゴリーを作成してユーザーに紐付ける
             categories = []
             req_categories = request.data['categories']

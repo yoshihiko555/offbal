@@ -22,7 +22,7 @@ export default class AuthService {
     auth0 = new auth0.WebAuth({
         domain: 'dev-orr54nx8.us.auth0.com',
         clientID: 'PBarwrwjyH8XR7ItR9dTVKilLZRhhEeh',
-        redirectUri: 'http://localhost:8080',
+        redirectUri: process.env.VUE_APP_AUTH_REDIRECT_URI,
         audience: 'https://offbal-api.com.br',
         responseType: 'token id_token',
         scope: 'openid profile email'
@@ -174,10 +174,12 @@ export default class AuthService {
     	.then(res => {
     		console.log(res)
     		axios({
-    			url: `https://${process.env.VUE_APP_AUTH_DOMAIN}/api/v2/users/${sub}`,
-    			method: 'DELETE',
-    			headers: { Authorization: `Bearer ${res.data.access_token}` },
-    			data: {}
+                url: '/api/auth/delete_auth_user/',
+                method: 'DELETE',
+                data: {
+                    url: `https://${process.env.VUE_APP_AUTH_DOMAIN}/api/v2/users/${sub}`,
+                    headers: { Authorization: `Bearer ${res.data.access_token}` },
+                }
     		})
     		.then(res => {
     			console.log(res)
@@ -222,21 +224,23 @@ export default class AuthService {
 
     // 管理APIへのアクセストークンを取得する静的メソッド
     static getManageAPIToken () {
-        const url = `https://${process.env.VUE_APP_AUTH_DOMAIN}/oauth/token`
-        const data = {
-	    	grant_type: 'client_credentials',
-	    	client_id: process.env.VUE_APP_MANAGE_CLIENT_ID,
-	    	client_secret: process.env.VUE_APP_MANAGE_CLIENT_SECRET,
-	    	audience: `https://${process.env.VUE_APP_AUTH_DOMAIN}/api/v2/`,
+        const http = axios.create({
+            baseURL: `${process.env.VUE_APP_AUTH_REDIRECT_URI}:8000/`,
+			xsrfCookieName: 'csrftoken',
+			xsrfHeaderName: 'X-CSRFTOKEN',
+			timeout: 10000,
+        })
+        const options = {
+            url: '/api/auth/get_oauth_token/',
+            method: 'POST',
+            data: {
+                url: `https://${process.env.VUE_APP_AUTH_DOMAIN}/oauth/token`,
+                grant_type: 'client_credentials',
+    	    	client_id: process.env.VUE_APP_MANAGE_CLIENT_ID,
+    	    	client_secret: process.env.VUE_APP_MANAGE_CLIENT_SECRET,
+    	    	audience: `https://${process.env.VUE_APP_AUTH_DOMAIN}/api/v2/`,
+            }
         }
-    	const options = {
-    			url: url,
-    			method: 'POST',
-	    		headers: {
-	    			 'content-type': 'application/x-www-form-urlencoded',
-                },
-	    		data: qs.stringify(data),
-    	}
-        return axios(options)
+        return http(options)
     }
 }

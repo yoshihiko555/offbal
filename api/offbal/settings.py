@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework_jwt',
     'django_filters',
     'api.apps.ApiConfig',
+    'corsheaders',
 ]
 
 REST_FRAMEWORK = {
@@ -76,6 +77,7 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -208,15 +210,23 @@ if DEBUG:
         level = logging.DEBUG,
         format = '''%(levelname)s %(asctime)s %(pathname)s:%(funcName)s:%(lineno)s
         %(message)s''')
-    INSTALLED_APPS += ['corsheaders']
-    MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
-    CORS_ORIGIN_WHITELIST = (
-        'http://localhost:8080',
-    )
 
 else:
     logging.basicConfig(
         level = logging.DEBUG,
         format = '''%(levelname)s %(asctime)s %(pathname)s:%(funcName)s 行数:%(lineno)s:%(lineno)s
-        %(message)s'''
-    )
+        %(message)s''')
+
+# CORS_ORIGIN_WHITELIST = (
+#     'http://localhost',
+# )
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS = default_headers + (
+    'access-control-allow-origin',
+)
+
+CORS_ALLOW_CREDENTIALS = True

@@ -55,6 +55,8 @@ from .utils import (
 from dateutil.relativedelta import relativedelta
 
 import logging
+import requests
+import urllib
 logger = logging.getLogger(__name__)
 
 
@@ -875,3 +877,30 @@ class SettingViewSet(BaseModelViewSet):
     permission_classes = (permissions.AllowAny,)
     queryset = mSetting.objects.all()
     serializer_class = SettingSerializer
+
+
+class AuthView(BaseModelViewSet):
+    permission_classes = (permissions.AllowAny,)
+    queryset = mUser.objects.all()
+    serializer_class = UserSerializer
+
+    @action(methods=['POST'], detail=False)
+    def get_oauth_token(self, request):
+        url = request.data['url']
+        header = {'Content-Type': 'application/x-www-form-urlencoded'}
+        payload = {
+            'grant_type': request.data['grant_type'],
+            'client_id': request.data['client_id'],
+            'client_secret': request.data['client_secret'],
+            'audience': request.data['audience'],
+        }
+        payload = urllib.parse.urlencode(payload)
+        response = requests.post(url, data=payload, headers=header)
+        return Response(response.json(), status=status.HTTP_200_OK)
+
+    @action(methods=['DELETE'], detail=False)
+    def delete_auth_user(self, request):
+        url = request.data['url']
+        header = request.data['headers']
+        response = requests.delete(url, headers=header)
+        return Response(response.json(), status=status.HTTP_200_OK)

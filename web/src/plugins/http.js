@@ -8,10 +8,19 @@ export default {
 	install: function (Vue, options) {
 		// デフォルト定義
 		const http = axios.create({
-			baseURL: process.env.NODE_ENV !== 'production' ? 'http://localhost:8000/' : '',
+			baseURL: `${process.env.VUE_APP_AUTH_REDIRECT_URI}:8000/`,
 			xsrfCookieName: 'csrftoken',
 			xsrfHeaderName: 'X-CSRFTOKEN',
 			timeout: 10000,
+			headers: {
+				common: {
+					'Content-Type': 'application/json;charset=utf-8',
+					'Access-Control-Allow-Origin': `${process.env.VUE_APP_AUTH_REDIRECT_URI}:8000`,
+					'X-Requested-With': 'XMLHttpRequest',
+					'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With, X-HTTP-Method-Override, Accept',
+					'Access-Control-Allow-Methods': 'PUT, DELETE, OPTIONS, POST, GET'
+				}
+			}
         })
 		// リクエストのデフォルト定義
 		http.interceptors.request.use((config) => {

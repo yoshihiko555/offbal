@@ -22,9 +22,9 @@
                 :tasks=detailCategory.tasks
             />
 
-            <SectionList/>
+            <!-- <SectionList/> -->
 
-            <CreateSectionBtn
+            <!-- <CreateSectionBtn
                 v-show="isCreateBtn"
                 @open-create='openCreate'
             />
@@ -36,7 +36,7 @@
                 v-show="isEditField"
                 ref='edit'
                 @close-edit='closeEdit'
-            />
+            /> -->
             <CompleteTaskList
                 :complete_tasks=detailCategory.complete_tasks
             />

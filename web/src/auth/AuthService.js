@@ -22,7 +22,7 @@ export default class AuthService {
     auth0 = new auth0.WebAuth({
         domain: 'dev-orr54nx8.us.auth0.com',
         clientID: 'PBarwrwjyH8XR7ItR9dTVKilLZRhhEeh',
-        redirectUri: process.env.VUE_APP_AUTH_REDIRECT_URI,
+        redirectUri: `${process.env.VUE_APP_AUTH_REDIRECT_URI}:8080/`,
         audience: 'https://offbal-api.com.br',
         responseType: 'token id_token',
         scope: 'openid profile email'

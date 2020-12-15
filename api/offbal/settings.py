@@ -11,6 +11,8 @@ from cryptography.hazmat.backends import default_backend
 env = environ.Env()
 env.read_env('.env')
 
+AWS_ENV = env.bool('AWS_ENV', default=False)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 
@@ -18,10 +20,13 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'y*ax+p&t$9(_!0$sq96*voyhz^*e^nb51bst6fs5b%!#a4_dcw'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if AWS_ENV:
+    DEBUG = False
+else:
+    DEBUG = True
 
 ALLOWED_HOSTS = [
     '*'
@@ -109,36 +114,37 @@ WSGI_APPLICATION = 'offbal.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-# 開発環境
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-# 開発環境 MySQL版
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'offbal_db',
-#         'USER': 'user',
-#         'PASSWORD': 'password',
-#         'HOST': 'db',
-#         'POST': 3306
-#     }
-# }
-
-# 本番環境
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'offbal_db',
-        'USER': 'admin',
-        'PASSWORD': 'admin0000',
-        'HOST': 'offbal-database1.cr3dgiurtqh1.ap-northeast-1.rds.amazonaws.com',
-        'PORT': '3306',
+if DEBUG:
+    # 開発環境
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+    # 開発環境 MySQL版
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.mysql',
+    #         'NAME': 'offbal_db',
+    #         'USER': 'user',
+    #         'PASSWORD': 'password',
+    #         'HOST': 'db',
+    #         'POST': 3306
+    #     }
+    # }
+else:
+    # 本番環境
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'offbal_db',
+            'USER': 'admin',
+            'PASSWORD': 'admin0000',
+            'HOST': 'offbal-database1.cr3dgiurtqh1.ap-northeast-1.rds.amazonaws.com',
+            'PORT': '3306',
+        }
+    }
 
 
 # Password validation
@@ -219,17 +225,11 @@ JWT_AUTH = {
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
 
-if DEBUG:
-    logging.basicConfig(
-        level = logging.DEBUG,
-        format = '''%(levelname)s %(asctime)s %(pathname)s:%(funcName)s:%(lineno)s
-        %(message)s''')
 
-else:
-    logging.basicConfig(
-        level = logging.DEBUG,
-        format = '''%(levelname)s %(asctime)s %(pathname)s:%(funcName)s 行数:%(lineno)s:%(lineno)s
-        %(message)s''')
+logging.basicConfig(
+    level = logging.DEBUG,
+    format = '''%(levelname)s %(asctime)s %(pathname)s:%(funcName)s 行数:%(lineno)s:%(lineno)s
+    %(message)s''')
 
 # CORS_ORIGIN_WHITELIST = (
 #     'http://localhost',

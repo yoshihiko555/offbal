@@ -175,12 +175,100 @@ class Const {
 
     TIMEZONE_OPTIONS = [
         {
-            label: '(UTC-08:00) Los Angeles',
-            value: '(UTC-08:00) Los Angeles',
+            label: '(UTC-10:00) ハワイ',
+            value: 'Pacific/Honolulu',
         },
         {
-            label: '(UTC+09:00) Tokyo',
-            value: '(UTC+09:00) Tokyo',
+            label: '(UTC-09:00) アラスカ',
+            value: 'America/Anchorage',
+        },
+        {
+            label: '(UTC-08:00) 太平洋標準時(米国およびカナダ)',
+            value: 'America/Los_Angeles',
+        },
+        {
+            label: '(UTC-07:00) アリゾナ',
+            value: 'America/Phoenix',
+        },
+        {
+            label: '(UTC-06:00) 中部標準時(米国およびカナダ)',
+            value: 'America/Chicago',
+        },
+        {
+            label: '(UTC-05:00) 東部標準時(米国およびカナダ)',
+            value: 'America/New_York',
+        },
+        {
+            label: '(UTC-04:00) 大西洋標準時(カナダ)',
+            value: 'America/Halifax',
+        },
+        {
+            label: '(UTC-03:00) ブエノスアイレス',
+            value: 'America/Argentina/Buenos_Aires',
+        },
+        {
+            label: '(UTC-02:00) 協定世界時-2',
+            value: 'Etc/GMT+2',
+        },
+        {
+            label: '(UTC-01:00) カーボベルデ諸島',
+            value: 'Atlantic/Cape_Verde',
+        },
+        {
+            label: '(UTC+00:00) ロンドン',
+            value: 'Europe/London',
+        },
+        {
+            label: '(UTC+01:00) ベルリン、ローマ',
+            value: 'Europe/Berlin',
+        },
+        {
+            label: '(UTC+02:00) アテネ、ブカレスト',
+            value: 'Europe/Istanbul',
+        },
+        {
+            label: '(UTC+03:00) ナイロビ',
+            value: 'Africa/Nairobi',
+        },
+        {
+            label: '(UTC+04:00) モスクワ、サンクトペテルブルグ',
+            value: 'Europe/Moscow',
+        },
+        {
+            label: '(UTC+05:00) タシケント',
+            value: 'Asia/Tashkent',
+        },
+        {
+            label: '(UTC+06:00) アスタナ',
+            value: 'Asia/Almaty',
+        },
+        {
+            label: '(UTC+07:00) バンコク、ハノイ、ジャカルタ',
+            value: 'Asia/Bangkok',
+        },
+        {
+            label: '(UTC+08:00) 北京、重慶、香港、ウルムチ',
+            value: 'Asia/Shanghai',
+        },
+        {
+            label: '(UTC+09:00) 大阪、札幌、東京',
+            value: 'Asia/Tokyo',
+        },
+        {
+            label: '(UTC+10:00) ホバート',
+            value: 'Australia/Hobart',
+        },
+        {
+            label: '(UTC+11:00) ソロモン諸島',
+            value: 'Pacific/Guadalcanal',
+        },
+        {
+            label: '(UTC+12:00) フィジー、マーシャル諸島',
+            value: 'Pacific/Fiji',
+        },
+        {
+            label: '(UTC+13:00) サモア',
+            value: 'Pacific/Apia',
         },
     ]
 

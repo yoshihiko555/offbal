@@ -4,7 +4,21 @@ from datetime import (
     timedelta
 )
 from django.utils import timezone as tz
-
+import pytz
+from .models import (
+    mUser,
+    Week,
+    mSetting,
+    Category,
+    mUserCategoryRelation,
+    CategoryMemberShip,
+    Section,
+    Task,
+    SubTask,
+    Label,
+    Karma,
+    DefaultCategory,
+)
 
 def utc_to_jst(timestamp_utc):
     """
@@ -14,6 +28,15 @@ def utc_to_jst(timestamp_utc):
     timestamp_jst = datetime.strftime(datetime_jst, '%Y-%m-%d %H:%M:%S')
     return timestamp_jst
 
+def utc_to_localtime(timestamp_utc, user_id):
+    """
+    UTCを設定したタイムゾーンの日時に変換するメソッド
+    """
+    setting = mUser.objects.get(id=user_id).setting_target_user
+    user_timezone = setting.time_zone
+    datetime_jst = timestamp_utc.astimezone(pytz.timezone(user_timezone))
+    timestamp_jst = datetime.strftime(datetime_jst, '%Y-%m-%d %H:%M:%S')
+    return timestamp_jst
 
 class ReturnDateTime():
     '''

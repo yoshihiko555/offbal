@@ -10,8 +10,8 @@ services:
         volumes:
             - ./api/:/usr/src/offbal/api/
         tty: true
-        # depends_on:
-        #     - db
+        depends_on:
+            - db
 
     web:
         build: ./web
@@ -23,19 +23,19 @@ services:
         volumes:
             - ./web/:/usr/src/offbal/web/
         tty: true
-        # depends_on:
-        #     - api
-    # db:
-    #     image: mysql:latest
-    #     container_name: offbal-db
-    #     restart: always
-    #     command: --default-authentication-plugin=mysql_native_password
-    #     environment:
-    #         MYSQL_DATABASE: offbal_db
-    #         MYSQL_USER: user
-    #         MYSQL_PASSWORD: password
-    #         MYSQL_ALLOW_EMPTY_PASSWORD: ‘yes’
-    #     volumes:
-    #         - ./mysql/:/var/lib/mysql/
-    #     ports:
-    #         - '3306:3306'
+        depends_on:
+            - api
+    db:
+        image: mysql:latest
+        container_name: offbal-db
+        restart: always
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_DATABASE: offbal_db
+            MYSQL_USER: user
+            MYSQL_PASSWORD: password
+            MYSQL_ALLOW_EMPTY_PASSWORD: ‘yes’
+        volumes:
+            - ./mysql/:/var/lib/mysql/
+        ports:
+            - '3306:3306'

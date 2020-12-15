@@ -30,11 +30,11 @@ class UserManager(BaseUserManager):
         mSetting.objects.create(
             target_user=user
         )
-        category = Category.objects.create(
-            creator=user,
-            name='インボックス'
-        )
-        category.member.add(user)
+        # category = Category.objects.create(
+        #     creator=user,
+        #     name='インボックス'
+        # )
+        # category.member.add(user)
 
         return user
 
@@ -154,8 +154,31 @@ class mSetting(models.Model):
         GERMAN = 'german', _('German')
 
     class Timezone(models.TextChoices):
-        AMERICA_LOS_ANGELES = '(UTC-08:00) Los Angeles', _('America Los Angeles')
-        ASIA_TOKYO = '(UTC+09:00) Tokyo', _('Asia Tokyo')
+        HONOLULU = 'Pacific/Honolulu', _('(UTC-10:00) ハワイ')
+        ANCHORAGE = 'America/Anchorage', _('(UTC-09:00) アラスカ')
+        LOS_ANGELES = 'America/Los_Angeles', _('(UTC-08:00) 太平洋標準時(米国およびカナダ)')
+        PHOENIX = 'America/Phoenix', _('(UTC-07:00) アリゾナ')
+        CHICAGO = 'America/Chicago', _('(UTC-06:00) 中部標準時(米国およびカナダ)')
+        NEW_YORK = 'America/New_York', _('(UTC-05:00) 東部標準時(米国およびカナダ)')
+        HALIFAX = 'America/Halifax', _('(UTC-04:00) 大西洋標準時(カナダ)')
+        BUENOS_AIRES = 'America/Argentina/Buenos_Aires', _('(UTC-03:00) ブエノスアイレス')
+        GMT2 = 'Etc/GMT+2', _('(UTC-02:00) 協定世界時-2')
+        CAPE_VERDE = 'Atlantic/Cape_Verde', _('(UTC-01:00) カーボベルデ諸島')
+        LONDON = 'Europe/London', _('(UTC+00:00) ロンドン')
+        BERLIN = 'Europe/Berlin', _('(UTC+01:00) ベルリン、ローマ')
+        ISTANBUL = 'Europe/Istanbul', _('(UTC+02:00) アテネ、ブカレスト')
+        NAIROBI = 'Africa/Nairobi', _('(UTC+03:00) ナイロビ')
+        MASCOW = 'Europe/Moscow', _('(UTC+04:00) モスクワ、サンクトペテルブルグ')
+        TASHKENT = 'Asia/Tashkent', _('(UTC+05:00) タシケント')
+        ALMATY = 'Asia/Almaty', _('(UTC+06:00) アスタナ')
+        BANGKOK = 'Asia/Bangkok', _('(UTC+07:00) バンコク、ハノイ、ジャカルタ')
+        SHANGHAI = 'Asia/Shanghai', _('(UTC+08:00) 北京、重慶、香港、ウルムチ')
+        TOKYO = 'Asia/Tokyo', _('(UTC+09:00) 大阪、札幌、東京')
+        HABART = 'Australia/Hobart', _('(UTC+10:00) ホバート')
+        GUADALCANAL = 'Pacific/Guadalcanal', _('(UTC+11:00) ソロモン諸島')
+        FIJI = 'Pacific/Fiji', _('(UTC+12:00) フィジー、マーシャル諸島')
+        APIA = 'Pacific/Apia', _('(UTC+13:00) サモア')
+
 
     class Theme(models.TextChoices):
         DEFAULT = 'default', _('Default')
@@ -185,7 +208,7 @@ class mSetting(models.Model):
     time_zone = models.CharField(
         max_length=50,
         choices=Timezone.choices,
-        default=Timezone.ASIA_TOKYO
+        default=Timezone.TOKYO
     )
 
     time_format = models.IntegerField(

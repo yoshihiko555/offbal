@@ -26,7 +26,7 @@ from django.utils import timezone as timezone_django
 from django.db.models import Q
 
 from .utils import (
-    utc_to_jst,
+    utc_to_localtime,
 )
 
 logging.basicConfig(
@@ -290,6 +290,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     start_time_str = serializers.CharField(write_only=True, allow_blank=True)
 
     target_user = serializers.CharField(read_only=True)
+    target_user_id = serializers.ReadOnlyField(source='target_user.id')
     target_category = serializers.ReadOnlyField(source='target_category.id')
     target_category_name = serializers.CharField(read_only=True, source='target_category.name')
     target_category_color = serializers.CharField(read_only=True, source='target_category.color')
@@ -315,6 +316,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         fields = [
             'id',
             'target_user',
+            'target_user_id',
             'target_category',
             'target_category_name',
             'target_category_color',
@@ -351,28 +353,28 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     def get_start_time(self, obj):
         if obj.start_time == None:
             return ''
-        return utc_to_jst(obj.start_time)
+        return utc_to_localtime(obj.start_time, obj.target_user_id)
 
     def get_deadline(self, obj):
         if obj.deadline == None:
             return ''
-        return utc_to_jst(obj.deadline)
+        return utc_to_localtime(obj.deadline, obj.target_user_id)
 
     def get_remind(self, obj):
         if obj.remind == None:
             return ''
-        return utc_to_jst(obj.remind)
+        return utc_to_localtime(obj.remind, obj.target_user_id)
 
     def get_created_at(self, obj):
-        return utc_to_jst(obj.created_at)
+        return utc_to_localtime(obj.created_at, obj.target_user_id)
 
     def get_updated_at(self, obj):
-        return utc_to_jst(obj.updated_at)
+        return utc_to_localtime(obj.updated_at, obj.target_user_id)
 
     def get_completed_at(self, obj):
         if obj.completed_at == None:
             return ''
-        return utc_to_jst(obj.completed_at)
+        return utc_to_localtime(obj.completed_at, obj.target_user_id)
 
     def get_sub_tasks(self, obj):
         return SubTaskSerializer(obj.subtask_target_task.all(), many=True).data
@@ -521,15 +523,15 @@ class SubTaskSerializer(DynamicFieldsModelSerializer):
         ]
 
     def get_created_at(self, obj):
-        return utc_to_jst(obj.created_at)
+        return utc_to_localtime(obj.created_at, obj.target_task.target_user.id)
 
     def get_updated_at(self, obj):
-        return utc_to_jst(obj.updated_at)
+        return utc_to_localtime(obj.updated_at, obj.target_task.target_user.id)
 
     def get_completed_at(self, obj):
         if obj.completed_at == None:
             return ''
-        return utc_to_jst(obj.completed_at)
+        return utc_to_localtime(obj.completed_at, obj.target_task.target_user.id)
 
     def get_target_section(self, obj):
         try:
@@ -577,10 +579,10 @@ class LabelSerializer(DynamicFieldsModelSerializer):
         ]
 
     def get_created_at(self, obj):
-        return utc_to_jst(obj.created_at)
+        return utc_to_localtime(obj.created_at, obj.author.id)
 
     def get_updated_at(self, obj):
-        return utc_to_jst(obj.updated_at)
+        return utc_to_localtime(obj.updated_at, obj.author.id)
 
 
     def create(self, validated_data):
@@ -615,10 +617,10 @@ class KarmaSerializer(DynamicFieldsModelSerializer):
         ]
 
     def get_created_at(self, obj):
-        return utc_to_jst(obj.created_at)
+        return utc_to_localtime(obj.created_at, obj.target_user.id)
 
     def get_updated_at(self, obj):
-        return utc_to_jst(obj.updated_at)
+        return utc_to_localtime(obj.updated_at, obj.target_user.id)
 
 
 class DefaultCategorySerializer(DynamicFieldsModelSerializer):

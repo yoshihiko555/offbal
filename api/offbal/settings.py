@@ -192,7 +192,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'api.mUser'
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 EMAIL_HOST = 'smtp.googlemail.com'
 EMAIL_PORT = 587
@@ -204,6 +204,9 @@ AUTH0_DOMAIN = 'dev-orr54nx8.us.auth0.com'
 API_IDENTIFIER = 'https://offbal-api.com.br'
 PUBLIC_KEY = None
 JWT_ISSUER = None
+
+if not DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 if AUTH0_DOMAIN:
     jsonurl = request.urlopen('https://' + AUTH0_DOMAIN + '/.well-known/jwks.json')

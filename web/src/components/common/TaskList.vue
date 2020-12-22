@@ -28,6 +28,9 @@
                     >
                         {{ restOfSubTasks(task) }}
                     </v-list-item-subtitle>
+                    <v-list-item-subtitle
+                        v-else
+                    >no subtasks</v-list-item-subtitle>
                 </v-list-item-content>
                 <TaskMenuBtn
                     :task=task
@@ -112,7 +115,7 @@
             restOfSubTasks (task) {
                 const subTasks = task.sub_tasks.length
                 const completeSubTasks = task.complete_sub_tasks.length
-                return completeSubTasks + ' of ' + subTasks + ' task completed.'
+                return completeSubTasks + ' of ' + subTasks + ' subtask completed.'
             },
             taskDeadline (task) {
                 if (task.deadline === '') return '----'

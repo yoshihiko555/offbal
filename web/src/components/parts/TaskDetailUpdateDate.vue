@@ -136,7 +136,7 @@
                 icon
                 @click="showTaskDeleteConfirm"
             >
-                <v-icon>mdi-delete</v-icon>
+                <i class='bx bxs-trash task_delete_btn' style='color:#e60b0b'></i>
             </v-btn>
         </v-card-actions>
     </v-list>
@@ -183,3 +183,8 @@
         }
     }
 </script>
+<style lang="scss" scoped>
+    .task_delete_btn {
+        font-size: 25px;
+    }
+</style>

@@ -117,13 +117,25 @@
             toPage (route, param) {
             	// カテゴリー or ラベルならparamを格納する
             	const params = param || ''
-            	this.$router.push({
-            		name: route,
-            		params: {
-            			name: params.name,
-            		}
-            	})
+                // カテゴリ間の移動の判定
+                if (this.$router.currentRoute.name === route) {
+                    // カテゴリ名が違ったら移動する
+                    if (param !== undefined && this.$router.currentRoute.params.name !== param.name) {
+                        this.pagePush(route, params)
+                    }
+                // 異なるメニューへの移動の判定
+                } else {
+                    this.pagePush(route, params)
+                }
                 this.$eventHub.$emit('closeTaskDetail')
+            },
+            pagePush (route, params) {
+                this.$router.push({
+                    name: route,
+                    params: {
+                        name: params.name,
+                    }
+                })
             },
             createLabel () {
                 this.$refs.label.open()

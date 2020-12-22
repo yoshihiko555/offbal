@@ -1,5 +1,8 @@
 <template>
     <v-list>
+        <v-card-subtitle
+            v-if="cloneTask.sub_tasks != undefined && cloneTask.sub_tasks.length > 0"
+        >サブタスク一覧</v-card-subtitle>
         <v-list-item
             v-for="(subtask, i) in cloneTask.sub_tasks"
             :key="i"
@@ -76,7 +79,7 @@
                                 @click="deleteSubTask(subtask, i)"
                                 size="small"
                             >
-                                <i class='bx bx-minus'></i>
+                                <i class='bx bx-trash' style='color:#e60b0b'></i>
                             </v-btn>
                         </v-card-actions>
                     </v-col>

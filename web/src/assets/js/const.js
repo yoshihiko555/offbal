@@ -183,7 +183,7 @@ class Const {
             value: 'America/Anchorage',
         },
         {
-            label: '(UTC-08:00) 太平洋標準時(米国およびカナダ)',
+            label: '(UTC-08:00) 太平洋標準時',
             value: 'America/Los_Angeles',
         },
         {
@@ -191,15 +191,15 @@ class Const {
             value: 'America/Phoenix',
         },
         {
-            label: '(UTC-06:00) 中部標準時(米国およびカナダ)',
+            label: '(UTC-06:00) 中部標準時',
             value: 'America/Chicago',
         },
         {
-            label: '(UTC-05:00) 東部標準時(米国およびカナダ)',
+            label: '(UTC-05:00) 東部標準時',
             value: 'America/New_York',
         },
         {
-            label: '(UTC-04:00) 大西洋標準時(カナダ)',
+            label: '(UTC-04:00) 大西洋標準時',
             value: 'America/Halifax',
         },
         {
@@ -223,7 +223,7 @@ class Const {
             value: 'Europe/Berlin',
         },
         {
-            label: '(UTC+02:00) アテネ、ブカレスト',
+            label: '(UTC+02:00) アテネ',
             value: 'Europe/Istanbul',
         },
         {
@@ -231,7 +231,7 @@ class Const {
             value: 'Africa/Nairobi',
         },
         {
-            label: '(UTC+04:00) モスクワ、サンクトペテルブルグ',
+            label: '(UTC+04:00) モスクワ',
             value: 'Europe/Moscow',
         },
         {
@@ -243,11 +243,11 @@ class Const {
             value: 'Asia/Almaty',
         },
         {
-            label: '(UTC+07:00) バンコク、ハノイ、ジャカルタ',
+            label: '(UTC+07:00) バンコク、ハノイ',
             value: 'Asia/Bangkok',
         },
         {
-            label: '(UTC+08:00) 北京、重慶、香港、ウルムチ',
+            label: '(UTC+08:00) 北京、重慶、香港',
             value: 'Asia/Shanghai',
         },
         {
@@ -263,7 +263,7 @@ class Const {
             value: 'Pacific/Guadalcanal',
         },
         {
-            label: '(UTC+12:00) フィジー、マーシャル諸島',
+            label: '(UTC+12:00) フィジー',
             value: 'Pacific/Fiji',
         },
         {

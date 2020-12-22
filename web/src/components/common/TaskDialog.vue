@@ -157,6 +157,12 @@
                 })
                 .then(res => {
                     console.log(res)
+                    const category = res.data.target_category_name
+                    if (this.$route.path !== `/myapp/category/${category}`) {
+                        this.$router.push({
+                            path: `/myapp/category/${category}`
+                        })
+                    }
                     this.addTask(res.data)
                 })
                 .catch(e => {

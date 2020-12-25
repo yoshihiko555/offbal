@@ -102,7 +102,7 @@
 
 <style lang='scss' scoped>
     .create_task_field_wrap {
-        margin-top: 5px;
+        margin-top: 25px;
         height: 60px;
         .task_input_area {
             width: 100%;

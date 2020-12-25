@@ -64,6 +64,7 @@
     import CompleteTaskList from '@/components/common/CompleteTaskList'
     import TaskDetail from '@/components/common/TaskDetail'
     import TodayTaskCountBtn from '@/components/parts/TodayTaskCountBtn'
+    import NoTaskMsgArea from '@/components/parts/NoTaskMsgArea'
 
     import { mapGetters, mapActions } from 'vuex'
 
@@ -81,6 +82,7 @@
             CompleteTaskList,
             TaskDetail,
             TodayTaskCountBtn,
+            NoTaskMsgArea,
         },
         data: () => ({
             isCreateBtn: true,        // セクション追加ボタン

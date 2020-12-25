@@ -398,6 +398,12 @@ class Const {
             type: 'created_at',
         },
     ]
+
+    NO_TASK_MSG = [
+        'タスクが存在しません。',
+        '今日締め切りのタスクはありません。',
+        '近日中のタスクはありません。'
+    ]
 }
 
 export { Const }

@@ -71,7 +71,7 @@ class BaseModelViewSet(viewsets.ModelViewSet, GetLoginUserMixin, CreateKarmaMixi
 
 class UserViewSet(BaseModelViewSet):
 
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = mUser.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'auth0_id'
@@ -83,7 +83,7 @@ class UserViewSet(BaseModelViewSet):
 
 class CategoryViewSet(BaseModelViewSet):
 
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_class = CategoryFilter
@@ -263,7 +263,7 @@ class CategoryViewSet(BaseModelViewSet):
 
 class SectionViewSet(BaseModelViewSet):
 
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = Section.objects.all()
     serializer_class = SectionSerializer
 
@@ -280,7 +280,7 @@ class SectionViewSet(BaseModelViewSet):
 
 class TaskViewSet(BaseModelViewSet):
 
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
@@ -676,7 +676,7 @@ class TaskViewSet(BaseModelViewSet):
 
 class SubTaskViewSet(BaseModelViewSet):
 
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = SubTask.objects.all()
     serializer_class = SubTaskSerializer
 
@@ -744,7 +744,7 @@ class SubTaskViewSet(BaseModelViewSet):
 
 class LabelViewSet(BaseModelViewSet):
 
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = Label.objects.all()
     serializer_class = LabelSerializer
 
@@ -809,7 +809,7 @@ class LabelViewSet(BaseModelViewSet):
 
 class KarmaViewSet(BaseModelViewSet):
 
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = Karma.objects.all()
     serializer_class = KarmaSerializer
     filter_class = KarmaFilter
@@ -874,7 +874,7 @@ class KarmaViewSet(BaseModelViewSet):
 
 
 class SettingViewSet(BaseModelViewSet):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = mSetting.objects.all()
     serializer_class = SettingSerializer
 

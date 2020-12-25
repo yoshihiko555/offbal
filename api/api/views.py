@@ -83,7 +83,7 @@ class AppInitView(generics.ListAPIView, GetLoginUserMixin):
     '''
     アプリ初期描画時に必要なデータを取得
     '''
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def list(self, request, *args, **kwargs):
         self.set_auth0_id(request)
@@ -122,7 +122,7 @@ class DefaultCategoriesView(generics.ListAPIView, GetLoginUserMixin):
     '''
     デフォルトカテゴリー一覧を返却する
     '''
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = DefaultCategory.objects.all()
     serializer_class = DefaultCategorySerializer
 
@@ -152,7 +152,7 @@ class DefaultCategoriesView(generics.ListAPIView, GetLoginUserMixin):
 
 
 class SearchView(generics.ListAPIView, GetLoginUserMixin):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     filter_class = TaskFilter

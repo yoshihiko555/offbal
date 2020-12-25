@@ -11,7 +11,9 @@
             <TaskList :tasks='todayTasks' />
         </div>
         <div v-else>
-            <p class="today_subtitle">今日締め切りのタスクはありません。</p>
+            <NoTaskMsgArea
+                :type=1
+            />
         </div>
     </div>
 </template>
@@ -19,10 +21,13 @@
 <script>
     import moment from 'moment'
     import TaskList from '@/components/common/TaskList'
+    import NoTaskMsgArea from '@/components/parts/NoTaskMsgArea'
+
     export default {
         name: 'TodayScheduled',
         components: {
         	TaskList,
+            NoTaskMsgArea,
         },
         data: () => ({
         	drawer: false,
@@ -68,9 +73,6 @@
         }
         .today_title {
             height: 50px;
-        }
-        .today_subtitle {
-            padding-left: 6px;
         }
     }
 </style>

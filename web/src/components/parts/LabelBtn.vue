@@ -94,42 +94,53 @@
                 </div>
                 <!-- ラベル作成モード -->
                 <div v-else>
-                    <v-row class="label_input_area">
-                        <v-spacer></v-spacer>
-                        <v-col cols="10" class="pa-0">
-                            <vs-input
-                                placeholder="ラベルを新規作成する"
-                                v-model="labelData.name"
-                                @keypress.prevent.enter.exact="changeCreateLabelSubmitValue"
-                                @keyup.prevent.enter.exact="setCreateLabelName"
-                            >
-                                <template #icon>
-                                    <i class="bx bx-label"></i>
-                                </template>
-                                <template v-if="createLabelDuplicate" #message-danger>
-                                    既にこのラベルは作成されています。
-                                </template>
-                            </vs-input>
-                        </v-col>
-                        <v-spacer></v-spacer>
-                    </v-row>
-                    <v-row>
-                        <v-spacer></v-spacer>
-                        <v-col cols="10" class="pa-0">
-                            <v-card-actions>
-                                <vs-button
-                                    dark
-                                    @click="endCreateNewLabel"
-                                >キャンセル</vs-button>
-                                <vs-button
-                                    color="success"
-                                    @click="createLabelBtn"
-                                    :disabled="createLabelDisabled"
-                                >作成</vs-button>
-                            </v-card-actions>
-                        </v-col>
-                        <v-spacer></v-spacer>
-                    </v-row>
+                    <ValidationObserver ref="label" v-slot="{ invalid }">
+                        <v-row class="label_input_area">
+                            <v-spacer></v-spacer>
+                            <v-col cols="10" class="pa-0">
+                                <ValidationProvider v-slot="{ errors }" name="ラベル" rules="max:20">
+                                    <vs-input
+                                        placeholder="ラベルを新規作成する"
+                                        v-model="labelData.name"
+                                        @keypress.prevent.enter.exact="changeCreateLabelSubmitValue"
+                                        @keyup.prevent.enter.exact="setCreateLabelName"
+                                    >
+                                        <template #icon>
+                                            <i class="bx bx-label"></i>
+                                        </template>
+                                        <template
+                                            v-if="createLabelDuplicate"
+                                            #message-danger
+                                        >既にこのラベルは作成されています。
+                                        </template>
+                                        <template
+                                            v-else
+                                            #message-danger
+                                        >{{ errors[0] }}
+                                        </template>
+                                    </vs-input>
+                                </ValidationProvider>
+                            </v-col>
+                            <v-spacer></v-spacer>
+                        </v-row>
+                        <v-row>
+                            <v-spacer></v-spacer>
+                            <v-col cols="10" class="pa-0">
+                                <v-card-actions>
+                                    <vs-button
+                                        dark
+                                        @click="endCreateNewLabel"
+                                    >キャンセル</vs-button>
+                                    <vs-button
+                                        color="success"
+                                        @click="createLabelBtn"
+                                        :disabled="createLabelDisabled || invalid"
+                                    >作成</vs-button>
+                                </v-card-actions>
+                            </v-col>
+                            <v-spacer></v-spacer>
+                        </v-row>
+                    </ValidationObserver>
                 </div>
             </v-card>
         </v-menu>
@@ -269,7 +280,8 @@
             },
             createLabelBtn () {
                 // ラベル作成の送信ボタンが押されたらラベル作成
-                if (this.labelData.name.length === 0) return
+                const length = this.labelData.name.length
+                if (length === 0 || length > 20) return
                 this.isLoadingUpdateLabel = true
                 this.$axios({
                     url: '/api/label/',

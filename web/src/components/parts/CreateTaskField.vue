@@ -2,21 +2,24 @@
     <div
         class="create_task_field_wrap"
     >
-        <!-- <v-form
-            @submit.prevent
-        > -->
+        <ValidationObserver ref="task">
             <v-row
-                class="mx-5 mt-5 mb-2"
+                class="mx-2 mt-5 mb-2"
             >
-                <vs-input
-                    v-model="task.content"
-                    placeholder="新規タスクを追加"
-                    @keyup.enter="create"
-                    @keypress="setCreate"
-                >
-                </vs-input>
+                <ValidationProvider class="task_input_area" v-slot="{ errors }" name='タスク' rules="max:100">
+                    <vs-input
+                        v-model="task.content"
+                        placeholder="新規タスクを追加"
+                        @keyup.enter="create"
+                        @keypress="setCreate"
+                    >
+                        <template #message-danger>
+                            {{ errors[0] }}
+                        </template>
+                    </vs-input>
+                </ValidationProvider>
             </v-row>
-        <!-- </v-form> -->
+        </ValidationObserver>
     </div>
 </template>
 
@@ -52,6 +55,7 @@
             taskSubmitValue: false
         }),
         created () {
+            this.$eventHub.$on('initCreateTaskField', this.init)
         },
         methods: {
             ...mapMutations([
@@ -62,7 +66,7 @@
             },
             create () {
                 const length = this.task.content.length
-                if (length === 0 || !this.taskSubmitValue) return
+                if (length === 0 || length > 100 || !this.taskSubmitValue) return
                 this.task.category_id = this.category.id
                 this.$axios({
                     url: '/api/task/',
@@ -98,6 +102,11 @@
 
 <style lang='scss' scoped>
     .create_task_field_wrap {
+        margin-top: 5px;
+        height: 60px;
+        .task_input_area {
+            width: 100%;
+        }
         .vs-input-parent::v-deep {
             width: 100%;
             .vs-input {

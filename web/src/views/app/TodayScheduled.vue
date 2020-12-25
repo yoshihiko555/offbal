@@ -1,22 +1,23 @@
 <template>
     <div id='today-list' class='main_content_wrap' :class="{ 'is-task-drawer': drawer }" v-show="loading">
-        <h1 class="mb-4">Today<span class="today_date pl-3">{{ todayDate }}</span></h1>
+        <h1 class="mb-4 today_title">Today<span class="today_date pl-3">{{ todayDate }}</span></h1>
         <div v-show="expiredTasks.length > 0" class="mb-4">
-            <p class="ma-0 ml-1">期限切れのタスク</p>
+            <p class="ma-0 ml-1 today_subtitle">期限切れのタスク</p>
             <TaskList :tasks='expiredTasks' />
             <v-divider/>
         </div>
         <div v-if='todayTasks.length > 0'>
-            <p class='ma-0 ml-1'>今日のタスク</p>
+            <p class='ma-0 ml-1 today_subtitle'>今日締め切りのタスク</p>
             <TaskList :tasks='todayTasks' />
         </div>
         <div v-else>
-            <p>今日のタスクはありません。</p>
+            <p class="today_subtitle">今日締め切りのタスクはありません。</p>
         </div>
     </div>
 </template>
 
 <script>
+    import moment from 'moment'
     import TaskList from '@/components/common/TaskList'
     export default {
         name: 'TodayScheduled',
@@ -26,14 +27,15 @@
         data: () => ({
         	drawer: false,
         	todayTasks: [],
+            createdAtTodayTasks: [],
             expiredTasks: [],
             todayDate: null,
             loading: false,
         }),
         created () {
         	this.$eventHub.$on('changeToggleDrawer', this.changeToggleDrawer)
-            const date = new Date()
-            this.todayDate = `${date.getMonth() + 1}/${date.getDate()}`
+            const todayDate = moment()
+            this.todayDate = todayDate.format('YYYY-MM-DD')
         	this.$axios({
         		url: '/api/task/get_today_tasks/',
         		method: 'GET',
@@ -59,7 +61,16 @@
 </script>
 
 <style lang="scss" scoped>
-    .today_date {
-        font-size: 0.8em;
+    .main_content_wrap {
+        padding-left: 5px;
+        .today_date {
+            font-size: 0.8em;
+        }
+        .today_title {
+            height: 50px;
+        }
+        .today_subtitle {
+            padding-left: 6px;
+        }
     }
 </style>

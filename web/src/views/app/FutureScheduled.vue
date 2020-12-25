@@ -4,7 +4,7 @@
         <div
             v-for="(data, key) in futureTasks"
             :key="key"
-            class="mb-4"
+            class="mb-4 future_subtitle"
         >
             <p class="ma-0 ml-1">{{ key }}</p>
             <TaskList :tasks='data' />
@@ -68,4 +68,11 @@
 </script>
 
 <style lang="scss" scoped>
+    .main_content_wrap {
+        padding-left: 5px;
+
+        .future_subtitle {
+            padding-left: 6px;
+        }
+    }
 </style>

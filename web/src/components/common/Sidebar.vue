@@ -136,6 +136,7 @@
                         name: params.name,
                     }
                 })
+                this.$eventHub.$emit('initCreateTaskField')
             },
             createLabel () {
                 this.$refs.label.open()

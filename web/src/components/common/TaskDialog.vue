@@ -18,7 +18,7 @@
                         cols="11"
                         class="task_dialog_task_input_area"
                     >
-                        <ValidationProvider v-slot="{ errors }" name='タスク' rules="required">
+                        <ValidationProvider name='タスク' rules="required|max:100">
                             <v-textarea
                                 class="mt-3"
                                 outlined
@@ -28,9 +28,6 @@
                                 no-resize
                                 :counter="100"
                             >
-                                <template #message-danger>
-                                    {{ errors[0] }}
-                                </template>
                             </v-textarea>
                         </ValidationProvider>
                     </v-col>

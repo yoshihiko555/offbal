@@ -1,8 +1,7 @@
 <template>
-    <v-list>
-        <v-card-subtitle
-            v-if="cloneTask.sub_tasks != undefined && cloneTask.sub_tasks.length > 0"
-        >サブタスク一覧</v-card-subtitle>
+    <v-list
+        class="task_detail_subtask_area_wrap"
+    >
         <v-list-item
             v-for="(subtask, i) in cloneTask.sub_tasks"
             :key="i"
@@ -10,7 +9,7 @@
             <v-container class="ma-0 pa-0">
                 <v-row
                     v-if="!isEditSubTask(subtask)"
-                    class="sub_task_area_wrap"
+                    class="subtask_area_wrap subtask_show_area"
                     @mouseover="mouseOverSubTask(subtask)"
                     @mouseleave="mouseLeaveSubTask(subtask)"
                 >
@@ -44,24 +43,31 @@
                         <!-- </v-list-item-action> -->
                     </v-col>
                 </v-row>
+
                 <v-row
                     v-else
-                    class="sub_task_area_wrap"
+                    class="subtask_area_wrap"
                 >
                     <v-col cols="9">
-                        <vs-input
-                            v-model="cloneEditSubTaskData.content"
-                            @keypress.prevent.enter.exact="changeEditSubTaskSubmitValue"
-                            @keyup.prevent.enter.exact="setEditSubTaskContent(subtask, i)"
-                        >
-                            <template #icon>
-                                <i class="bx bx-message-alt-detail"></i>
-                            </template>
-                        </vs-input>
+                        <ValidationProvider class="subtask_edit_area" v-slot="{ errors }" name="サブタスク" rules="max:100">
+                            <vs-input
+                                v-model="cloneEditSubTaskData.content"
+                                @keypress.prevent.enter.exact="changeEditSubTaskSubmitValue"
+                                @keyup.prevent.enter.exact="setEditSubTaskContent(subtask, i)"
+                            >
+                                <template #icon>
+                                    <i class="bx bx-message-alt-detail"></i>
+                                </template>
+                                <template #message-danger>
+                                    {{ errors[0] }}
+                                </template>
+                            </vs-input>
+                        </ValidationProvider>
                     </v-col>
                     <v-col cols="3">
                         <v-card-actions class="pa-0 ma-0">
                             <v-btn
+                                v-if="subtaskEditInvalid == false"
                                 class="edit_sub_task_content_submit_btn"
                                 icon
                                 color="primary"
@@ -70,6 +76,17 @@
                                 size="small"
                             >
                                 <i class='bx bx-check'></i>
+                            </v-btn>
+                            <v-btn
+                                v-else
+                                class="edit_sub_task_content_submit_btn"
+                                icon
+                                color="primary"
+                                @click.stop
+                                @click="endEditSubTaskContent()"
+                                size="small"
+                            >
+                                <i class='bx bx-x'></i>
                             </v-btn>
                             <v-btn
                                 class="edit_task_content_submit_btn"
@@ -87,14 +104,20 @@
             </v-container>
         </v-list-item>
         <v-list-item
-            class="create_sub_task_area"
+            class="subtask_input_area_wrap"
         >
-            <vs-input
-                v-model="createSubTaskData.content"
-                placeholder="新規サブタスクを追加"
-                @keyup.enter="createSubTask"
-                @keypress="setCreateSubTask"
-            ></vs-input>
+            <ValidationProvider class="subtask_input_area" v-slot="{ errors }" name="サブタスク" rules="max:100">
+                <vs-input
+                    v-model="createSubTaskData.content"
+                    placeholder="新規サブタスクを追加"
+                    @keyup.enter="createSubTask"
+                    @keypress="setCreateSubTask"
+                >
+                    <template #message-danger>
+                        {{ errors[0] }}
+                    </template>
+                </vs-input>
+            </ValidationProvider>
         </v-list-item>
     </v-list>
 </template>
@@ -139,6 +162,10 @@
         watch: {
         },
         computed: {
+            subtaskEditInvalid () {
+                const length =  this.cloneEditSubTaskData.content.length
+                return (length === 0 || length > 100) ? true : false
+            },
         },
         methods: {
             ...mapMutations([
@@ -193,7 +220,7 @@
             setEditSubTaskContent (subtask, i) {
                 // サブタスク編集の入力エリアでenterが押されたら更新
                 const length = this.cloneEditSubTaskData.content.length
-                if (!this.editSubTaskSubmitValue) return
+                if (length > 100 || !this.editSubTaskSubmitValue) return
                 if (length === 0) {
                     this.cloneTask.sub_tasks.splice(i, 1)
                     this.deleteSubTaskAction(this.cloneEditSubTaskData.id)
@@ -248,7 +275,7 @@
             createSubTask () {
                 // サブタスクを作成する
                 const length = this.createSubTaskData.content.length
-                if (length === 0 || !this.subTaskSubmitValue) return
+                if (length === 0 || length > 100 || !this.subTaskSubmitValue) return
                 this.createSubTaskData.target_task = this.task.id
                 this.$axios({
                     url: '/api/sub_task/',
@@ -273,13 +300,32 @@
     }
 </script>
 <style lang="scss" scoped>
-    .vs-input-parent::v-deep {
-        width: 100%;
-        .vs-input {
-            width: 100%;
+    .task_detail_subtask_area_wrap {
+        .error_msg {
+            height: 10px;
+            color: red;
+            padding: 0px 10px;
+            font-size: 13px;
         }
-    }
-    .sub_task_area_wrap {
-        height: 65px;
+        .vs-input-parent::v-deep {
+            width: 100%;
+            .vs-input {
+                width: 100%;
+            }
+        }
+        .subtask_area_wrap {
+            height: 68px;
+        }
+        .subtask_show_area {
+            padding-top: 8px;
+        }
+        .subtask_input_area_wrap {
+            height: 73px;
+            .subtask_input_area {
+                width: 100%;
+                height: 100%;
+                padding-top: 13px;
+            }
+        }
     }
 </style>

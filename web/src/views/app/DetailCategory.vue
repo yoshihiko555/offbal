@@ -150,17 +150,21 @@
 </script>
 
 <style lang="scss" scoped>
-    .detail_category_header {
-        display: flex;
-        align-items: center;
+    .main_content_wrap {
+        padding-left: 5px;
+        .detail_category_header {
+            height: 50px;
+            display: flex;
+            align-items: center;
 
-        .category_title {
-            display: inline-block;
+            .category_title {
+                display: inline-block;
+            }
         }
-    }
-    .operation_btn_wrap::v-deep {
-        .vs-button {
-            display: inline-block;
+        .operation_btn_wrap::v-deep {
+            .vs-button {
+                display: inline-block;
+            }
         }
     }
     .today_todo_count_wrap::v-deep {

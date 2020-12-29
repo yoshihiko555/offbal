@@ -76,6 +76,7 @@
             endTime: '',
         }),
         created () {
+            this.$eventHub.$off('setDeadline', this.setEndTime)
             this.$eventHub.$on('setDeadline', this.setEndTime)
         },
         mounted: function () {

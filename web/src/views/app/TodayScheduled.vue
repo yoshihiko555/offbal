@@ -51,6 +51,7 @@
                 text: 'Loading...',
                 opacity: '0',
             })
+        	this.$eventHub.$off('changeToggleDrawer', this.changeToggleDrawer)
         	this.$eventHub.$on('changeToggleDrawer', this.changeToggleDrawer)
             const todayDate = moment()
             this.todayDate = todayDate.format('YYYY-MM-DD')
@@ -68,6 +69,9 @@
         	.catch(e => {
         		console.log(e)
         	})
+        },
+        destroyed () {
+            this.$eventHub.$off('changeToggleDrawer')
         },
         computed: {
         },

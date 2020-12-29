@@ -67,14 +67,10 @@
         created () {
         },
         mounted () {
-            this.$eventHub.$on('filterTaskList', this.filterTaskList)
-            window.addEventListener('click', this.onClickTaskDetailOuter)
-        },
-        beforeDestroy () {
-            window.removeEventListener('click', this.onClickTaskDetailOuter)
-        },
-        destroyed () {
             this.$eventHub.$off('filterTaskList')
+            this.$eventHub.$on('filterTaskList', this.filterTaskList)
+            window.removeEventListener('click', this.onClickTaskDetailOuter)
+            window.addEventListener('click', this.onClickTaskDetailOuter)
         },
     	computed: {
     		...mapGetters([
@@ -107,6 +103,7 @@
                 this.complete_task_list = []
             }, 400),
             showTaskDetail (task) {
+                console.log('タスク詳細開く')
                 this.$eventHub.$emit('showTaskDetail', task)
             },
             closeSameTaskDetail (task) {
@@ -160,7 +157,10 @@
             },
             onClickTaskDetailOuter (e) {
                 // タスク詳細の外側をクリックしたときに、タスク詳細を閉じる
-                if (!this.$el.contains(e.target)) {
+                if (!e.target.parentNode.contains(e.target)) {
+                    console.log('タスク詳細の外側クリック', e.target)
+                    console.log(this.$el)
+                    console.log(e.target.parentNode.contains(e.target))
                     this.$eventHub.$emit('closeTaskDetail')
                 }
             }

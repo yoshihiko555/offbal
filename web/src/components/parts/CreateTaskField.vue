@@ -55,6 +55,7 @@
             taskSubmitValue: false
         }),
         created () {
+            this.$eventHub.$off('initCreateTaskField', this.init)
             this.$eventHub.$on('initCreateTaskField', this.init)
         },
         methods: {

@@ -157,6 +157,8 @@
             localCompleteTasks: [],
         }),
         created () {
+            this.$eventHub.$off('cloneCompleteTasks', this.cloneCompleteTasks)
+            this.$eventHub.$off('addCloneCompleteTasks', this.addCloneCompleteTasks)
             this.$eventHub.$on('cloneCompleteTasks', this.cloneCompleteTasks)
             this.$eventHub.$on('addCloneCompleteTasks', this.addCloneCompleteTasks)
         },

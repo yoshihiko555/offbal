@@ -71,6 +71,8 @@
             isChange: true,
         }),
         created () {
+            this.$eventHub.$off('confirmApplySetting', this.applySetting)
+            this.$eventHub.$off('confirmCancelSetting', this.cancelSetting)
             this.$eventHub.$on('confirmApplySetting', this.applySetting)
             this.$eventHub.$on('confirmCancelSetting', this.cancelSetting)
             this.changeActiveSidebar()

@@ -155,6 +155,7 @@
             localCloneTask: {},
         }),
         created () {
+            this.$eventHub.$off('endEditSubTaskContent', this.endEditSubTaskContent)
             this.$eventHub.$on('endEditSubTaskContent', this.endEditSubTaskContent)
         },
         mounted: function () {

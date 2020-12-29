@@ -86,6 +86,7 @@
             editTaskSubmitValue: false,
         }),
         created () {
+            this.$eventHub.$off('endEditTaskContent', this.endEditTaskContent)
             this.$eventHub.$on('endEditTaskContent', this.endEditTaskContent)
         },
         watch: {

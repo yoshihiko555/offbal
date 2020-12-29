@@ -75,6 +75,7 @@
             startTime: '',
         }),
         created () {
+            this.$eventHub.$off('setStartTime', this.setStartTime)
             this.$eventHub.$on('setStartTime', this.setStartTime)
             if (this.defaultDeadline !== null) this.deadline.value = this.defaultDeadline
         },

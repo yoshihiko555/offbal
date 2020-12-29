@@ -85,6 +85,13 @@
             selectedLabelList: [],
         }),
         created () {
+            this.$eventHub.$off('showTaskDetail')
+            this.$eventHub.$off('closeTaskDetail')
+            this.$eventHub.$off('closeSameTaskDetail')
+            this.$eventHub.$off('deleteTaskConfirm')
+            this.$eventHub.$off('selectPriority')
+            this.$eventHub.$off('showTaskDeleteConfirm')
+            this.$eventHub.$off('cloneTaskAfterUpdateSubTask')
             this.$eventHub.$on('showTaskDetail', this.showTaskDetail)
             this.$eventHub.$on('closeTaskDetail', this.closeTaskDetail)
             this.$eventHub.$on('closeSameTaskDetail', this.closeSameTaskDetail)

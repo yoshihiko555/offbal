@@ -45,6 +45,7 @@
             isLoading: false,
         }),
         created () {
+        	this.$eventHub.$off('changeToggleDrawer', this.changeToggleDrawer)
         	this.$eventHub.$on('changeToggleDrawer', this.changeToggleDrawer)
             this.isLoading = true
             const loading = this.$vs.loading({
@@ -66,6 +67,9 @@
         	.catch(e => {
         		console.log(e)
         	})
+        },
+        destroyed () {
+            this.$eventHub.$off('changeToggleDrawer')
         },
         computed: {
         },

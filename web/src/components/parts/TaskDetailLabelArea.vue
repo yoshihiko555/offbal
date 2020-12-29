@@ -215,6 +215,8 @@
             createLabelConfirm: false,
         }),
         created () {
+            this.$eventHub.$off('endCreateLabel', this.endCreateLabel)
+            this.$eventHub.$off('confirmCreateLabelContent', this.confirmCreateLabelContent)
             this.$eventHub.$on('endCreateLabel', this.endCreateLabel)
             this.$eventHub.$on('confirmCreateLabelContent', this.confirmCreateLabelContent)
         },

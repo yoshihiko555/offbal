@@ -83,9 +83,11 @@
         }),
         created () {
             // FilterBtnから渡ってきた値で検索結果を絞る
+            this.$eventHub.$off('filterSearchResult', this.filterSearchResult)
             this.$eventHub.$on('filterSearchResult', this.filterSearchResult)
         },
         mounted: function () {
+        	this.$eventHub.$off('changeToggleDrawer', this.changeToggleDrawer)
         	this.$eventHub.$on('changeToggleDrawer', this.changeToggleDrawer)
             this.searchStart(this.$route.query.text)
         },

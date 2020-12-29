@@ -98,6 +98,8 @@
             .catch(e => {
                 console.log(e)
             })
+            this.$eventHub.$off('openEdit', this.openEdit)
+            this.$eventHub.$off('changeToggleDrawer', this.changeToggleDrawer)
             this.$eventHub.$on('openEdit', this.openEdit)
             this.$eventHub.$on('changeToggleDrawer', this.changeToggleDrawer)
         },

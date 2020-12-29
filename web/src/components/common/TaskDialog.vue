@@ -120,6 +120,7 @@
             },
         }),
         created () {
+            this.$eventHub.$off('createTaskInfo', this.createTaskInfo)
             this.$eventHub.$on('createTaskInfo', this.createTaskInfo)
         },
         mounted: function () {

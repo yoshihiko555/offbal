@@ -188,6 +188,7 @@
             for (const i in this.defaultLabelList) {
                 this.selectedLabelList.push(this.defaultLabelList[i].id)
             }
+            this.$eventHub.$off('confirmCreateLabelContent', this.confirmCreateLabelContent)
             this.$eventHub.$on('confirmCreateLabelContent', this.confirmCreateLabelContent)
         },
         mounted: function () {

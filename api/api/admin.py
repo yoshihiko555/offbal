@@ -6,7 +6,6 @@ from .models import (
     Category,
     mUserCategoryRelation,
     CategoryMemberShip,
-    Section,
     Task,
     SubTask,
     Label,
@@ -19,7 +18,6 @@ admin.site.register(mSetting)
 admin.site.register(Category)
 admin.site.register(mUserCategoryRelation)
 admin.site.register(CategoryMemberShip)
-admin.site.register(Section)
 admin.site.register(Task)
 admin.site.register(SubTask)
 admin.site.register(Label)

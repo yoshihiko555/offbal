@@ -6,7 +6,6 @@ from .models import (
     Category,
     mUserCategoryRelation,
     CategoryMemberShip,
-    Section,
     Task,
     SubTask,
     Label,
@@ -102,7 +101,6 @@ class CategorySerializer(DynamicFieldsModelSerializer):
     auth0_id = serializers.CharField(write_only=True)
     tasks = serializers.SerializerMethodField()
     complete_tasks = serializers.SerializerMethodField()
-    sections = serializers.SerializerMethodField()
     favorite = serializers.SerializerMethodField()
     archived = serializers.SerializerMethodField()
     is_favorite = serializers.BooleanField(write_only=True, required=False)
@@ -127,7 +125,6 @@ class CategorySerializer(DynamicFieldsModelSerializer):
             'auth0_id',
             'tasks',
             'complete_tasks',
-            'sections',
             'is_favorite',
             'is_archived',
             'isCategory',
@@ -145,18 +142,15 @@ class CategorySerializer(DynamicFieldsModelSerializer):
 
     def get_tasks(self, obj):
         if hasattr(self, 'ordering_type') and self.ordering_type != None:
-            return TaskSerializer(obj.task_target_category.all().filter(Q(target_section=None) & Q(completed=False)).order_by('-' + self.ordering_type), many=True).data
+            return TaskSerializer(obj.task_target_category.all().filter(Q(completed=False)).order_by('-' + self.ordering_type), many=True).data
         else:
-            return TaskSerializer(obj.task_target_category.all().filter(Q(target_section=None) & Q(completed=False)), many=True).data
+            return TaskSerializer(obj.task_target_category.all().filter(Q(completed=False)), many=True).data
 
     def get_complete_tasks(self, obj):
         if hasattr(self, 'ordering_type') and self.ordering_type != None:
-            return TaskSerializer(obj.task_target_category.all().filter(Q(target_section=None) & Q(completed=True)).order_by('-' + self.ordering_type), many=True).data
+            return TaskSerializer(obj.task_target_category.all().filter(Q(completed=True)).order_by('-' + self.ordering_type), many=True).data
         else:
-            return TaskSerializer(obj.task_target_category.all().filter(Q(target_section=None) & Q(completed=True)).order_by('completed_at'), many=True).data
-
-    def get_sections(self, obj):
-        return SectionSerializer(obj.section_target_category.all(), many=True, context=self.context).data
+            return TaskSerializer(obj.task_target_category.all().filter(Q(completed=True)).order_by('completed_at'), many=True).data
 
     def create(self, validated_data):
         try:
@@ -212,50 +206,6 @@ class CategoryMemberShipSerializer(DynamicFieldsModelSerializer):
             'accepted',
         ]
 
-class SectionSerializer(DynamicFieldsModelSerializer):
-
-    tasks = serializers.SerializerMethodField()
-    complete_tasks = serializers.SerializerMethodField()
-    target_category_name = serializers.CharField(read_only=True, source='target_category.name')
-
-    # 画面側でのアイコン描画判定用 (カテゴリーかセクションか)
-    isCategory = serializers.BooleanField(read_only=True, default=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    class Meta:
-        model = Section
-        fields = [
-            'id',
-            'target_category',
-            'name',
-            'deleted',
-            'archived',
-            'tasks',
-            'complete_tasks',
-            'isCategory',
-            'target_category_name',
-        ]
-
-    def get_tasks(self, obj):
-        if hasattr(self, 'ordering_type') and self.ordering_type != None:
-            return TaskSerializer(obj.task_target_section.all().filter(Q(completed=False)).order_by('-' + self.ordering_type), many=True).data
-        else:
-            return TaskSerializer(obj.task_target_section.all().filter(Q(completed=False)), many=True).data
-
-    def get_complete_tasks(self, obj):
-        if hasattr(self, 'ordering_type') and self.ordering_type != None:
-            return TaskSerializer(obj.task_target_section.all().filter(Q(completed=True)).order_by('-' + self.ordering_type), many=True).data
-        else:
-            return TaskSerializer(obj.task_target_section.all().filter(Q(completed=True)), many=True).data
-
-    def create(self, validated_data):
-        section = Section.objects.create(
-                target_category = validated_data['target_category'],
-                name = validated_data['name'],
-            )
-        return section
 
 class TaskSerializer(DynamicFieldsModelSerializer):
     """
@@ -264,7 +214,6 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         content : タスク内容 (必須)
         comment : コメント (必須,空でもok)
         category_id ： カテゴリーのid (必須)
-        section_id : セクションのid (必須) ※指定無しの場合0
         deadline_str : 有効期限の文字列 (必須,空でもok) [%Y-%m-%d %H:%M:%S]
         remind_str : リマインダーの文字列 (必須,空でもok) [%Y-%m-%d %H:%M:%S]
         label_list : ラベルidのリスト (必須,空でもok)
@@ -279,7 +228,6 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     auth0_id = serializers.CharField(write_only=True)
 
     category_id = serializers.IntegerField(write_only=True)
-    section_id = serializers.IntegerField(write_only=True)
     deadline_str = serializers.CharField(write_only=True, allow_blank=True)
     remind_str = serializers.CharField(write_only=True, allow_blank=True)
     label_list = serializers.ListField(
@@ -294,8 +242,6 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     target_category = serializers.ReadOnlyField(source='target_category.id')
     target_category_name = serializers.CharField(read_only=True, source='target_category.name')
     target_category_color = serializers.CharField(read_only=True, source='target_category.color')
-    target_section = serializers.ReadOnlyField(source='target_section.id', default=0)
-    target_section_name = serializers.CharField(read_only=True, source='target_section.name', default='')
     label = serializers.SerializerMethodField()
     start_time = serializers.SerializerMethodField()
     deadline = serializers.SerializerMethodField()
@@ -320,8 +266,6 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'target_category',
             'target_category_name',
             'target_category_color',
-            'target_section',
-            'target_section_name',
             'content',
             'label',
             'priority',
@@ -333,7 +277,6 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             'is_comp_sub_public',
             'auth0_id',
             'category_id',
-            'section_id',
             'deadline_str',
             'remind_str',
             'label_list',
@@ -401,13 +344,9 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         logger.debug(validated_data)
 
         category_id = validated_data['category_id']
-        section_id = validated_data['section_id']
 
         try:
             user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
-            section = Section.objects.get(id=section_id) if section_id != 0 else None
-            if section != None:
-                category = section.target_category
             category = Category.objects.get(id=category_id) if category_id != 0 else Category.objects.get(name='インボックス', creator=user)
 
         except mUser.DoesNotExist:
@@ -415,9 +354,6 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             return None
         except Category.DoesNotExist:
             logger.error('Categoryが見つかりませんでした。')
-            return None
-        except Section.DoesNotExist:
-            logger.error('Sectionが見つかりませんでした。')
             return None
 
         st_str = validated_data['start_time_str']
@@ -433,7 +369,6 @@ class TaskSerializer(DynamicFieldsModelSerializer):
             comment=validated_data['comment'],
             target_user=user,
             target_category=category,
-            target_section=section,
             priority=validated_data['priority'],
             start_time=start_time,
             deadline=deadline,
@@ -453,26 +388,18 @@ class TaskSerializer(DynamicFieldsModelSerializer):
     def update(self, instance, validated_data):
 
         category_id = validated_data['category_id']
-        section_id = validated_data['section_id']
 
         try:
             user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
-            section = Section.objects.get(id=section_id) if section_id != 0 else None
-            if section != None:
-                category = section.target_category
             category = Category.objects.get(id=category_id) if category_id != 0 else Category.objects.get(name='インボックス', creator=user)
 
             instance.target_category = category
-            instance.target_section = section
 
         except mUser.DoesNotExist:
             logger.error('mUserが見つかりませんでした。')
             return None
         except Category.DoesNotExist:
             logger.error('Categoryが見つかりませんでした。')
-            return None
-        except Section.DoesNotExist:
-            logger.error('Sectionが見つかりませんでした。')
             return None
 
         st_str = validated_data['start_time_str']
@@ -507,7 +434,6 @@ class SubTaskSerializer(DynamicFieldsModelSerializer):
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
     completed_at = serializers.SerializerMethodField()
-    target_section = serializers.SerializerMethodField()
 
     class Meta:
         model = SubTask
@@ -519,7 +445,6 @@ class SubTaskSerializer(DynamicFieldsModelSerializer):
             'completed_at',
             'created_at',
             'updated_at',
-            'target_section',
         ]
 
     def get_created_at(self, obj):
@@ -532,13 +457,6 @@ class SubTaskSerializer(DynamicFieldsModelSerializer):
         if obj.completed_at == None:
             return ''
         return utc_to_localtime(obj.completed_at, obj.target_task.target_user.id)
-
-    def get_target_section(self, obj):
-        try:
-            task = Task.objects.get(pk=obj.target_task)
-            return task.target_section.id if task.target_section != None else 0
-        except Task.DoesNotExist:
-            return 0
 
     def create(self, validated_data):
         logger.debug("サブタスクを作る")

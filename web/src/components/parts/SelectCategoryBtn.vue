@@ -27,12 +27,12 @@
             <v-list
                 dense
             >
-                <vs-input
+                <!-- <vs-input
                     class="px-3 mt-3"
                     size="small"
                     placeholder="カテゴリー名を検索"
                     v-model="filterValue"
-                ></vs-input>
+                ></vs-input> -->
                 <v-list-item-group>
                     <!-- フィルター絞る前 -->
                     <div v-if="filterValue.length === 0">
@@ -116,7 +116,7 @@
     const Con = new Const()
 
     export default {
-        name: 'SelectCategorySectionBtn',
+        name: 'SelectCategoryBtn',
         components: {},
         props: {},
         data: () => ({

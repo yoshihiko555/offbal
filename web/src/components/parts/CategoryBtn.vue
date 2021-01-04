@@ -73,7 +73,7 @@
                                     >mdi-circle-medium</v-icon>
                                     {{ category.name }}
                                 </v-list-item>
-                                <v-list-item
+                                <!-- <v-list-item
                                     class="pl-14"
                                     v-for="(section, i) in category.sections"
                                     :key="i"
@@ -84,7 +84,7 @@
                                         color="grey lighten-1"
                                     >mdi-rhombus-medium-outline</v-icon>
                                     {{ section.name }}
-                                </v-list-item>
+                                </v-list-item> -->
                             </div>
                         <!-- </div> -->
                         <!-- フィルター絞る前ここまで -->
@@ -153,11 +153,6 @@
                 required: false,
                 default: () => ('')
             },
-            defaultSection: {
-                type: String,
-                required: false,
-                default: () => ('')
-            },
         },
         data: () => ({
             categoryBtnColor: Con.NON_ACTIVE_COLOR,
@@ -166,14 +161,12 @@
             menu: false,
             category: {
                 name: '',
-                section: '',
             },
             isSelected: false,
         }),
         created () {
             this.category = {
                 name: this.defaultCategory,
-                section: this.defaultSection
             }
             this.$eventHub.$emit('createTaskInfo', 'category_id', this.defaultCategoryId)
         },
@@ -185,20 +178,20 @@
                 if (val.length > 0) {
                     const categoryList = this.categories
                     for (const [k, category] of Object.entries(categoryList)) {
-                        if (this.filterCategorySectionName(category)) {
+                        if (this.filterCategoryName(category)) {
                             this.filteredItems.push(category)
                         }
-                        for (const [j, section] of Object.entries(category.sections)) {
-                            if (this.filterCategorySectionName(section)) {
-                                this.filteredItems.push(section)
-                            }
-                        }
+                        // for (const [j, section] of Object.entries(category.sections)) {
+                        //     if (this.filterCategoryName(section)) {
+                        //         this.filteredItems.push(section)
+                        //     }
+                        // }
                     }
                 }
             },
             category: {
                 handler: function (val) {
-                    if (val.name !== '' || val.section !== '') {
+                    if (val.name !== '') {
                         this.categoryBtnColor = Con.ACTIVE_COLOR
                         this.isSelected = true
                     } else {
@@ -214,9 +207,7 @@
                 'categories',
             ]),
             categoryName () {
-                let category = this.category.name
-                if (this.category.section !== '') category += '/' + this.category.section
-                return category
+                return this.category.name
             }
         },
         methods: {
@@ -225,21 +216,21 @@
                 if (value.isCategory) {
                     this.setCategoryInfo(value)
                     this.$eventHub.$emit('createTaskInfo', 'category_id', value.id)
-                    this.$eventHub.$emit('createTaskInfo', 'section_id', 0)
+                    this.$eventHub.$emit('createTaskInfo')
                 } else {
-                    this.setSectionInfo(value)
-                    this.selectSection(value)
+                    // this.setSectionInfo(value)
+                    // this.selectSection(value)
                 }
                 this.menu = false
             },
-            selectSection (value) {
-                // セクションを選択
-                if (value.target_category_name !== 'インボックス') {
-                    this.$eventHub.$emit('createTaskInfo', 'category_id', value.target_category)
-                }
-                this.$eventHub.$emit('createTaskInfo', 'section_id', value.id)
-            },
-            filterCategorySectionName (value) {
+            // selectSection (value) {
+            //     // セクションを選択
+            //     if (value.target_category_name !== 'インボックス') {
+            //         this.$eventHub.$emit('createTaskInfo', 'category_id', value.target_category)
+            //     }
+            //     this.$eventHub.$emit('createTaskInfo', 'section_id', value.id)
+            // },
+            filterCategoryName (value) {
                 // カテゴリー名・セクション名を検索する
                 return value.name.indexOf(this.filterValue) === 0
             },
@@ -247,16 +238,15 @@
                 // カテゴリー選択時情報をセット
                 this.category = {
                     name: value.name,
-                    section: ''
                 }
             },
-            setSectionInfo (value) {
-                // セクション選択時情報をセット
-                this.category = {
-                    name: value.target_category_name,
-                    section: value.name
-                }
-            }
+            // setSectionInfo (value) {
+            //     // セクション選択時情報をセット
+            //     this.category = {
+            //         name: value.target_category_name,
+            //         section: value.name
+            //     }
+            // }
         },
     }
 </script>

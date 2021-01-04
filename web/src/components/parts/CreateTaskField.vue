@@ -43,7 +43,6 @@
         data: () => ({
             task: {
                 category_id: 0,
-                section_id: 0,
                 content: '',
                 comment: '',
                 start_time_str: '',
@@ -87,7 +86,6 @@
             init () {
                 this.task = {
                     category_id: 0,
-                    section_id: 0,
                     content: '',
                     comment: '',
                     start_time_str: '',

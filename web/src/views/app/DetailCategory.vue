@@ -22,21 +22,6 @@
                 :tasks=detailCategory.tasks
             />
 
-            <!-- <SectionList/> -->
-
-            <!-- <CreateSectionBtn
-                v-show="isCreateBtn"
-                @open-create='openCreate'
-            />
-            <CreateSectionField
-                v-show="isCreateField"
-                @close-create='closeCreate'
-            />
-            <EditSectionField
-                v-show="isEditField"
-                ref='edit'
-                @close-edit='closeEdit'
-            /> -->
             <CompleteTaskList
                 :complete_tasks=detailCategory.complete_tasks
             />
@@ -55,11 +40,7 @@
     import _ from 'lodash'
     import FilterBtn from '@/components/parts/FilterBtn'
     import SortBtn from '@/components/parts/SortBtn'
-    import CreateSectionBtn from '@/components/parts/CreateSectionBtn'
-    import CreateSectionField from '@/components/parts/CreateSectionField'
-    import EditSectionField from '@/components/parts/EditSectionField'
     import TaskList from '@/components/common/TaskList'
-    import SectionList from '@/components/common/SectionList'
     import CreateTaskField from '@/components/parts/CreateTaskField'
     import CompleteTaskList from '@/components/common/CompleteTaskList'
     import TaskDetail from '@/components/common/TaskDetail'
@@ -73,11 +54,7 @@
         components: {
             FilterBtn,
             SortBtn,
-            CreateSectionBtn,
-            CreateSectionField,
-            EditSectionField,
             TaskList,
-            SectionList,
             CreateTaskField,
             CompleteTaskList,
             TaskDetail,

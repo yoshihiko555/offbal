@@ -46,7 +46,6 @@
                         <CategoryBtn
                             :defaultCategoryId=task.target_category
                             :defaultCategory=task.target_category_name
-                            :defaultSection=task.target_section_name
                         />
                         <LabelBtn
                             :defaultLabelList=task.label
@@ -138,8 +137,8 @@
                 this.dialog = false
             },
             update () {
-                const { target_category: targetCategory, target_section: targetSection } = this.task
-                const { category_id: categoryId, section_id: sectionId } = this.updateTaskData
+                const { target_category: targetCategory } = this.task
+                const { category_id: categoryId } = this.updateTaskData
                 this.$axios({
                     url: `/api/task/${this.task.id}/`,
                     method: 'PUT',
@@ -147,7 +146,7 @@
                 })
                 .then(res => {
                     // カテゴリー、セクションを更新したら消すのと追加
-                    if (targetCategory !== categoryId || targetSection !== sectionId) {
+                    if (targetCategory !== categoryId) {
                         this.addTask(res.data)
                         this.deleteTask(this.task)
                     // 変わらなければ、更新
@@ -164,7 +163,6 @@
             createUpdateTaskData (task) {
                 this.updateTaskData = {
                     category_id: task.target_category,
-                    section_id: task.target_section,
                     content: task.content,
                     comment: task.comment,
                     priority: task.priority,

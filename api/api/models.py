@@ -431,22 +431,6 @@ class CategoryMemberShip(TimeStampModel):
         return self.invitee_user.username
 
 
-class Section(TimeStampModel):
-
-    target_category = models.ForeignKey(
-        'api.Category',
-        on_delete=models.CASCADE,
-        related_name='section_target_category'
-    )
-
-    name = models.CharField(max_length=20)
-    deleted = models.BooleanField(default=False)
-    archived = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.name
-
-
 class Task(TimeStampModel,
            TaskModel):
 
@@ -460,14 +444,6 @@ class Task(TimeStampModel,
         Category,
         on_delete=models.CASCADE,
         related_name='task_target_category'
-    )
-
-    target_section = models.ForeignKey(
-        Section,
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-        related_name='task_target_section'
     )
 
     is_comp_sub_public = models.BooleanField(default=False)

@@ -29,7 +29,7 @@
             </v-list>
         </v-menu>
 
-        <SelectCategorySectionBtn
+        <SelectCategoryBtn
             @move-category-section='moveCategorySection'
             ref='selectCategorySection'
         />
@@ -43,13 +43,13 @@
 <script>
     import { mapActions, mapMutations } from 'vuex'
     import EditTaskDialog from '@/components/common/EditTaskDialog'
-    import SelectCategorySectionBtn from '@/components/parts/SelectCategorySectionBtn'
+    import SelectCategoryBtn from '@/components/parts/SelectCategoryBtn'
 
     export default {
         name: 'TaskMenuBtn',
         components: {
             EditTaskDialog,
-            SelectCategorySectionBtn,
+            SelectCategoryBtn,
         },
         props: {
             task: {
@@ -105,7 +105,6 @@
                 const task = this.task
                 this.cloneTask = {
                     category_id: task.target_category,
-                    section_id: task.target_section,
                     content: task.content,
                     comment: task.comment,
                     priority: task.priority,
@@ -140,7 +139,6 @@
             init () {
                 this.cloneTask = {
                     category_id: 0,
-                    section_id: 0,
                     content: '',
                     comment: '',
                     start_time_str: '',
@@ -150,10 +148,9 @@
                     label_list: [],
                 }
             },
-            createMoveCategorySectionTaskData (categoryId, sectionId) {
+            createMoveCategorySectionTaskData (categoryId) {
                 this.cloneTask = {
                     category_id: categoryId,
-                    section_id: sectionId,
                     content: this.task.content,
                     comment: this.task.comment,
                     priority: this.task.priority,
@@ -167,10 +164,10 @@
                 }
             },
             moveCategorySection (value) {
-                const { target_category: targetCategory, target_section: targetSection } = this.task
-                const { category_id: categoryId, section_id: sectionId } = value
-                if (targetCategory === categoryId && targetSection === sectionId) return
-                this.createMoveCategorySectionTaskData(categoryId, sectionId)
+                const { target_category: targetCategory } = this.task
+                const { category_id: categoryId } = value
+                if (targetCategory === categoryId) return
+                this.createMoveCategorySectionTaskData(categoryId)
                 this.$axios({
                     url: `/api/task/${this.task.id}/`,
                     method: 'PUT',

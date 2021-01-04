@@ -6,7 +6,6 @@ from .models import (
     mSetting,
     Category,
     CategoryMemberShip,
-    Section,
     Task,
     SubTask,
     Label,

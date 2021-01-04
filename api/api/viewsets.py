@@ -15,7 +15,6 @@ from .serializers import (
     SettingSerializer,
     CategorySerializer,
     CategoryMemberShipSerializer,
-    SectionSerializer,
     TaskSerializer,
     SubTaskSerializer,
     LabelSerializer,
@@ -28,7 +27,6 @@ from .models import (
     Category,
     mUserCategoryRelation,
     CategoryMemberShip,
-    Section,
     Task,
     SubTask,
     Label,
@@ -260,23 +258,6 @@ class CategoryViewSet(BaseModelViewSet):
         '''
         res = user.category_creator_user.all().count() + 1
         return res
-
-class SectionViewSet(BaseModelViewSet):
-
-    permission_classes = (permissions.IsAuthenticated,)
-    queryset = Section.objects.all()
-    serializer_class = SectionSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            return Response(self.get_serializer(serializer.instance).data, status=status.HTTP_201_CREATED)
-
-        logger.debug(serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class TaskViewSet(BaseModelViewSet):
 
@@ -513,10 +494,8 @@ class TaskViewSet(BaseModelViewSet):
             logger.error('ラベルが見つかりませんでした。')
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        target_section = task.target_section.id if task.target_section != None else 0
         data = {
             'id': task_id,
-            'target_section': target_section,
             'label': LabelSerializer(result, many=True).data
         }
         return Response(data=data, status=status.HTTP_200_OK)
@@ -731,11 +710,8 @@ class SubTaskViewSet(BaseModelViewSet):
             logger.error('タスクが見つかりませんでした。')
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        section_id = task.target_section.id if task.target_section != None else 0
-
         return Response({
             'target_task': task_id,
-            'target_section': section_id,
             'sub_tasks': self.get_serializer(subTasks, many=True).data,
             'complete_sub_tasks': self.get_serializer(result, many=True).data
         }, status=status.HTTP_200_OK)
@@ -777,11 +753,8 @@ class LabelViewSet(BaseModelViewSet):
             logger.error('タスクが見つかりませんでした。')
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        section_id = task.target_section.id if task.target_section != None else 0
-
         return Response({
             'target_task': task_id,
-            'target_section': section_id,
             'delete_labels': self.get_serializer(result, many=True).data
         }, status=status.HTTP_200_OK)
 

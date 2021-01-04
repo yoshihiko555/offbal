@@ -5,7 +5,7 @@
         hover
         accordion
     >
-        <v-expansion-panel
+        <!-- <v-expansion-panel
             v-for="section in detailCategory.sections"
             v-show="!section.archived"
             :key="section.id"
@@ -23,19 +23,19 @@
                     :tasks=section.tasks
                 />
             </v-expansion-panel-content>
-        </v-expansion-panel>
+        </v-expansion-panel> -->
     </v-expansion-panels>
 </template>
 
 <script>
     import TaskList from '@/components/common/TaskList'
-    import SectionMenuBtn from '@/components/parts/SectionMenuBtn'
+    // import SectionMenuBtn from '@/components/parts/SectionMenuBtn'
     import { mapGetters } from 'vuex'
 
     export default {
         name: 'SectionList',
         components: {
-            SectionMenuBtn,
+            // SectionMenuBtn,
             TaskList,
         },
         data: () => ({

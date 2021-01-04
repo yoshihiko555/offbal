@@ -12,7 +12,6 @@ from .models import (
     Category,
     mUserCategoryRelation,
     CategoryMemberShip,
-    Section,
     Task,
     SubTask,
     Label,

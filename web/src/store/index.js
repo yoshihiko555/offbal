@@ -34,13 +34,8 @@ export default new Vuex.Store({
             state.labels.push(payload)
 		},
 		updateLabelToTask (state, payload) {
-			let task
-			if (payload.target_section === 0) {
-				task = state.detailCategory.tasks.find(task => task.id === payload.id)
-			} else {
-				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				task = section.tasks.find(task => task.id === payload.id)
-			}
+			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
+
 			if (task === undefined) return
 			task.label = []
 			for (const i in payload.label) {
@@ -61,91 +56,30 @@ export default new Vuex.Store({
 	    setDetailCategory (state, payload) {
 	        state.detailCategory = payload
 	    },
-	    addSection (state, payload) {
-	        // カテゴリー詳細
-	        state.detailCategory.sections.push(payload)
-
-	        // 全体の該当カテゴリー
-	        const category = state.categories.find(category => category.id === payload.target_category)
-	        category.sections.push(payload)
-	    },
-	    updateSection (state, payload) {
-	        // カテゴリー詳細
-	        const index = state.detailCategory.sections.findIndex(section => section.id === payload.id)
-	        Vue.set(state.detailCategory.sections, index, payload)
-
-	        // 全体の該当カテゴリー
-	        const category = state.categories.find(category => category.id === payload.target_category)
-	        const j = category.sections.findIndex(section => section.id === payload.id)
-	        Vue.set(category.sections, j, payload)
-	    },
-	    deleteSection (state, payload) {
-	        // カテゴリー詳細
-	        const index = state.detailCategory.sections.findIndex(section => section.id === payload)
-	        if (index !== -1) state.detailCategory.sections = state.detailCategory.sections.filter((_, i) => i !== index)
-
-	        // 全体の該当カテゴリー
-	        const category = state.categories.find(category => category.id === state.detailCategory.id)
-	        const j = category.sections.findIndex(section => section.id === payload)
-	        if (j !== -1) category.sections = category.sections.filter((_, i) => i !== j)
-	    },
 		addTask (state, payload) {
 			// 違うカテゴリーだったら追加しない
 			if (state.detailCategory.id !== payload.target_category) return
-			if (payload.target_section === 0) {
-				// カテゴリーのタスクに追加
-				state.detailCategory.tasks.push(payload)
-			} else {
-				// セクションのタスクに追加
-				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				section.tasks.push(payload)
-			}
+			state.detailCategory.tasks.push(payload)
 		},
 		deleteTask (state, payload) {
 			// カテゴリー詳細
-			if (payload.target_section === 0) {
-				const index = state.detailCategory.tasks.findIndex(task => task.id === payload.id)
-				if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
-			} else {
-				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				const index = section.tasks.findIndex(task => task.id === payload.id)
-				if (index !== -1) section.tasks = section.tasks.filter((_, i) => i !== index)
-			}
+			const index = state.detailCategory.tasks.findIndex(task => task.id === payload.id)
+			if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
 	    },
 		deleteTasks (state, payload) {
 			for (const i in payload) {
-				if (payload[i].target_section === 0) {
-					const index = state.detailCategory.tasks.findIndex(task => task.id === payload[i].id)
-					if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
-				} else {
-					const section = state.detailCategory.sections.find(section => section.id === payload[i].target_section)
-					const index = section.tasks.findIndex(task => task.id === payload[i].id)
-					if (index !== -1) section.tasks = section.tasks.filter((_, i) => i !== index)
-				}
+				const index = state.detailCategory.tasks.findIndex(task => task.id === payload[i].id)
+				if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
 			}
 		},
 		updateTask (state, payload) {
-			if (payload.target_section === 0) {
-				const index = state.detailCategory.tasks.findIndex(task => task.id === payload.id)
-				Vue.set(state.detailCategory.tasks, index, payload)
-			} else {
-				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				const index = section.tasks.findIndex(task => task.id === payload.id)
-				Vue.set(section.tasks, index, payload)
-			}
+			const index = state.detailCategory.tasks.findIndex(task => task.id === payload.id)
+			Vue.set(state.detailCategory.tasks, index, payload)
 		},
 		updateTasks (state, payload) {
 			state.detailCategory.tasks.splice(0, state.detailCategory.tasks.length)
-			for (const i in state.detailCategory.sections) {
-				state.detailCategory.sections[i].tasks.splice(0, state.detailCategory.sections[i].tasks.length)
-			}
 			for (const j in payload) {
-				if (payload[j].target_section === 0) {
-					state.detailCategory.tasks.push(payload[j])
-				} else {
-					const section = state.detailCategory.sections.find(section => section.id === payload[j].target_section)
-					section.tasks.push(payload[j])
-				}
+				state.detailCategory.tasks.push(payload[j])
 			}
 		},
 		addCompleteTask (state, payload) {
@@ -157,24 +91,12 @@ export default new Vuex.Store({
 			}
 		},
 		addSubTask (state, payload) {
-			let task
-			if (payload.target_section === 0) {
-				task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
-			} else {
-				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				task = section.tasks.find(task => task.id === payload.target_task)
-			}
+			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			if (task === undefined) return
 			task.sub_tasks.push(payload)
 		},
 		updateCompleteSubTasks (state, payload) {
-			let task
-			if (payload.target_section === 0) {
-				task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
-			} else {
-				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				task = section.tasks.find(task => task.id === payload.target_task)
-			}
+			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			if (task === undefined) return
 			task.sub_tasks.splice(0, task.sub_tasks.length)
 			task.sub_tasks.push(...payload.sub_tasks)
@@ -182,13 +104,7 @@ export default new Vuex.Store({
 			task.complete_sub_tasks.push(...payload.complete_sub_tasks)
 		},
 		updateSubTask (state, payload) {
-			let task
-			if (payload.target_section === 0) {
-				task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
-			} else {
-				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				task = section.tasks.find(task => task.id === payload.target_task)
-			}
+			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			if (task === undefined) return
 			const index = task.sub_tasks.findIndex(sub => sub.id === payload.id)
 			Vue.set(task.sub_tasks, index, payload)
@@ -196,13 +112,7 @@ export default new Vuex.Store({
 			if (i !== -1) Vue.set(task.complete_sub_tasks, i, payload)
 		},
 		deleteSubTask (state, payload) {
-			let task
-			if (payload.target_section === 0) {
-				task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
-			} else {
-				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				task = section.tasks.find(task => task.id === payload.target_task)
-			}
+			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			if (task === undefined) return
 			const index = task.sub_tasks.findIndex(subtask => subtask.id === payload.id)
 			if (index !== -1) task.sub_tasks = task.sub_tasks.filter((_, i) => i !== index)
@@ -210,13 +120,7 @@ export default new Vuex.Store({
 			if (j !== -1) task.complete_sub_tasks = task.complete_sub_tasks.filter((_, i) => i !== j)
 		},
 		deleteLabels (state, payload) {
-			let task
-			if (payload.target_section === 0) {
-				task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
-			} else {
-				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
-				task = section.tasks.find(task => task.id === payload.target_task)
-			}
+			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			if (task === undefined) return
 			for (const i in payload.delete_labels) {
 				const index = task.label.findIndex(label => label.id === payload.delete_labels[i].id)
@@ -226,12 +130,7 @@ export default new Vuex.Store({
 		// タスクを複数追加。TODO id順にする？？
 		addTasks (state, payload) {
 			for (const i in payload) {
-				if (payload[i].target_section === 0) {
-					state.detailCategory.tasks.push(payload[i])
-				} else {
-					const section = state.detailCategory.sections.find(section => section.id === payload[i].target_section)
-					section.tasks.push(payload[i])
-				}
+				state.detailCategory.tasks.push(payload[i])
 			}
 		},
 		deleteCompleteTasks (state, payload) {
@@ -318,20 +217,6 @@ export default new Vuex.Store({
 					reject(e)
 		        })
 			})
-	    },
-	    // セクション削除
-	    deleteSectionAction (ctx, id) {
-	        Vue.prototype.$axios({
-	            url: `/api/section/${id}/`,
-	            method: 'DELETE',
-	        })
-	        .then(res => {
-	            console.log(res)
-	            this.commit('deleteSection', id)
-	        })
-	        .catch(e => {
-	            console.log(e)
-	        })
 	    },
 		// タスク削除
 	    deleteTaskAction (ctx, id) {

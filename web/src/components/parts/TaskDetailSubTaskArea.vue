@@ -124,6 +124,7 @@
 <script>
     import { mapActions, mapMutations } from 'vuex'
     import _ from 'lodash'
+    import { isFromDetailCategory } from '@/mixins'
 
     export default {
         name: 'TaskDetailSubTaskArea',
@@ -278,6 +279,7 @@
                 const length = this.createSubTaskData.content.length
                 if (length === 0 || length > 100 || !this.subTaskSubmitValue) return
                 this.createSubTaskData.target_task = this.task.id
+                this.createSubTaskData.is_detail_category = isFromDetailCategory(this.$route.name)
                 this.$axios({
                     url: '/api/sub_task/',
                     method: 'POST',

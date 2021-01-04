@@ -19,6 +19,9 @@ export default new Vuex.Store({
 	    categories: state => state.categories,
 		labels: state => state.labels,
 		detailCategory: state => state.detailCategory,
+		todaySchedule: state => state.todaySchedule,
+		futureSchedule: state => state.futureSchedule,
+		searchResult: state => state.searchResult,
 	},
 	mutations: {
 		setCategories (state, payload) {
@@ -38,6 +41,7 @@ export default new Vuex.Store({
 				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
 				task = section.tasks.find(task => task.id === payload.id)
 			}
+			if (task === undefined) return
 			task.label = []
 			for (const i in payload.label) {
 				task.label.push(payload.label[i])
@@ -160,6 +164,7 @@ export default new Vuex.Store({
 				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
 				task = section.tasks.find(task => task.id === payload.target_task)
 			}
+			if (task === undefined) return
 			task.sub_tasks.push(payload)
 		},
 		updateCompleteSubTasks (state, payload) {
@@ -170,6 +175,7 @@ export default new Vuex.Store({
 				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
 				task = section.tasks.find(task => task.id === payload.target_task)
 			}
+			if (task === undefined) return
 			task.sub_tasks.splice(0, task.sub_tasks.length)
 			task.sub_tasks.push(...payload.sub_tasks)
 			task.complete_sub_tasks.splice(0, task.complete_sub_tasks.length)
@@ -183,6 +189,7 @@ export default new Vuex.Store({
 				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
 				task = section.tasks.find(task => task.id === payload.target_task)
 			}
+			if (task === undefined) return
 			const index = task.sub_tasks.findIndex(sub => sub.id === payload.id)
 			Vue.set(task.sub_tasks, index, payload)
 			const i = task.complete_sub_tasks.findIndex(sub => sub.id === payload.id)
@@ -196,6 +203,7 @@ export default new Vuex.Store({
 				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
 				task = section.tasks.find(task => task.id === payload.target_task)
 			}
+			if (task === undefined) return
 			const index = task.sub_tasks.findIndex(subtask => subtask.id === payload.id)
 			if (index !== -1) task.sub_tasks = task.sub_tasks.filter((_, i) => i !== index)
 			const j = task.complete_sub_tasks.findIndex(subtask => subtask.id === payload.id)
@@ -209,6 +217,7 @@ export default new Vuex.Store({
 				const section = state.detailCategory.sections.find(section => section.id === payload.target_section)
 				task = section.tasks.find(task => task.id === payload.target_task)
 			}
+			if (task === undefined) return
 			for (const i in payload.delete_labels) {
 				const index = task.label.findIndex(label => label.id === payload.delete_labels[i].id)
 				if (index !== -1) task.label = task.label.filter((_, i) => i !== index)
@@ -238,7 +247,29 @@ export default new Vuex.Store({
 				}
 			}
 			this.commit('setting/destorySession')
-		}
+		},
+		setTodaySchedule (state, payload) {
+			state.todaySchedule = payload
+			console.log(payload)
+		},
+		setFutureSchedule (state, payload) {
+			state.futureSchedule = payload
+		},
+		setSearchResult (state, payload) {
+			state.searchResult = payload
+		},
+		updateTodaySchedule (state, payload) {
+		},
+		updateFutureSchedule (state, payload) {
+		},
+		updateSearchResult (state, payload) {
+		},
+		deleteTodaySchedule (state, payload) {
+		},
+		deleteFutureSchedule (state, payload) {
+		},
+		deleteSearchResult (state, payload) {
+		},
 	},
 	actions: {
 		// アプリ画面初期描画時の処理
@@ -432,6 +463,79 @@ export default new Vuex.Store({
 				})
 			})
 		},
+		getTodaySchedule (ctx, kwargs) {
+			return new Promise((resolve, reject) => {
+				Vue.prototype.$axios({
+					url: '/api/task/get_today_tasks/',
+	        		method: 'GET',
+				})
+				.then(res => {
+					console.log('今日のタスク', res)
+					this.commit('setTodaySchedule', res.data)
+					resolve(res)
+				})
+				.catch(e => {
+					console.log(e)
+					reject(e)
+				})
+			})
+		},
+		getFutureSchedule (ctx, kwargs) {
+			return new Promise((resolve, reject) => {
+				Vue.prototype.$axios({
+					url: '/api/task/get_future_tasks',
+	        		method: 'GET',
+				})
+				.then(res => {
+					console.log('来週までのタスク', res)
+					resolve(res)
+				})
+				.catch(e => {
+					console.log(e)
+					reject(e)
+				})
+			})
+		},
+		getSearchResultAction (ctx, searchText) {
+			return new Promise((resolve, reject) => {
+				Vue.prototype.$axios({
+					url: '/api/search',
+					method: 'GET',
+					params: {
+						searchText: searchText
+					}
+				})
+				.then(res => {
+					console.log('検索結果', res)
+					this.commit('setSearchResult', res.data)
+					resolve(res)
+				})
+				.catch(e => {
+					console.log(e)
+					reject(e)
+				})
+			})
+		},
+		getFilteredSearchResult (ctx, kwargs) {
+			return new Promise((resolve, reject) => {
+				Vue.prototype.$axios({
+					url: '/api/task/get_filter_task_list/',
+					method: 'GET',
+					params: {
+	                	...kwargs
+	                }
+				})
+				.then(res => {
+					console.log('フィルター掛けた検索結果', res)
+					this.commit('setSearchResult', res.data)
+					resolve(res)
+				})
+				.catch(e => {
+					console.log(e)
+					reject(e)
+				})
+			})
+		}
 	},
 	modules: {
 		setting,

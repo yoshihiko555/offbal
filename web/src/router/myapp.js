@@ -1,4 +1,4 @@
-import { MyApp, StartApp, Activitys, DetailCategory, TodayScheduled, FutureScheduled, Karma, SearchResult } from '@/views/index'
+import { MyApp, StartApp, Activitys, DetailCategory, TodaySchedule, FutureSchedule, Karma, SearchResult } from '@/views/index'
 
 const routes = {
 	path: '/myapp',
@@ -27,16 +27,16 @@ const routes = {
 		},
 		{
 			path: 'today',
-			name: 'TodayScheduled',
-			component: TodayScheduled,
+			name: 'TodaySchedule',
+			component: TodaySchedule,
 		    meta: {
 		    	title: 'Today',
 		    },
 		},
 		{
-			path: 'future-scheduled',
-			name: 'FutureScheduled',
-			component: FutureScheduled,
+			path: 'future-schedule',
+			name: 'FutureSchedule',
+			component: FutureSchedule,
 		    meta: {
 		    	title: 'Future',
 		    },

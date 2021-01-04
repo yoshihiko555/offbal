@@ -1,14 +1,14 @@
 <template>
     <div id='future-scheduled-list' class='main_content_wrap' :class="{ 'is-task-drawer': drawer }">
-        <h1 class="mb-4">FutureScheduled</h1>
+        <h1 class="mb-4">FutureSchedule</h1>
         <div v-if="isLoading">
             <div ref="loadingContent" class="loading_div">
             </div>
         </div>
         <div v-else>
-            <div v-if="Object.keys(futureTasks).length > 0">
+            <div v-if="Object.keys(futureSchedule).length > 0">
                 <div
-                    v-for="(data, key) in futureTasks"
+                    v-for="(data, key) in futureSchedule"
                     :key="key"
                     class="mb-4 future_subtitle"
                 >
@@ -32,15 +32,15 @@
     import TaskList from '@/components/common/TaskList'
     import NoTaskMsgArea from '@/components/parts/NoTaskMsgArea'
 
+    import { mapGetters, mapMutations, mapActions } from 'vuex'
+
     export default {
-        name: 'FutureScheduled',
+        name: 'FutureSchedule',
         components: {
         	TaskList,
             NoTaskMsgArea,
         },
-
         data: () => ({
-        	futureTasks: [],
             drawer: false,
             isLoading: false,
         }),
@@ -54,26 +54,32 @@
                 text: 'Loading...',
                 opacity: '0',
             })
-        	this.$axios({
-        		url: '/api/task/get_future_tasks',
-        		method: 'GET',
-        	})
-        	.then(res => {
-                console.log('来週までのタスク', res)
-        		this.futureTasks = this.toListEachDate(res.data)
+            this.getFutureSchedule()
+            .then(res => {
+                this.setFutureSchedule(this.toListEachDate(res.data))
                 loading.close()
                 this.isLoading = false
-        	})
-        	.catch(e => {
-        		console.log(e)
-        	})
+            })
+            .catch(e => {
+                console.log(e)
+                loading.close()
+            })
         },
         destroyed () {
             this.$eventHub.$off('changeToggleDrawer')
         },
         computed: {
+            ...mapGetters([
+                'futureSchedule',
+            ])
         },
         methods: {
+            ...mapMutations([
+                'setFutureSchedule',
+            ]),
+            ...mapActions([
+                'getFutureSchedule',
+            ]),
             changeToggleDrawer (value) {
                 this.drawer = value
             },

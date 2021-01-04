@@ -6,14 +6,14 @@
             </div>
         </div>
         <div v-else>
-            <div v-show="expiredTasks.length > 0" class="mb-4">
+            <div v-show="todaySchedule.expired_tasks.length > 0" class="mb-4">
                 <p class="ma-0 ml-1 today_subtitle">期限切れのタスク</p>
-                <TaskList :tasks='expiredTasks' />
+                <TaskList :tasks='todaySchedule.expired_tasks' />
                 <v-divider/>
             </div>
-            <div v-if='todayTasks.length > 0'>
+            <div v-if='todaySchedule.today_tasks.length > 0'>
                 <p class='ma-0 ml-1 today_subtitle'>今日締め切りのタスク</p>
-                <TaskList :tasks='todayTasks' />
+                <TaskList :tasks='todaySchedule.today_tasks' />
             </div>
             <div v-else>
                 <NoTaskMsgArea
@@ -29,17 +29,17 @@
     import TaskList from '@/components/common/TaskList'
     import NoTaskMsgArea from '@/components/parts/NoTaskMsgArea'
 
+    import { mapGetters, mapMutations, mapActions } from 'vuex'
+
     export default {
-        name: 'TodayScheduled',
+        name: 'TodaySchedule',
         components: {
         	TaskList,
             NoTaskMsgArea,
         },
         data: () => ({
         	drawer: false,
-        	todayTasks: [],
             createdAtTodayTasks: [],
-            expiredTasks: [],
             todayDate: null,
             isLoading: false,
         }),
@@ -55,27 +55,29 @@
         	this.$eventHub.$on('changeToggleDrawer', this.changeToggleDrawer)
             const todayDate = moment()
             this.todayDate = todayDate.format('YYYY-MM-DD')
-        	this.$axios({
-        		url: '/api/task/get_today_tasks/',
-        		method: 'GET',
-        	})
-        	.then(res => {
-        		console.log('今日のタスク', res)
-        		this.todayTasks = res.data.today_tasks
-                this.expiredTasks = res.data.expired_tasks
+            this.getTodaySchedule()
+            .then(res => {
                 loading.close()
                 this.isLoading = false
-        	})
-        	.catch(e => {
-        		console.log(e)
-        	})
+            })
+            .catch(e => {
+                loading.close()
+            })
         },
         destroyed () {
             this.$eventHub.$off('changeToggleDrawer')
         },
         computed: {
+            ...mapGetters([
+                'todaySchedule',
+            ]),
         },
         methods: {
+            ...mapMutations([
+            ]),
+            ...mapActions([
+                'getTodaySchedule',
+            ]),
             changeToggleDrawer (value) {
                 this.drawer = value
             },

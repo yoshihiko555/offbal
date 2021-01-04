@@ -19,13 +19,13 @@ class Const {
             title: 'Today',
             icon: 'mdi-calendar-today',
             isNest: false,
-            route: 'TodayScheduled',
+            route: 'TodaySchedule',
         },
         {
             title: 'Coming soon',
             icon: 'mdi-calendar-month-outline',
             isNest: false,
-            route: 'FutureScheduled',
+            route: 'FutureSchedule',
         },
     ]
 

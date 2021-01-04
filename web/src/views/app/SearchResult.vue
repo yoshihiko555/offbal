@@ -65,6 +65,8 @@
     import SortBtn from '@/components/parts/SortBtn'
     import Loading from '@/components/parts/Loading'
 
+    import { mapGetters, mapActions } from 'vuex'
+
     export default {
         name: 'SearchResult',
         props: {
@@ -77,7 +79,7 @@
         },
         data: () => ({
             searchText: '',
-            searchResult: [],
+            // searchResult: [],
             isLoading: false,
             drawer: false,
         }),
@@ -94,7 +96,12 @@
         watch: {
         },
         computed: {
+            ...mapGetters([
+                'searchResult',
+            ]),
             taskLength () {
+                // ロード中は0件を返す
+                if (this.isLoading || this.searchResult === undefined) return 0
                 return this.searchResult.length
             }
         },
@@ -106,6 +113,10 @@
             this.$eventHub.$off('filterSearchResult')
         },
         methods: {
+            ...mapActions([
+                'getSearchResultAction',
+                'getFilteredSearchResult',
+            ]),
             search () {
                 this.isLoading = true
                 const loading = this.$vs.loading({
@@ -114,21 +125,12 @@
                     text: 'Loading...',
                     opacity: '0',
                 })
-                this.$axios({
-                    url: '/api/search/',
-                    method: 'GET',
-                    params: {
-                        searchText: this.searchText
-                    }
-                })
+                this.getSearchResultAction(this.searchText)
                 .then(res => {
-                    console.log(res)
-                    this.searchResult = res.data
                     loading.close()
                     this.isLoading = false
                 })
                 .catch(e => {
-                    console.log(e)
                     loading.close()
                 })
             },
@@ -149,20 +151,7 @@
                         queryParams[i] = val[i]
                     }
                 }
-                this.$axios({
-                    url: '/api/task/get_filter_task_list/',
-                    method: 'GET',
-                    params: {
-                        ...queryParams
-                    }
-                })
-                .then(res => {
-                    console.log(res)
-                    this.searchResult = res.data
-                })
-                .catch(e => {
-                    console.log(e)
-                })
+                this.getFilteredSearchResult(queryParams)
             },
             changeToggleDrawer (value) {
                 this.drawer = value

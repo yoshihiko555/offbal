@@ -103,7 +103,6 @@
                 this.complete_task_list = []
             }, 400),
             showTaskDetail (task) {
-                console.log('タスク詳細開く')
                 this.$eventHub.$emit('showTaskDetail', task)
             },
             closeSameTaskDetail (task) {

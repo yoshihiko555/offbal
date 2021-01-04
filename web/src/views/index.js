@@ -9,11 +9,11 @@ export { default as InitSelectCategory } from './InitSelectCategory'
 export { default as MyApp } from './app/MyApp'
 export { default as Activitys } from './app/Activitys'
 export { default as DetailCategory } from './app/DetailCategory'
-export { default as FutureScheduled } from './app/FutureScheduled'
+export { default as FutureSchedule } from './app/FutureSchedule'
 export { default as Karma } from './app/Karma'
 export { default as SearchResult } from './app/SearchResult'
 export { default as StartApp } from './app/StartApp'
-export { default as TodayScheduled } from './app/TodayScheduled'
+export { default as TodaySchedule } from './app/TodaySchedule'
 
 // Setting
 export { default as Setting } from './setting/Setting'

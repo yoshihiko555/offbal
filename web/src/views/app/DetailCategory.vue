@@ -96,7 +96,6 @@
                 this.$eventHub.$emit('cloneCompleteTasks', res.data.complete_tasks)
             })
             .catch(e => {
-                console.log(e)
             })
             this.$eventHub.$off('openEdit', this.openEdit)
             this.$eventHub.$off('changeToggleDrawer', this.changeToggleDrawer)

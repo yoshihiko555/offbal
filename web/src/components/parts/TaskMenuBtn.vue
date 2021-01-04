@@ -134,7 +134,10 @@
                 this.init()
             },
             deleteLocalTask () {
-                this.deleteTaskAction(this.task.id)
+                this.deleteTaskAction({
+                    id: this.task.id,
+                    route: this.$route.name
+                })
             },
             init () {
                 this.cloneTask = {

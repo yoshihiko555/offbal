@@ -118,6 +118,37 @@ export const updateEachRouteSubTask = (state, payload) => {
 	}
 }
 
+export const deleteEachRouteTask = (state, payload) => {
+	const task = payload.task
+	const route = payload.route
+	switch (route) {
+		case 'SearchResult': {
+			const index = getSearchResultTaskIndex(state, task.id)
+			if (index !== -1) state.searchResult = state.searchResult.filter((_, i) => i !== index)
+			break
+		}
+		case 'TodaySchedule': {
+			const eIndex = getExpiredTaskIndex(state, task.id)
+			const tIndex = getTodaysTaskIndex(state, task.id)
+			if (eIndex !== -1) state.todaySchedule.expired_tasks = state.todaySchedule.expired_tasks.filter((_, i) => i !== eIndex)
+			if (tIndex !== -1) state.todaySchedule.today_tasks = state.todaySchedule.today_tasks.filter((_, i) => i !== tIndex)
+			break
+		}
+		case 'FutureSchedule': {
+			const res = getFutureTaskIndex(state, task.id)
+			if (!Object.keys(res).length === false) {
+				console.log('ok')
+				const index = res.index
+				const key = res.key
+				state.futureSchedule[key] = state.futureSchedule[key].filter((_, i) => i !== index)
+				if (state.futureSchedule[key].length === 0) delete state.futureSchedule[key]
+			}
+			break
+		}
+		default:
+	}
+}
+
 const updateSubTaskData = (task, subtask) => {
     if (task === undefined) return
 
@@ -140,12 +171,24 @@ const getSearchResultTask = (state, taskId) => {
 	return state.searchResult.find(task => task.id === taskId)
 }
 
+const getSearchResultTaskIndex = (state, taskId) => {
+	return state.searchResult.findIndex(task => task.id === taskId)
+}
+
 const getExpiredTask = (state, taskId) => {
 	return state.todaySchedule.expired_tasks.find(task => task.id === taskId)
 }
 
+const getExpiredTaskIndex = (state, taskId) => {
+	return state.todaySchedule.expired_tasks.findIndex(task => task.id === taskId)
+}
+
 const getTodaysTask = (state, taskId) => {
 	return state.todaySchedule.today_tasks.find(task => task.id === taskId)
+}
+
+const getTodaysTaskIndex = (state, taskId) => {
+	return state.todaySchedule.today_tasks.findIndex(task => task.id === taskId)
 }
 
 const getFutureTask = (state, taskId) => {
@@ -155,6 +198,18 @@ const getFutureTask = (state, taskId) => {
 		if (task !== undefined) break
 	}
 	return task
+}
+
+const getFutureTaskIndex = (state, taskId) => {
+	const res = {}
+	for (const key in state.futureSchedule) {
+		const index = state.futureSchedule[key].findIndex(task => task.id === taskId)
+		if (index !== undefined && index !== -1) {
+			res.index = index
+			res.key = key
+		}
+	}
+	return res
 }
 
 export const globalStoreMixins = {

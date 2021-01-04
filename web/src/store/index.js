@@ -6,7 +6,8 @@ import {
 	addEachRouteSubTask,
 	deleteEachRouteSubTask,
 	updateEachRouteCompleteSubTask,
-	updateEachRouteSubTask
+	updateEachRouteSubTask,
+	deleteEachRouteTask
 } from '@/mixins/store'
 
 import setting from './setting'
@@ -70,7 +71,9 @@ export default new Vuex.Store({
 		},
 		deleteTask (state, payload) {
 			// カテゴリー詳細
-			const index = state.detailCategory.tasks.findIndex(task => task.id === payload.id)
+			deleteEachRouteTask(state, payload)
+			const task = payload.task
+			const index = state.detailCategory.tasks.findIndex(target => target.id === task.id)
 			if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
 	    },
 		deleteTasks (state, payload) {
@@ -167,13 +170,11 @@ export default new Vuex.Store({
 		},
 		setTodaySchedule (state, payload) {
 			state.todaySchedule = payload
-			console.log(payload)
 		},
 		setFutureSchedule (state, payload) {
 			state.futureSchedule = payload
 		},
 		setSearchResult (state, payload) {
-			console.log('setSearchResult', payload)
 			state.searchResult = payload
 		},
 		updateTodaySchedule (state, payload) {
@@ -238,14 +239,18 @@ export default new Vuex.Store({
 			})
 	    },
 		// タスク削除
-	    deleteTaskAction (ctx, id) {
+	    deleteTaskAction (ctx, kwargs) {
 	        Vue.prototype.$axios({
-	            url: `/api/task/${id}/`,
+	            url: `/api/task/${kwargs.id}/`,
 	            method: 'DELETE',
 	        })
 	        .then(res => {
 	            console.log(res)
-	            this.commit('deleteTask', res.data)
+				const data = {
+					task: res.data,
+					route: kwargs.route
+				}
+	            this.commit('deleteTask', data)
 	        })
 	        .catch(e => {
 	            console.log(e)
@@ -318,7 +323,11 @@ export default new Vuex.Store({
 			})
 			.then(res => {
 				console.log(res)
-				this.commit('deleteTask', res.data)
+				const data = {
+					task: res.data,
+					route: kwargs.route
+				}
+				this.commit('deleteTask', data)
 				this.commit('addCompleteTask', res.data)
 			})
 			.catch(e => {

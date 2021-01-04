@@ -204,7 +204,10 @@
                 })
             },
             deleteTaskConfirm () {
-                this.deleteTaskAction(this.cloneTask.id)
+                this.deleteTaskAction({
+                    id: this.cloneTask.id,
+                    route: this.$route.name
+                })
                 this.closeTaskDetail()
                 this.taskDeleteConfirm = false
             },

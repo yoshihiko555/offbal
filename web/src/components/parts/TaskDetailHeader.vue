@@ -106,6 +106,7 @@
             checkTask: _.debounce(function checkTask () {
                 this.updateCompleteTaskAction({
                     complete_task: this.cloneTask,
+                    route: this.$route.name
                 })
                 this.$eventHub.$emit('closeTaskDetail')
             }, 600),

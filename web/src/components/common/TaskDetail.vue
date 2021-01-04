@@ -176,6 +176,7 @@
                 // タスクの詳細の情報をセット
                 this.cloneTask = _.cloneDeep(this.task)
                 this.completeSubTaskList = _.cloneDeep(this.task.complete_sub_tasks)
+                console.log(this.task)
             },
             setSelectedLabelList () {
                 this.selectedLabelList = []

@@ -65,7 +65,7 @@
     import SortBtn from '@/components/parts/SortBtn'
     import Loading from '@/components/parts/Loading'
 
-    import { mapGetters, mapActions } from 'vuex'
+    import { mapGetters, mapMutations, mapActions } from 'vuex'
 
     export default {
         name: 'SearchResult',
@@ -113,6 +113,9 @@
             this.$eventHub.$off('filterSearchResult')
         },
         methods: {
+            ...mapMutations([
+                'setSearchResult',
+            ]),
             ...mapActions([
                 'getSearchResultAction',
                 'getFilteredSearchResult',
@@ -129,6 +132,8 @@
                 .then(res => {
                     loading.close()
                     this.isLoading = false
+                    this.setSearchResult(res.data)
+                    console.log(this.searchResult)
                 })
                 .catch(e => {
                     loading.close()

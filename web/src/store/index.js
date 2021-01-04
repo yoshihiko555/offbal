@@ -2,6 +2,13 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexPersistedstate from 'vuex-persistedstate'
 import { setTitle } from '@/mixins'
+import {
+	addEachRouteSubTask,
+	deleteEachRouteSubTask,
+	updateEachRouteCompleteSubTask,
+	updateEachRouteSubTask
+} from '@/mixins/store'
+
 import setting from './setting'
 
 Vue.use(Vuex)
@@ -91,11 +98,16 @@ export default new Vuex.Store({
 			}
 		},
 		addSubTask (state, payload) {
-			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
+			addEachRouteSubTask(state, payload)
+			if (state.detailCategory.tasks === undefined) return
+
+			const subtask = payload.subtask
+			const task = state.detailCategory.tasks.find(task => task.id === subtask.target_task)
 			if (task === undefined) return
-			task.sub_tasks.push(payload)
+			task.sub_tasks.push(subtask)
 		},
 		updateCompleteSubTasks (state, payload) {
+			updateEachRouteCompleteSubTask(state, payload)
 			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			if (task === undefined) return
 			task.sub_tasks.splice(0, task.sub_tasks.length)
@@ -104,19 +116,25 @@ export default new Vuex.Store({
 			task.complete_sub_tasks.push(...payload.complete_sub_tasks)
 		},
 		updateSubTask (state, payload) {
-			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
+			updateEachRouteSubTask(state, payload)
+			const subtask = payload.subtask
+			const task = state.detailCategory.tasks.find(task => task.id === subtask.target_task)
 			if (task === undefined) return
-			const index = task.sub_tasks.findIndex(sub => sub.id === payload.id)
-			Vue.set(task.sub_tasks, index, payload)
-			const i = task.complete_sub_tasks.findIndex(sub => sub.id === payload.id)
-			if (i !== -1) Vue.set(task.complete_sub_tasks, i, payload)
+			const index = task.sub_tasks.findIndex(sub => sub.id === subtask.id)
+			Vue.set(task.sub_tasks, index, subtask)
+			const i = task.complete_sub_tasks.findIndex(sub => sub.id === subtask.id)
+			if (i !== -1) Vue.set(task.complete_sub_tasks, i, subtask)
 		},
 		deleteSubTask (state, payload) {
-			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
+			deleteEachRouteSubTask(state, payload)
+			if (state.detailCategory.tasks === undefined) return
+
+			const subtask = payload.subtask
+			const task = state.detailCategory.tasks.find(task => task.id === subtask.target_task)
 			if (task === undefined) return
-			const index = task.sub_tasks.findIndex(subtask => subtask.id === payload.id)
+			const index = task.sub_tasks.findIndex(target => target.id === subtask.id)
 			if (index !== -1) task.sub_tasks = task.sub_tasks.filter((_, i) => i !== index)
-			const j = task.complete_sub_tasks.findIndex(subtask => subtask.id === payload.id)
+			const j = task.complete_sub_tasks.findIndex(target => target.id === subtask.id)
 			if (j !== -1) task.complete_sub_tasks = task.complete_sub_tasks.filter((_, i) => i !== j)
 		},
 		deleteLabels (state, payload) {
@@ -155,6 +173,7 @@ export default new Vuex.Store({
 			state.futureSchedule = payload
 		},
 		setSearchResult (state, payload) {
+			console.log('setSearchResult', payload)
 			state.searchResult = payload
 		},
 		updateTodaySchedule (state, payload) {
@@ -232,14 +251,18 @@ export default new Vuex.Store({
 	            console.log(e)
 	        })
 	    },
-		deleteSubTaskAction (ctx, id) {
+		deleteSubTaskAction (ctx, kwargs) {
 	        Vue.prototype.$axios({
-	            url: `/api/sub_task/${id}/`,
+	            url: `/api/sub_task/${kwargs.id}/`,
 	            method: 'DELETE',
+				data: {}
 	        })
 	        .then(res => {
-	            console.log(res)
-	            this.commit('deleteSubTask', res.data)
+				const data = {
+					subtask: res.data,
+					route: kwargs.route,
+				}
+	            this.commit('deleteSubTask', data)
 	        })
 	        .catch(e => {
 	            console.log(e)
@@ -277,6 +300,7 @@ export default new Vuex.Store({
 			})
 			.then(res => {
 				console.log(res)
+				res.data.route = kwargs.route
 				this.commit('updateCompleteSubTasks', res.data)
 			})
 			.catch(e => {

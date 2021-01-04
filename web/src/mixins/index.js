@@ -75,17 +75,12 @@ export const setTheme = (self, setting) => {
     }
 }
 
-export const isFromDetailCategory = route => {
-	return route === 'DetailCategory'
-}
-
 export const globalMixins = {
 		methods: {
 			setTitle,
             setDescription,
 			objectArraySort,
 			toAppPage,
-			setTheme,
-			isFromDetailCategory,
+			setTheme
 		}
 }

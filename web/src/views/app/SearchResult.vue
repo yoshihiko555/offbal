@@ -130,10 +130,11 @@
                 })
                 this.getSearchResultAction(this.searchText)
                 .then(res => {
-                    loading.close()
-                    this.isLoading = false
+                    console.log('検索結果', res.data)
                     this.setSearchResult(res.data)
                     console.log(this.searchResult)
+                    loading.close()
+                    this.isLoading = false
                 })
                 .catch(e => {
                     loading.close()

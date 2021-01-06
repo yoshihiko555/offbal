@@ -201,6 +201,7 @@
                     task_id: this.cloneTask.id,
                     key: key,
                     value: value,
+                    route: this.$route.name
                 })
             },
             deleteTaskConfirm () {

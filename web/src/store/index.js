@@ -7,7 +7,8 @@ import {
 	deleteEachRouteSubTask,
 	updateEachRouteCompleteSubTask,
 	updateEachRouteSubTask,
-	deleteEachRouteTask
+	deleteEachRouteTaskData,
+	updateEachRouteTask
 } from '@/mixins/store'
 
 import setting from './setting'
@@ -71,20 +72,24 @@ export default new Vuex.Store({
 		},
 		deleteTask (state, payload) {
 			// カテゴリー詳細
-			deleteEachRouteTask(state, payload)
+			deleteEachRouteTaskData(state, payload)
 			const task = payload.task
 			const index = state.detailCategory.tasks.findIndex(target => target.id === task.id)
 			if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
 	    },
 		deleteTasks (state, payload) {
-			for (const i in payload) {
-				const index = state.detailCategory.tasks.findIndex(task => task.id === payload[i].id)
+			deleteEachRouteTaskData(state, payload)
+			const task = payload.task
+			for (const i in task) {
+				const index = state.detailCategory.tasks.findIndex(target => target.id === task[i].id)
 				if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
 			}
 		},
 		updateTask (state, payload) {
-			const index = state.detailCategory.tasks.findIndex(task => task.id === payload.id)
-			Vue.set(state.detailCategory.tasks, index, payload)
+			updateEachRouteTask(state, payload)
+			const task = payload.task
+			const index = state.detailCategory.tasks.findIndex(target => target.id === task.id)
+			Vue.set(state.detailCategory.tasks, index, task)
 		},
 		updateTasks (state, payload) {
 			state.detailCategory.tasks.splice(0, state.detailCategory.tasks.length)
@@ -150,8 +155,9 @@ export default new Vuex.Store({
 		},
 		// タスクを複数追加。TODO id順にする？？
 		addTasks (state, payload) {
-			for (const i in payload) {
-				state.detailCategory.tasks.push(payload[i])
+			const task = payload.task
+			for (const i in task) {
+				state.detailCategory.tasks.push(task[i])
 			}
 		},
 		deleteCompleteTasks (state, payload) {
@@ -176,18 +182,6 @@ export default new Vuex.Store({
 		},
 		setSearchResult (state, payload) {
 			state.searchResult = payload
-		},
-		updateTodaySchedule (state, payload) {
-		},
-		updateFutureSchedule (state, payload) {
-		},
-		updateSearchResult (state, payload) {
-		},
-		deleteTodaySchedule (state, payload) {
-		},
-		deleteFutureSchedule (state, payload) {
-		},
-		deleteSearchResult (state, payload) {
 		},
 	},
 	actions: {
@@ -345,7 +339,11 @@ export default new Vuex.Store({
 			})
 			.then(res => {
 				console.log(res)
-				this.commit('updateTask', res.data)
+				const data = {
+					task: res.data,
+					route: kwargs.route
+				}
+				this.commit('updateTask', data)
 			})
 			.catch(e => {
 				console.log(e)
@@ -366,12 +364,16 @@ export default new Vuex.Store({
 				})
 				.then(res => {
 					console.log(res)
+					const data = {
+						task: res.data,
+						route: kwargs.route
+					}
 					if (completed) {
-						this.commit('deleteTasks', res.data)
+						this.commit('deleteTasks', data)
 						this.commit('addCompleteTasks', res.data)
 					} else {
 						this.commit('deleteCompleteTasks', res.data)
-						this.commit('addTasks', res.data)
+						this.commit('addTasks', data)
 					}
 					resolve(res)
 				})
@@ -388,8 +390,6 @@ export default new Vuex.Store({
 	        		method: 'GET',
 				})
 				.then(res => {
-					console.log('今日のタスク', res)
-					this.commit('setTodaySchedule', res.data)
 					resolve(res)
 				})
 				.catch(e => {
@@ -405,7 +405,6 @@ export default new Vuex.Store({
 	        		method: 'GET',
 				})
 				.then(res => {
-					console.log('来週までのタスク', res)
 					resolve(res)
 				})
 				.catch(e => {
@@ -424,8 +423,6 @@ export default new Vuex.Store({
 					}
 				})
 				.then(res => {
-					console.log('検索結果', res)
-					this.commit('setSearchResult', res.data)
 					resolve(res)
 				})
 				.catch(e => {

@@ -118,9 +118,17 @@ export const updateEachRouteSubTask = (state, payload) => {
 	}
 }
 
-export const deleteEachRouteTask = (state, payload) => {
+export const deleteEachRouteTaskData = (state, payload) => {
 	const task = payload.task
 	const route = payload.route
+	if (Array.isArray(task)) {
+		deleteEachRouteTasks(state, task, route)
+	} else {
+		deleteEachRouteTask(state, task, route)
+	}
+}
+
+export const deleteEachRouteTask = (state, task, route) => {
 	switch (route) {
 		case 'SearchResult': {
 			const index = getSearchResultTaskIndex(state, task.id)
@@ -137,11 +145,45 @@ export const deleteEachRouteTask = (state, payload) => {
 		case 'FutureSchedule': {
 			const res = getFutureTaskIndex(state, task.id)
 			if (!Object.keys(res).length === false) {
-				console.log('ok')
 				const index = res.index
 				const key = res.key
 				state.futureSchedule[key] = state.futureSchedule[key].filter((_, i) => i !== index)
 				if (state.futureSchedule[key].length === 0) delete state.futureSchedule[key]
+			}
+			break
+		}
+		default:
+	}
+}
+
+export const deleteEachRouteTasks = (state, tasks, route) => {
+	for (const i in tasks) {
+		deleteEachRouteTask(state, tasks[i], route)
+	}
+}
+
+export const updateEachRouteTask = (state, payload) => {
+	const task = payload.task
+	const route = payload.route
+	switch (route) {
+		case 'SearchResult': {
+			const index = getSearchResultTaskIndex(state, task.id)
+			Vue.set(state.searchResult, index, task)
+			break
+		}
+		case 'TodaySchedule': {
+			const eIndex = getExpiredTaskIndex(state, task.id)
+			const tIndex = getTodaysTaskIndex(state, task.id)
+			if (eIndex !== -1) Vue.set(state.todaySchedule.expired_tasks, eIndex, task)
+			if (tIndex !== -1) Vue.set(state.todaySchedule.today_tasks, tIndex, task)
+			break
+		}
+		case 'FutureSchedule': {
+			const res = getFutureTaskIndex(state, task.id)
+			if (!Object.keys(res).length === false) {
+				const index = res.index
+				const key = res.key
+				Vue.set(state.futureSchedule[key], index, task)
 			}
 			break
 		}
@@ -218,5 +260,7 @@ export const globalStoreMixins = {
         deleteEachRouteSubTask,
         updateEachRouteCompleteSubTask,
         updateEachRouteSubTask,
+		deleteEachRouteTaskData,
+		updateEachRouteTask
     }
 }

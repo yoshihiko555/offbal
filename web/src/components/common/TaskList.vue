@@ -88,6 +88,7 @@
                 this.updateCompleteTasksAction({
                     complete_task_list: this.complete_task_list,
                     completed: 1,
+                    route: this.$route.name
                 })
                 .then(res => {
                     this.$eventHub.$emit('addCloneCompleteTasks', res.data)

@@ -189,6 +189,7 @@
                 this.updateCompleteTasksAction({
                     complete_task_list: deleteCompleteTasks,
                     completed: 0,
+                    route: this.$route.name
                 })
                 this.beforeCompleteTasks = _.cloneDeep(this.localCompleteTasks)
             }, 400),

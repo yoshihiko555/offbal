@@ -57,6 +57,8 @@
             this.todayDate = todayDate.format('YYYY-MM-DD')
             this.getTodaySchedule()
             .then(res => {
+                console.log('今日のタスク', res.data)
+                this.setTodaySchedule(res.data)
                 loading.close()
                 this.isLoading = false
             })
@@ -74,6 +76,7 @@
         },
         methods: {
             ...mapMutations([
+                'setTodaySchedule',
             ]),
             ...mapActions([
                 'getTodaySchedule',

@@ -56,6 +56,7 @@
             })
             this.getFutureSchedule()
             .then(res => {
+                console.log('来週までのタスク', res.data)
                 this.setFutureSchedule(this.toListEachDate(res.data))
                 loading.close()
                 this.isLoading = false

@@ -7,7 +7,7 @@
             class="ma-0 pa-0"
         >
             <h5
-                class="task_dialog_header mb-3"
+                class="task_dialog_header mt-2"
                 align="center"
             >
                 タスクを削除しますか？
@@ -67,5 +67,8 @@
 <style lang="scss" scoped>
     .task_delete_confirm_btn {
         margin: 0 auto;
+        .vs-button__content::v-deep {
+            width: 75px;
+        }
     }
 </style>

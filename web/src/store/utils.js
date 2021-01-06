@@ -253,14 +253,3 @@ const getFutureTaskIndex = (state, taskId) => {
 	}
 	return res
 }
-
-export const globalStoreMixins = {
-    methods: {
-        addEachRouteSubTask,
-        deleteEachRouteSubTask,
-        updateEachRouteCompleteSubTask,
-        updateEachRouteSubTask,
-		deleteEachRouteTaskData,
-		updateEachRouteTask
-    }
-}

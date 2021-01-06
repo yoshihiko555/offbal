@@ -9,7 +9,7 @@ import {
 	updateEachRouteSubTask,
 	deleteEachRouteTaskData,
 	updateEachRouteTask
-} from '@/mixins/store'
+} from '@/store/utils'
 
 import setting from './setting'
 
@@ -19,6 +19,9 @@ const initialState = {
 	categories: [],
 	labels: [],
 	detailCategory: {},
+	todaySchedule: [],
+	futureSchedule: [],
+	searchResult: [],
 }
 
 export default new Vuex.Store({
@@ -74,15 +77,19 @@ export default new Vuex.Store({
 			// カテゴリー詳細
 			deleteEachRouteTaskData(state, payload)
 			const task = payload.task
-			const index = state.detailCategory.tasks.findIndex(target => target.id === task.id)
-			if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
+			if (state.detailCategory.tasks !== undefined) {
+				const index = state.detailCategory.tasks.findIndex(target => target.id === task.id)
+				if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
+			}
 	    },
 		deleteTasks (state, payload) {
 			deleteEachRouteTaskData(state, payload)
 			const task = payload.task
-			for (const i in task) {
-				const index = state.detailCategory.tasks.findIndex(target => target.id === task[i].id)
-				if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
+			if (state.detailCategory.tasks !== undefined) {
+				for (const i in task) {
+					const index = state.detailCategory.tasks.findIndex(target => target.id === task[i].id)
+					if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
+				}
 			}
 		},
 		updateTask (state, payload) {
@@ -176,12 +183,15 @@ export default new Vuex.Store({
 		},
 		setTodaySchedule (state, payload) {
 			state.todaySchedule = payload
+			console.log('setTodaySchedule', state.todaySchedule)
 		},
 		setFutureSchedule (state, payload) {
 			state.futureSchedule = payload
+			console.log('setFutureSchedule', state.futureSchedule)
 		},
 		setSearchResult (state, payload) {
 			state.searchResult = payload
+			console.log('setSearchResult', state.searchResult)
 		},
 	},
 	actions: {

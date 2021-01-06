@@ -132,7 +132,6 @@
                 .then(res => {
                     console.log('検索結果', res.data)
                     this.setSearchResult(res.data)
-                    console.log(this.searchResult)
                     loading.close()
                     this.isLoading = false
                 })

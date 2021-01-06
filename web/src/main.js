@@ -10,7 +10,6 @@ import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import myRules from '@/assets/js/rules'
 import { globalMixins } from '@/mixins'
 import { globalValidateMixins } from '@/mixins/validate'
-import { globalStoreMixins } from '@/mixins/store'
 import eventHub from '@/plugins/eventHub'
 import truncate from '@/filters/truncate'
 
@@ -34,7 +33,6 @@ Vue.use(eventHub)
 
 Vue.mixin(globalMixins)
 Vue.mixin(globalValidateMixins)
-Vue.mixin(globalStoreMixins)
 
 // ルールの呼び出し
 myRules()

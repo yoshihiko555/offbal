@@ -27,7 +27,9 @@
                     this.search(val)
                 } else {
                     const prefix = (this.isCategory()) ? '/myapp/category' : '/myapp'
-                	this.$router.push(`${prefix}/${this.setting.start_page}`)
+                    if (!this.isSamePage()) {
+                        this.$router.push(`${prefix}/${this.setting.start_page}`)
+                    }
                 }
             },
         },
@@ -62,6 +64,15 @@
         			return true
         		}
         	},
+            isSamePage () {
+                // 検索文字が0文字になった時にこれらのページなら移動しない
+                if (this.$route.name === 'TodaySchedule' ||
+                    this.$route.name === 'FutureSchedule') {
+                    return true
+                } else {
+                    return false
+                }
+            }
         }
     }
 </script>

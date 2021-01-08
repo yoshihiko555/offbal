@@ -65,10 +65,11 @@
     }
 </script>
 <style lang="scss" scoped>
+    .vs-button.task_delete_confirm_btn {
+        width: 70px;
+        margin-top: 10px;
+    }
     .task_delete_confirm_btn {
         margin: 0 auto;
-        .vs-button__content::v-deep {
-            width: 75px;
-        }
     }
 </style>

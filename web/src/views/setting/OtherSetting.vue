@@ -33,11 +33,15 @@
         <ChangeCategoryDialog
             ref='category'
         />
+        <EditLabelDialog
+            ref='label'
+        />
     </div>
 </template>
 
 <script>
     import ChangeCategoryDialog from '@/components/common/ChangeCategoryDialog'
+    import EditLabelDialog from '@/components/common/EditLabelDialog'
     import _ from 'lodash'
     import { mapActions } from 'vuex'
 
@@ -45,6 +49,7 @@
         name: 'OtherSetting',
         components: {
             ChangeCategoryDialog,
+            EditLabelDialog,
         },
         props: {
             setting: {
@@ -68,7 +73,7 @@
                 this.$refs.category.open()
             },
             changeLabel () {
-                console.log('ラベル編集')
+                this.$refs.label.open()
             },
             update: _.debounce(function () {
                 this.updateSettingAction(this.cloneSetting)

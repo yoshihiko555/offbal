@@ -734,8 +734,9 @@ class LabelViewSet(BaseModelViewSet):
         logger.debug(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
     @action(methods=['DELETE'], detail=False)
-    def delete(self, request):
+    def deleteTaskLabels(self, request):
         task_id = request.data['task_id']
         delete_label_list = request.data['delete_label_list']
         result = []

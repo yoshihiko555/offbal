@@ -45,7 +45,9 @@ export default new Vuex.Store({
 		addLabel (state, payload) {
             state.labels.push(payload)
 		},
-		updateLabelToTask (state, payload) {
+		updateTaskLabel (state, payload) {
+			// タスクのラベルを更新
+			if (state.detailCategory.tasks === undefined) return
 			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
 
 			if (task === undefined) return
@@ -53,6 +55,11 @@ export default new Vuex.Store({
 			for (const i in payload.label) {
 				task.label.push(payload.label[i])
 			}
+		},
+		updateLabel (state, payload) {
+			console.log('updateLabel', payload)
+			const index = state.labels.findIndex(label => label.id === payload.id)
+			Vue.set(state.labels, index, payload)
 		},
 		updateCategory (state, payload) {
 	        // カテゴリー詳細の更新
@@ -152,13 +159,19 @@ export default new Vuex.Store({
 			const j = task.complete_sub_tasks.findIndex(target => target.id === subtask.id)
 			if (j !== -1) task.complete_sub_tasks = task.complete_sub_tasks.filter((_, i) => i !== j)
 		},
-		deleteLabels (state, payload) {
+		deleteTaskLabels (state, payload) {
+			if (state.detailCategory.tasks === undefined) return
 			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			if (task === undefined) return
 			for (const i in payload.delete_labels) {
 				const index = task.label.findIndex(label => label.id === payload.delete_labels[i].id)
 				if (index !== -1) task.label = task.label.filter((_, i) => i !== index)
 			}
+		},
+		deleteLabel (state, payload) {
+			console.log('deleteLabel', payload)
+			const index = state.labels.findIndex(label => label.id === payload.id)
+			if (index !== -1) state.labels = state.labels.filter((_, i) => i !== index)
 		},
 		// タスクを複数追加。TODO id順にする？？
 		addTasks (state, payload) {
@@ -215,8 +228,25 @@ export default new Vuex.Store({
 	        	})
 			})
 		},
-		addLabelsAction (ctx, kwargs) {
-			this.commit('addLabel', kwargs)
+		addLabelAction (ctx, kwargs) {
+			return new Promise((resolve, reject) => {
+				Vue.prototype.$axios({
+					url: '/api/label/',
+					method: 'POST',
+					data: {
+						name: kwargs.name
+					}
+				})
+				.then(res => {
+					console.log('ラベル作成成功', res)
+					this.commit('addLabel', res.data)
+					resolve(res)
+				})
+				.catch(e => {
+					console.log(e)
+					reject(e)
+				})
+			})
 		},
 	    // カテゴリーの更新
 	    updateCategoryAction (ctx, kwargs) {
@@ -281,9 +311,9 @@ export default new Vuex.Store({
 		updateTaskAction (ctx, kwargs) {
 			this.commit('updateTask', kwargs)
 		},
-		deleteLabelAction (ctx, kwargs) {
+		deleteTaskLabelsAction (ctx, kwargs) {
 			Vue.prototype.$axios({
-				url: '/api/label/delete/',
+				url: '/api/label/deleteTaskLabels/',
 				method: 'DELETE',
 				data: {
 					task_id: kwargs.task_id,
@@ -292,7 +322,23 @@ export default new Vuex.Store({
 			})
 			.then(res => {
 				console.log(res)
-				this.commit('deleteLabels', res.data)
+				this.commit('deleteTaskLabels', res.data)
+			})
+			.catch(e => {
+				console.log(e)
+			})
+		},
+		deleteLabelAction (ctx, kwargs) {
+			Vue.prototype.$axios({
+				url: `/api/label/${kwargs.id}`,
+				method: 'DELETE',
+				data: {
+					...kwargs
+				}
+			})
+			.then(res => {
+				console.log(res)
+				this.commit('deleteLabel', kwargs)
 			})
 			.catch(e => {
 				console.log(e)
@@ -391,6 +437,23 @@ export default new Vuex.Store({
 					console.log(e)
 					reject(e)
 				})
+			})
+		},
+		updateLabelAction (ctx, kwargs) {
+			console.log('updateLabelAction', kwargs)
+			Vue.prototype.$axios({
+				url: `/api/label/${kwargs.id}/`,
+				method: 'PUT',
+				data: {
+					...kwargs
+				}
+			})
+			.then(res => {
+				console.log('ラベル更新成功', res)
+				this.commit('updateLabel', res.data)
+			})
+			.catch(e => {
+				console.log(e)
 			})
 		},
 		getTodaySchedule (ctx, kwargs) {

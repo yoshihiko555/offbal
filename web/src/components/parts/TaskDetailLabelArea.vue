@@ -258,11 +258,11 @@
         methods: {
             ...mapMutations([
                 'addLabel',
-                'updateLabelToTask',
+                'updateTaskLabel',
             ]),
             ...mapActions([
-                'addLabelsAction',
-                'deleteLabelAction',
+                'addLabelAction',
+                'deleteTaskLabelsAction',
             ]),
             confirmCreateLabelContent () {
                 this.createLabelBtn()
@@ -287,10 +287,10 @@
                 const index = this.localSelectedLabelList.indexOf(label.id)
                 if (index !== -1) this.localSelectedLabelList.splice(index, 1)
                 this.deleteLabelList.push(label)
-                this.deleteLabelToAction()
+                this.deleteTaskLabel()
             },
-            deleteLabelToAction: _.debounce(function deleteLabelToAction () {
-                this.deleteLabelAction({
+            deleteTaskLabel: _.debounce(function deleteTaskLabel () {
+                this.deleteTaskLabelsAction({
                     task_id: this.cloneTask.id,
                     delete_label_list: this.deleteLabelList
                 })
@@ -311,7 +311,7 @@
                 }
             },
             addLabelBtn () {
-                // ラベルを選択した後送信
+                // ラベルを選択し、タスクと紐づける
                 this.isLoadingUpdateLabel = true
                 this.$axios({
                     url: '/api/task/change_label_list/',
@@ -326,7 +326,7 @@
                     this.cloneTask.label = res.data.label
                     // this.setSelectedLabelList()
                     this.endCreateLabel()
-                    this.updateLabelToTask(res.data)
+                    this.updateTaskLabel(res.data)
                     this.isLoadingUpdateLabel = false
                 })
                 .catch(e => {
@@ -337,21 +337,14 @@
                 // ラベル作成の送信ボタンが押されたらラベル作成
                 if (this.createLabelValue.length === 0) return
                 this.isLoadingUpdateLabel = true
-                this.$axios({
-                    url: '/api/label/',
-                    method: 'POST',
-                    data: {
-                        name: this.createLabelValue,
-                    }
+
+                this.addLabelAction({
+                    name: this.createLabelValue
                 })
                 .then(res => {
                     this.isLoadingUpdateLabel = false
                     this.localSelectedLabelList.push(res.data.id)
-                    this.addLabelsAction(res.data)
                     this.isCreateNewLabel = false
-                })
-                .catch(e => {
-                    console.log(e)
                 })
                 this.createLabelValue = ''
             },

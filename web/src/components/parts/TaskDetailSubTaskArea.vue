@@ -30,6 +30,14 @@
                     </v-col>
                     <v-col cols="2">
                         <!-- <v-list-item-action> -->
+                            <!-- <vs-button
+                                v-if="isMouseOverSubTask(subtask)"
+                                border
+                                @click.stop
+                                @click="editSubTaskContent(subtask)"
+                            >
+                                <i class='bx bxs-pencil'></i> edit
+                            </vs-button> -->
                             <v-btn
                                 v-if="isMouseOverSubTask(subtask)"
                                 icon

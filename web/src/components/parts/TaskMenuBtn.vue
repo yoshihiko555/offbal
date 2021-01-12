@@ -91,6 +91,8 @@
             ...mapMutations([
                 'addTask',
                 'deleteTask',
+                'updateTaskEachRoute',
+                'addTaskEachRoute',
             ]),
             ...mapActions([
                 'deleteTaskAction',
@@ -127,11 +129,20 @@
                 .then(res => {
                     console.log(res)
                     this.addTask(res.data)
+                    if (!this.isDetailCategory()) {
+                        addTaskEachRoute({
+                            task: res.data,
+                            route: this.$route.name
+                        })
+                    }
                 })
                 .catch(e => {
                     console.log(e)
                 })
                 this.init()
+            },
+            isDetailCategory () {
+                return this.$route.name === 'DetailCategory'
             },
             deleteLocalTask () {
                 this.deleteTaskAction({
@@ -178,13 +189,29 @@
                 })
                 .then(res => {
                     console.log(res)
+                    console.log(this.$route)
+                    console.log(this.$router)
+                    const route = this.$route.name
                     this.addTask(res.data)
-                    this.deleteTask(this.task)
+                    if (this.isDetailCategory()) {
+                        this.deleteTask({
+                            task: this.task,
+                            route: route
+                        })
+                    } else {
+                        this.updateTaskEachRoute({
+                            task: res.data,
+                            route: route
+                        })
+                    }
                 })
                 .catch(e => {
                     console.log(e)
                 })
                 this.init()
+            },
+            isDetailCategory () {
+                return this.$route.name === 'DetailCategory'
             }
         }
     }

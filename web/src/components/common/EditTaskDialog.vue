@@ -125,6 +125,7 @@
             ...mapMutations([
                 'addTask',
                 'deleteTask',
+                'updateTaskEachRoute',
             ]),
             open (task) {
                 this.task = _.cloneDeep(task)
@@ -147,11 +148,26 @@
                 .then(res => {
                     // カテゴリー、セクションを更新したら消すのと追加
                     if (targetCategory !== categoryId) {
+                        const route = this.$route.name
                         this.addTask(res.data)
-                        this.deleteTask(this.task)
+                        if (this.isDetailCategory()) {
+                            this.deleteTask({
+                                task: this.task,
+                                route: route
+                            })
+                        } else {
+                            this.updateTaskEachRoute({
+                                task: res.data,
+                                route: route
+                            })
+                        }
                     // 変わらなければ、更新
                     } else {
-                        this.updateTaskAction(res.data)
+                        const data = {
+                            task: res.data,
+                            route: this.$route.name
+                        }
+                        this.updateTaskAction(data)
                     }
                     console.log(res)
                     this.close()
@@ -159,6 +175,9 @@
                 .catch(e => {
                     console.log(e)
                 })
+            },
+            isDetailCategory () {
+                return this.$route.name === 'DetailCategory'
             },
             createUpdateTaskData (task) {
                 this.updateTaskData = {

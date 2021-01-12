@@ -191,6 +191,73 @@ export const updateEachRouteTask = (state, payload) => {
 	}
 }
 
+export const updateEachRouteTaskLabel = (state, payload) => {
+	const task = payload.task
+	const route = payload.route
+	switch (route) {
+		case 'SearchResult': {
+			const t = getSearchResultTask(state, task.id)
+			updateTaskLabel(t, task)
+			break
+		}
+		case 'TodaySchedule': {
+			const eTask = getExpiredTask(state, task.id)
+			const tTask = getTodaysTask(state, task.id)
+			updateTaskLabel(eTask, task)
+			updateTaskLabel(tTask, task)
+			break
+		}
+		case 'FutureSchedule': {
+			const fTask = getFutureTask(state, task.id)
+			updateTaskLabel(fTask, task)
+			break
+		}
+		default:
+	}
+}
+
+export const deleteEachRouteTaskLabels = (state, payload) => {
+	const targetTask = payload.target_task
+	const deleteLabels = payload.delete_labels
+	const route = payload.route
+	switch (route) {
+		case 'SearchResult': {
+			const t = getSearchResultTask(state, targetTask)
+			deleteTaskLabels(t, deleteLabels)
+			break
+		}
+		case 'TodaySchedule': {
+			const eTask = getExpiredTask(state, targetTask)
+			const tTask = getTodaysTask(state, targetTask)
+			deleteTaskLabels(eTask, deleteLabels)
+			deleteTaskLabels(tTask, deleteLabels)
+			break
+		}
+		case 'FutureSchedule': {
+			const fTask = getFutureTask(state, targetTask)
+			deleteTaskLabels(fTask, deleteLabels)
+			break
+		}
+		default:
+	}
+}
+
+const updateTaskLabel = (task, payload) => {
+	if (task === undefined) return
+	task.label = []
+	for (const i in payload.label) {
+		task.label.push(payload.label[i])
+	}
+}
+
+const deleteTaskLabels = (task, deleteLabels) => {
+	if (task === undefined) return
+	for (const i in deleteLabels) {
+		const index = task.label.findIndex(label => label.id === deleteLabels[i].id)
+		if (index !== -1) task.label = task.label.filter((_, i) => i !== index)
+	}
+}
+
 const updateSubTaskData = (task, subtask) => {
     if (task === undefined) return
 

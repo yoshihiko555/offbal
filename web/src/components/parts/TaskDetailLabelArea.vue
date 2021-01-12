@@ -292,7 +292,8 @@
             deleteTaskLabel: _.debounce(function deleteTaskLabel () {
                 this.deleteTaskLabelsAction({
                     task_id: this.cloneTask.id,
-                    delete_label_list: this.deleteLabelList
+                    delete_label_list: this.deleteLabelList,
+                    route: this.$route.name
                 })
                 this.deleteLabelList = []
             }, 400),
@@ -323,10 +324,14 @@
                 })
                 .then(res => {
                     console.log(res)
+                    const data = {
+                        task: res.data,
+                        route: this.$route.name
+                    }
                     this.cloneTask.label = res.data.label
                     // this.setSelectedLabelList()
                     this.endCreateLabel()
-                    this.updateTaskLabel(res.data)
+                    this.updateTaskLabel(data)
                     this.isLoadingUpdateLabel = false
                 })
                 .catch(e => {

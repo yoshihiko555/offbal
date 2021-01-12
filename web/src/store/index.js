@@ -8,7 +8,9 @@ import {
 	updateEachRouteCompleteSubTask,
 	updateEachRouteSubTask,
 	deleteEachRouteTaskData,
-	updateEachRouteTask
+	updateEachRouteTask,
+	updateEachRouteTaskLabel,
+	deleteEachRouteTaskLabels
 } from '@/store/utils'
 
 import setting from './setting'
@@ -46,6 +48,7 @@ export default new Vuex.Store({
             state.labels.push(payload)
 		},
 		updateTaskLabel (state, payload) {
+			updateEachRouteTaskLabel(state, payload)
 			// タスクのラベルを更新
 			if (state.detailCategory.tasks === undefined) return
 			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
@@ -80,6 +83,9 @@ export default new Vuex.Store({
 			if (state.detailCategory.id !== payload.target_category) return
 			state.detailCategory.tasks.push(payload)
 		},
+		addTaskEachRoute (state, payload) {
+			// TODO
+		},
 		deleteTask (state, payload) {
 			// カテゴリー詳細
 			deleteEachRouteTaskData(state, payload)
@@ -104,6 +110,9 @@ export default new Vuex.Store({
 			const task = payload.task
 			const index = state.detailCategory.tasks.findIndex(target => target.id === task.id)
 			Vue.set(state.detailCategory.tasks, index, task)
+		},
+		updateTaskEachRoute (state, payload) {
+			updateEachRouteTask(state, payload)
 		},
 		updateTasks (state, payload) {
 			state.detailCategory.tasks.splice(0, state.detailCategory.tasks.length)
@@ -160,6 +169,7 @@ export default new Vuex.Store({
 			if (j !== -1) task.complete_sub_tasks = task.complete_sub_tasks.filter((_, i) => i !== j)
 		},
 		deleteTaskLabels (state, payload) {
+			deleteEachRouteTaskLabels(state, payload)
 			if (state.detailCategory.tasks === undefined) return
 			const task = state.detailCategory.tasks.find(task => task.id === payload.target_task)
 			if (task === undefined) return
@@ -322,7 +332,11 @@ export default new Vuex.Store({
 			})
 			.then(res => {
 				console.log(res)
-				this.commit('deleteTaskLabels', res.data)
+				const data = {
+					...res.data,
+					route: kwargs.route
+				}
+				this.commit('deleteTaskLabels', data)
 			})
 			.catch(e => {
 				console.log(e)

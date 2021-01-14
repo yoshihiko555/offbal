@@ -38,7 +38,7 @@
 </template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex'
+    import { mapGetters, mapMutations, mapActions } from 'vuex'
     import _ from 'lodash'
     import { Const } from '@/assets/js/const'
     const Con = new Const()
@@ -59,16 +59,24 @@
             sortDisp: '',
             sortType: '',
         }),
+        created () {
+            this.$eventHub.$off('initSort')
+            this.$eventHub.$on('initSort', this.init)
+        },
         computed: {
             // ...mapGetters([
             //     'detailCategory',
             // ])
         },
         methods: {
+            ...mapMutations([
+                'updateSortedTasks'
+            ]),
             // ...mapActions([
             //     'updateCategoryAction',
             // ]),
             sort () {
+                this.isAsc = true
                 this.$emit('sort-tasks', this.cloneTasks.sort(this.sortBy(this.sortType, this.isAsc)))
             },
         	readySort (menu) {
@@ -102,15 +110,26 @@
                 }
             },
             cancelSort () {
-                this.sortType = 'created_at'
+                this.sortType = 'id'
                 this.sortDisp = ''
-                this.isAsc = true
+                this.isAsc = false
                 this.isSort = false
-                this.sort()
+                const taskList = _.cloneDeep(this.cloneTasks)
+                this.updateSortedTasks({
+                    task: taskList.sort(this.sortBy(this.sortType, this.isAsc)),
+                    route: this.$route.name
+                })
+                // this.sort()
             },
             togleSort () {
                 this.isAsc = !this.isAsc
                 this.sort()
+            },
+            init () {
+                this.isAsc = true
+                this.isSort = false
+                this.sortDisp = ''
+                this.sortType = ''
             }
         }
     }

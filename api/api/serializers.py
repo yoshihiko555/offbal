@@ -105,6 +105,7 @@ class CategorySerializer(DynamicFieldsModelSerializer):
     archived = serializers.SerializerMethodField()
     is_favorite = serializers.BooleanField(write_only=True, required=False)
     is_archived = serializers.BooleanField(write_only=True, required=False)
+    is_completed_task = serializers.BooleanField(read_only=True, default=False)
 
     # 画面側でのアイコン描画判定用 (カテゴリーかセクションか)
     isCategory = serializers.BooleanField(read_only=True, default=True)
@@ -131,6 +132,7 @@ class CategorySerializer(DynamicFieldsModelSerializer):
             'index',
             'icon',
             'is_active',
+            'is_completed_task',
         ]
 
 
@@ -331,8 +333,6 @@ class TaskSerializer(DynamicFieldsModelSerializer):
         if obj.deadline == None:
             return False
         now = datetime.now(timezone(timedelta(hours=+9), 'JST'))
-        logger.info(obj.deadline)
-        logger.info(now)
 
         # if (obj.deadline - now).days < 0:
             # return True

@@ -6,33 +6,33 @@
             :class="{ 'is-task-drawer': drawer }"
         >
             <div class="search_result_header_wrap pl-5">
-                <v-row>
+                <div class="search_result_header">
+                <!-- <v-row class="search_result_header">
                     <v-col
-                        cols="6"
+                        cols="9"
                         class="ma-0 pa-0"
-                    >
-                        <h3
-                            class="ml-4 search_result_title"
-                        >
-                            Search Result
-                        </h3>
-                    </v-col>
+                    > -->
+                        <h3 class="search_result_title">Search Result</h3>
+                    <!-- </v-col>
                     <v-spacer></v-spacer>
                     <v-col
-                        cols="6"
+                        cols="3"
                         class="ma-0 pa-0"
-                    >
-                        <div class="operation_btn_wrap pl-10">
-                            <v-spacer></v-spacer>
+                    > -->
+                        <v-spacer/>
+                        <div class="operation_btn_wrap pr-2 text-end">
+                            <!-- <v-spacer></v-spacer> -->
                             <FilterBtn
                                 :isSearchResult=true
                             />
                             <SortBtn
-                                :tasks=searchResult
+                                :tasks=searchResult.tasks
+                                @sort-tasks='sortTasks'
                             />
                         </div>
-                    </v-col>
-                </v-row>
+                    <!-- </v-col>
+                </v-row> -->
+                </div>
                 <v-row>
                     <v-col
                         cols="12"
@@ -53,7 +53,7 @@
             </div>
             <div v-else>
                 <TaskList
-                    :tasks=searchResult
+                    :tasks=searchResult.tasks
                 />
             </div>
         </v-container>
@@ -85,11 +85,11 @@
         }),
         created () {
             // FilterBtnから渡ってきた値で検索結果を絞る
-            this.$eventHub.$off('filterSearchResult', this.filterSearchResult)
+            this.$eventHub.$off('filterSearchResult')
             this.$eventHub.$on('filterSearchResult', this.filterSearchResult)
         },
         mounted: function () {
-        	this.$eventHub.$off('changeToggleDrawer', this.changeToggleDrawer)
+        	this.$eventHub.$off('changeToggleDrawer')
         	this.$eventHub.$on('changeToggleDrawer', this.changeToggleDrawer)
             this.searchStart(this.$route.query.text)
         },
@@ -101,8 +101,8 @@
             ]),
             taskLength () {
                 // ロード中は0件を返す
-                if (this.isLoading || this.searchResult === undefined) return 0
-                return this.searchResult.length
+                if (this.isLoading || this.searchResult.tasks === undefined) return 0
+                return this.searchResult.tasks.length
             }
         },
         beforeRouteUpdate (to, from, next) {
@@ -115,6 +115,8 @@
         methods: {
             ...mapMutations([
                 'setSearchResult',
+                'updateIsCompletedTask',
+                'updateSortedTasks',
             ]),
             ...mapActions([
                 'getSearchResultAction',
@@ -146,6 +148,7 @@
             filterSearchResult (val) {
                 // FilterBtnから渡ってきた値で検索結果を絞る
                 const queryParams = {}
+                this.changeSearchIsCompletedTask(val.isCompletedTask)
                 queryParams.searchText = this.searchText
                 for (const i in val) {
                     if (val[i] instanceof Array) {
@@ -157,19 +160,44 @@
                     }
                 }
                 this.getFilteredSearchResult(queryParams)
+                .then(res => {
+                    this.$eventHub.$emit('updateTaskListCompleteTasks', res.data)
+                })
             },
             changeToggleDrawer (value) {
                 this.drawer = value
+            },
+            changeSearchIsCompletedTask (isCompletedTask) {
+                this.updateIsCompletedTask({
+                    route: this.$route.name,
+                    isCompletedTask: isCompletedTask
+                })
+            },
+            sortTasks (val) {
+                console.log('sortTasks', val)
+                this.updateSortedTasks({
+                    task: val,
+                    route: this.$route.name
+                })
             },
         }
     }
 </script>
 <style lang="scss" scoped>
+    .search_result_header {
+        height: 60px;
+        display: flex;
+        // align-items: center;
+        // width: 100%;
+        margin: 0;
+        padding: 0;
+    }
     .search_result_title {
-        padding-top: 18px;
+        padding-top: 10px;
+        display: inline-block;
     }
     .operation_btn_wrap::v-deep {
-        text-align: end;
+        // text-align: end;
         .vs-button {
             display: inline-block;
         }

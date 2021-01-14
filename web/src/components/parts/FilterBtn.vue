@@ -119,27 +119,21 @@
                         </vs-select>
                     </v-list-item-action>
                 </v-list-item>
-                <!-- <v-list-item v-if="isSearchResult">
+                <v-list-item>
                     <v-list-item-content>
-                        <v-list-item-subtitle>完了状態 </v-list-item-subtitle>
+                        <v-list-item-subtitle>完了タスク</v-list-item-subtitle>
                     </v-list-item-content>
                     <v-list-item-action>
                         <vs-switch v-model="filterValue.isCompletedTask">
                             <template #off>
-                                <i class="bx bx-x"></i> 未完了
+                                <i class="bx bx-x"></i> 含めない
                             </template>
                             <template #on>
-                                <i class="bx bx-check"></i> 完了
+                                <i class="bx bx-check"></i> 含める
                             </template>
                         </vs-switch>
-                    </v-list-item-action> -->
-                        <!-- <vs-radio v-model="filterValue.isCompletedTask" val="1">
-                            完了
-                        </vs-radio>
-                        <vs-radio v-model="filterValue.isCompletedTask" val="2">
-                            未完了
-                        </vs-radio> -->
-                <!-- </v-list-item> -->
+                    </v-list-item-action>
+                </v-list-item>
                 <v-list-item>
                     <v-spacer></v-spacer>
                         <vs-button
@@ -186,7 +180,7 @@
                 selectedCategory: [],
                 selectedDeadline: [],
                 selectedLabelList: [],
-                // isCompletedTask: false,
+                isCompletedTask: false,
             },
             menu: false,
         }),
@@ -239,7 +233,7 @@
                 this.filterValue.selectedCategory = []
                 this.filterValue.selectedDeadline = []
                 this.filterValue.selectedLabelList = []
-                // this.filterValue.isCompletedTask = false
+                this.filterValue.isCompletedTask = false
             }
         }
     }

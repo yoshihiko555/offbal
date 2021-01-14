@@ -170,4 +170,7 @@ class SearchView(generics.ListAPIView, GetLoginUserMixin):
             queryset,
             many=True
         )
-        return Response(serializer.data)
+        return Response({
+            'tasks': serializer.data,
+            'is_completed_task': False,
+        })

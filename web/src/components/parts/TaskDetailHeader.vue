@@ -12,16 +12,16 @@
             @mouseover="isHover = true"
             @mouseleave="isHover = false"
         >
-            <vs-checkbox
+            <!-- <vs-checkbox
                 color="primary"
                 v-model="cloneTask.completed"
                 @click.stop
                 @change="checkTask()"
                 class="project_complete_checkbox"
                 line-through
-            >
+            > -->
                 <h1>{{ cloneTask.content }}</h1>
-            </vs-checkbox>
+            <!-- </vs-checkbox> -->
             <v-spacer></v-spacer>
             <v-btn
                 v-if="isHover"

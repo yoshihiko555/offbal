@@ -242,6 +242,62 @@ export const deleteEachRouteTaskLabels = (state, payload) => {
 	}
 }
 
+export const updateIsCompletedTaskStatus = (state, payload) => {
+	const route = payload.route
+	const isCompletedTask = payload.isCompletedTask
+	switch (route) {
+		case 'DetailCategory': {
+			state.detailCategory.is_completed_task = isCompletedTask
+			break
+		}
+		case 'SearchResult': {
+			state.searchResult.is_completed_task = isCompletedTask
+			break
+		}
+		default:
+	}
+}
+
+export const updateCompleteTask = (state, payload) => {
+	const route = payload.route
+	const task = payload.task
+	switch (route) {
+		case 'SearchResult': {
+			break
+		}
+		case 'DetailCategory': {
+			if (state.detailCategory.is_completed_task) return
+			if (state.detailCategory.tasks !== undefined) {
+				const index = state.detailCategory.tasks.findIndex(target => target.id === task.id)
+				if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
+			}
+			break
+		}
+		default:
+			deleteEachRouteTaskData(state, payload)
+	}
+}
+
+export const updateSortedTaskList = (state, payload) => {
+	const route = payload.route
+	const task = payload.task
+	switch (route) {
+		case 'SearchResult': {
+			if (state.searchResult.tasks !== undefined) {
+				state.searchResult.tasks = task
+			}
+			break
+		}
+		case 'DetailCategory': {
+			if (state.detailCategory.tasks !== undefined) {
+				state.detailCategory.tasks = task
+			}
+			break
+		}
+		default:
+	}
+}
+
 const updateTaskLabel = (task, payload) => {
 	if (task === undefined) return
 	task.label = []

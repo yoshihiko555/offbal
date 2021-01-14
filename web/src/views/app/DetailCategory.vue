@@ -22,9 +22,9 @@
                 :tasks=detailCategory.tasks
             />
 
-            <CompleteTaskList
+            <!-- <CompleteTaskList
                 :complete_tasks=detailCategory.complete_tasks
-            />
+            /> -->
 <!--             <TaskDetail/> -->
         </div>
         <div
@@ -47,7 +47,7 @@
     import TodayTaskCountBtn from '@/components/parts/TodayTaskCountBtn'
     import NoTaskMsgArea from '@/components/parts/NoTaskMsgArea'
 
-    import { mapGetters, mapActions } from 'vuex'
+    import { mapGetters, mapMutations, mapActions } from 'vuex'
 
     export default {
         name: 'DetailCategory',
@@ -76,8 +76,10 @@
             })
             this.$eventHub.$off('openEdit', this.openEdit)
             this.$eventHub.$off('changeToggleDrawer', this.changeToggleDrawer)
+            this.$eventHub.$off('displayCompleteTask', this.displayCompleteTask)
             this.$eventHub.$on('openEdit', this.openEdit)
             this.$eventHub.$on('changeToggleDrawer', this.changeToggleDrawer)
+            this.$eventHub.$on('changeIsCompletedTask', this.changeIsCompletedTask)
         },
         mounted: function () {
         },
@@ -99,6 +101,10 @@
     		])
     	},
         methods: {
+            ...mapMutations([
+                'updateIsCompletedTask',
+                'updateSortedTasks',
+            ]),
             ...mapActions([
                 'getDetailCategoryAction',
             ]),
@@ -123,7 +129,17 @@
                 this.drawer = value
             },
             sortTasks (val) {
-                console.log(val)
+                console.log('sortTasks', val)
+                this.updateSortedTasks({
+                    task: val,
+                    route: this.$route.name
+                })
+            },
+            changeIsCompletedTask (isCompletedTask) {
+                this.updateIsCompletedTask({
+                    route: this.$route.name,
+                    isCompletedTask: isCompletedTask
+                })
             }
         },
     }
@@ -133,7 +149,7 @@
     .main_content_wrap {
         padding-left: 5px;
         .detail_category_header {
-            height: 50px;
+            height: 60px;
             display: flex;
             align-items: center;
 

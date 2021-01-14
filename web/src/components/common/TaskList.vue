@@ -67,6 +67,8 @@
         created () {
         },
         mounted () {
+            this.$eventHub.$off('updateTaskListCompleteTasks', this.updateCompleteTasks)
+            this.$eventHub.$on('updateTaskListCompleteTasks', this.updateCompleteTasks)
             this.$eventHub.$off('filterTaskList')
             this.$eventHub.$on('filterTaskList', this.filterTaskList)
             window.removeEventListener('click', this.onClickTaskDetailOuter)
@@ -83,25 +85,39 @@
             ]),
             ...mapActions([
                 'updateCompleteTasksAction',
+                'updateCompleteTaskAction',
             ]),
             checkTask: _.debounce(function checkTask (task) {
-                this.updateCompleteTasksAction({
-                    complete_task_list: this.complete_task_list,
-                    completed: 1,
+                this.updateCompleteTaskAction({
+                    complete_task: task,
                     route: this.$route.name
                 })
                 .then(res => {
-                    this.$eventHub.$emit('addCloneCompleteTasks', res.data)
                 })
                 .catch(e => {
                     console.log(e)
                 })
+                // this.updateCompleteTasksAction({
+                //     complete_task_list: this.complete_task_list,
+                //     completed: 1,
+                //     route: this.$route.name
+                // })
+                // .then(res => {
+                //     this.$eventHub.$emit('addCloneCompleteTasks', res.data)
+                // })
+                // .catch(e => {
+                //     console.log(e)
+                // })
                 for (const i in this.complete_task_list) {
                     const completeTask = JSON.stringify(this.complete_task_list[i])
                     const targetTask = JSON.stringify(task)
                     if (completeTask === targetTask) this.closeSameTaskDetail(task)
                 }
-                this.complete_task_list = []
+                if (this.isDetailCategory()) {
+                    if (!this.detailCategory.is_completed_task) {
+                        this.complete_task_list = []
+                    }
+                }
             }, 400),
             showTaskDetail (task) {
                 this.$eventHub.$emit('showTaskDetail', task)
@@ -120,13 +136,16 @@
             },
             filterTaskList (val) {
                 // FilterBtnから渡ってきた値で検索結果を絞る
+                console.log('filterTaskList', val)
+                this.$eventHub.$emit('changeIsCompletedTask', val.isCompletedTask)
                 const queryParams = {
                     categoryId: this.detailCategory.id
                 }
                 const filterValueList = [
                     'selectedPriority',
                     'selectedDeadline',
-                    'selectedLabelList'
+                    'selectedLabelList',
+                    'isCompletedTask',
                 ]
                 for (const i in val) {
                     if (filterValueList.includes(i)) {
@@ -139,7 +158,6 @@
                         }
                     }
                 }
-                console.log(queryParams)
                 this.$axios({
                     url: '/api/task/get_filter_task_list/',
                     method: 'GET',
@@ -150,6 +168,7 @@
                 .then(res => {
                     console.log(res)
                     this.updateTasks(res.data)
+                    this.updateCompleteTasks(res.data)
                 })
                 .catch(e => {
                     console.log(e)
@@ -163,7 +182,18 @@
                     console.log(e.target.parentNode.contains(e.target))
                     this.$eventHub.$emit('closeTaskDetail')
                 }
-            }
+            },
+            updateCompleteTasks (tasks) {
+                this.complete_task_list = []
+                for (const i in tasks) {
+                    if (tasks[i].completed) {
+                        this.complete_task_list.push(tasks[i])
+                    }
+                }
+            },
+            isDetailCategory () {
+                return this.$route.name === 'DetailCategory'
+            },
         },
     }
 </script>

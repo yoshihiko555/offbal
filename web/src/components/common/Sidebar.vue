@@ -137,6 +137,7 @@
                     }
                 })
                 this.$eventHub.$emit('initCreateTaskField')
+                this.$eventHub.$emit('initSort')
             },
             createLabel () {
                 this.$refs.label.open()

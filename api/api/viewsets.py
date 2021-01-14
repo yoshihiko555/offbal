@@ -298,7 +298,7 @@ class TaskViewSet(BaseModelViewSet):
             complete_task = request.data['complete_task']
             try:
                 task = Task.objects.get(pk=complete_task['id'])
-                task.completed = True
+                task.completed = True if task.completed == False else False
                 task.completed_at = timezone.datetime.now()
                 task.save()
             except Task.DoesNotExist:
@@ -555,6 +555,19 @@ class TaskViewSet(BaseModelViewSet):
             selectedLabelList str(ラベルID) ※複数選択の場合,カンマ区切り
             isCompleteTask str(true or false)
             taskList str(タスクID) ※複数選択の場合,カンマ区切り
+
+
+            ● params
+                key:
+                    param名
+                value:
+                    isMultiple - 複数のデータか
+
+            ● filterRelatedName
+                key:
+                    paramsのkey
+                value:
+                    filterで使うquery
         """
 
         params = {
@@ -562,6 +575,7 @@ class TaskViewSet(BaseModelViewSet):
             'selectedPriority': True,
             'selectedDeadline': False,
             'selectedLabelList': True,
+            'isCompletedTask': False,
         }
 
         filterRelatedName = {
@@ -569,6 +583,7 @@ class TaskViewSet(BaseModelViewSet):
             'selectedPriority': 'priority__in',
             'selectedDeadline': 'deadline',
             'selectedLabelList': 'label__id__in',
+            'isCompletedTask': 'completed',
         }
 
         try:
@@ -579,16 +594,19 @@ class TaskViewSet(BaseModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         if request.query_params.get('searchText') != None:
-            taskList = self.task_filter(taskList, request.query_params['searchText'])
+            taskList = self.task_filter(taskList, request.query_params['searchText'], True)
 
         elif request.query_params.get('categoryId') != None:
             taskList = taskList.filter(
-                Q(target_category__id=request.query_params['categoryId']) & \
-                Q(completed=False)
+                Q(target_category__id=request.query_params['categoryId'])
             )
 
+        query_params = self.castIsCompletedTask(request.query_params)
+
+        logger.debug(query_params)
+
         for key, isMultiple in params.items():
-            value = request.query_params.get(key)
+            value = query_params[key] if key in query_params else None
             if value != None:
                 if isMultiple:
                     value = list(map(int, value.split(',')))
@@ -634,7 +652,20 @@ class TaskViewSet(BaseModelViewSet):
 
         return deadLineParams[param][0], deadLineParams[param][1]
 
-    def task_filter(self, tasks, value):
+    def castIsCompletedTask(self, params):
+
+        param = 'isCompletedTask'
+        paramsDict = dict(params)
+
+        if param in paramsDict:
+            if paramsDict[param][0] == 'true':
+                del paramsDict[param]
+            else:
+                paramsDict[param] = False
+        return paramsDict
+
+
+    def task_filter(self, tasks, value, isAll):
         """
         検索文字列でタスク絞る
         """
@@ -650,7 +681,10 @@ class TaskViewSet(BaseModelViewSet):
         query_str = '&'.join(t_list) + '|'
         query_str += '|'.join(l_list) + '|'
         query_str += '|'.join(s_list)
-        res = tasks.filter(eval(query_str), completed=False).distinct()
+        if isAll:
+            res = tasks.filter(eval(query_str)).distinct()
+        else:
+            res = tasks.filter(eval(query_str), completed=False).distinct()
         return res
 
 class SubTaskViewSet(BaseModelViewSet):

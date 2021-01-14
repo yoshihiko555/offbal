@@ -10,7 +10,10 @@ import {
 	deleteEachRouteTaskData,
 	updateEachRouteTask,
 	updateEachRouteTaskLabel,
-	deleteEachRouteTaskLabels
+	deleteEachRouteTaskLabels,
+	updateIsCompletedTaskStatus,
+	updateCompleteTask,
+	updateSortedTaskList
 } from '@/store/utils'
 
 import setting from './setting'
@@ -95,9 +98,13 @@ export default new Vuex.Store({
 				if (index !== -1) state.detailCategory.tasks = state.detailCategory.tasks.filter((_, i) => i !== index)
 			}
 	    },
+		updateCompleteStatus (state, payload) {
+			updateCompleteTask(state, payload)
+		},
 		deleteTasks (state, payload) {
 			deleteEachRouteTaskData(state, payload)
 			const task = payload.task
+			if (state.detailCategory.is_completed_task) return
 			if (state.detailCategory.tasks !== undefined) {
 				for (const i in task) {
 					const index = state.detailCategory.tasks.findIndex(target => target.id === task[i].id)
@@ -215,6 +222,16 @@ export default new Vuex.Store({
 		setSearchResult (state, payload) {
 			state.searchResult = payload
 			console.log('setSearchResult', state.searchResult)
+		},
+		setSearchResultTasks (state, payload) {
+			state.searchResult.tasks = payload
+			console.log('setSearchResult', state.searchResult)
+		},
+		updateIsCompletedTask (state, payload) {
+			updateIsCompletedTaskStatus(state, payload)
+		},
+		updateSortedTasks (state, payload) {
+			updateSortedTaskList(state, payload)
 		},
 	},
 	actions: {
@@ -391,7 +408,7 @@ export default new Vuex.Store({
 					task: res.data,
 					route: kwargs.route
 				}
-				this.commit('deleteTask', data)
+				this.commit('updateCompleteStatus', data)
 				this.commit('addCompleteTask', res.data)
 			})
 			.catch(e => {
@@ -524,12 +541,12 @@ export default new Vuex.Store({
 					url: '/api/task/get_filter_task_list/',
 					method: 'GET',
 					params: {
-	                	...kwargs
+	                	...kwargs,
 	                }
 				})
 				.then(res => {
 					console.log('フィルター掛けた検索結果', res)
-					this.commit('setSearchResult', res.data)
+					this.commit('setSearchResultTasks', res.data)
 					resolve(res)
 				})
 				.catch(e => {

@@ -54,12 +54,14 @@ export default new Vuex.Store({
 			updateEachRouteTaskLabel(state, payload)
 			// タスクのラベルを更新
 			if (state.detailCategory.tasks === undefined) return
-			const task = state.detailCategory.tasks.find(task => task.id === payload.id)
+			const id = (payload.id !== undefined) ? payload.id : payload.task.id
+			const task = state.detailCategory.tasks.find(task => task.id === id)
 
 			if (task === undefined) return
 			task.label = []
-			for (const i in payload.label) {
-				task.label.push(payload.label[i])
+			const label = (payload.label !== undefined) ? payload.label : payload.task.label
+			for (const i in label) {
+				task.label.push(label[i])
 			}
 		},
 		updateLabel (state, payload) {

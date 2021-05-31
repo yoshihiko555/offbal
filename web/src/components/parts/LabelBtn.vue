@@ -238,7 +238,7 @@
         },
         methods: {
             ...mapActions([
-                'addLabelsAction',
+                'addLabelAction',
             ]),
             confirmCreateLabelContent () {
                 this.createLabelBtn()
@@ -260,7 +260,7 @@
                 })
                 .then(res => {
                 	console.log(res)
-                    this.addLabelsAction(res.data)
+                    this.addLabelAction(res.data)
                     this.init()
                 })
                 .catch(e => {
@@ -284,19 +284,14 @@
                 const length = this.labelData.name.length
                 if (length === 0 || length > 20) return
                 this.isLoadingUpdateLabel = true
-                this.$axios({
-                    url: '/api/label/',
-                    method: 'POST',
-                    data: {
-                        name: this.labelData.name,
-                    }
+
+                this.addLabelAction({
+                    name: this.labelData.name
                 })
                 .then(res => {
-                    this.selectedLabelList.push(res.data.id)
-                    this.addLabelsAction(res.data)
-                    this.isCreateNewLabel = false
                     this.isLoadingUpdateLabel = false
                     this.init()
+                    this.selectedLabelList.push(res.data.id)
                 })
                 .catch(e => {
                     console.log(e)

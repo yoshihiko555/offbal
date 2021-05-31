@@ -66,7 +66,7 @@
         }),
         methods: {
             ...mapActions([
-                'addLabelsAction',
+                'addLabelAction',
             ]),
             open () {
             	this.init()
@@ -84,7 +84,7 @@
                 })
                 .then(res => {
                 	console.log(res)
-                    this.addLabelsAction(res.data)
+                    this.addLabelAction(res.data)
                     this.close()
                 })
                 .catch(e => {

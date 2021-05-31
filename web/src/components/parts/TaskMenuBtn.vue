@@ -130,7 +130,7 @@
                     console.log(res)
                     this.addTask(res.data)
                     if (!this.isDetailCategory()) {
-                        addTaskEachRoute({
+                        this.addTaskEachRoute({
                             task: res.data,
                             route: this.$route.name
                         })
@@ -210,9 +210,6 @@
                 })
                 this.init()
             },
-            isDetailCategory () {
-                return this.$route.name === 'DetailCategory'
-            }
         }
     }
 </script>

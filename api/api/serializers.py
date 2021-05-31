@@ -347,7 +347,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
 
         try:
             user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
-            category = Category.objects.get(id=category_id) if category_id != 0 else Category.objects.get(name='インボックス', creator=user)
+            category = Category.objects.get(id=category_id) if category_id != 0 else Category.objects.filter(creator=user, is_active=True).order_by('index').first()
 
         except mUser.DoesNotExist:
             logger.error('mUserが見つかりませんでした。')
@@ -391,7 +391,7 @@ class TaskSerializer(DynamicFieldsModelSerializer):
 
         try:
             user = mUser.objects.get(auth0_id=validated_data['auth0_id'])
-            category = Category.objects.get(id=category_id) if category_id != 0 else Category.objects.get(name='インボックス', creator=user)
+            category = Category.objects.get(id=category_id) if category_id != 0 else Category.objects.filter(creator=user, is_active=True).order_by('index').first()
 
             instance.target_category = category
 
